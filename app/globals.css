@@ -10,6 +10,7 @@
 .layout {
     display: grid;
     grid-template-columns: 1.8fr 10fr;
+    padding: 0 10px;
 }
 
 .sidebar {
@@ -34,6 +35,7 @@
 @media screen and (max-width: 1280px) {
     .layout {
         grid-template-columns: 12fr;
+        padding:0 10px;
     }
 
     .sidebar {

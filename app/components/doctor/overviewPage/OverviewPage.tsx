@@ -8,9 +8,9 @@ const OverviewPage = () => {
     <Layout>
       <Header />
       <div className='mt-8'>
-        <div className='flex justify-between w-[80%]'>
+        <div className='flex gap-5 justify-between w-[100%] xl:w-[80%] pr-5'>
           <div className='flex justify-between h-24 px-5 items-center border border-gray-300 w-[400px] rounded-md'>
-            <div className='flex gap-5 items-center px-2'>
+            <div className='flex gap-5 items-center'>
               <div className='flex justify-center items-center rounded-full w-14 h-14 bg-gray-300'>
                 <Image src={appointmentBlue} alt='apps icon' />
               </div>
@@ -36,6 +36,7 @@ const OverviewPage = () => {
             </div>
             <p className='text-gray-700 text-2xl pr-2'>50</p>
           </div>
+
         </div>
       </div>
     </Layout>
