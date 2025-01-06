@@ -1,27 +1,44 @@
-// contexts/RoleContext.js
-"use client"
-import React, { createContext, useContext, useState, useEffect } from 'react';
+"use client";
+import React, { createContext, useContext, useState, useEffect } from "react";
 
 const RoleContext = createContext();
 
-export const useRole = () => useContext(RoleContext);
+// Custom hook to access the RoleContext
+export const useRole = () => {
+  const context = useContext(RoleContext);
+  if (!context) {
+    throw new Error("useRole must be used within a RoleProvider");
+  }
+  return context;
+};
 
+// Provider Component
 export const RoleProvider = ({ children }) => {
-  const [role, setRole] = useState(null);
+  const [role, setRole] = useState(null); // Default state
 
+  // Initialize role from localStorage
   useEffect(() => {
-    // Check localStorage for the stored role on initial load
-    const storedRole = localStorage.getItem('role');
-    if (storedRole) {
-      setRole(storedRole); // Set role from localStorage if available
+    try {
+      const storedRole = localStorage.getItem("role");
+      if (storedRole) {
+        setRole(storedRole);
+      }
+    } catch (error) {
+      console.error("Failed to read role from localStorage:", error);
     }
   }, []);
 
-  const setUserRole = (role) => {
-    setRole(role);
-    localStorage.setItem('role', role); // Persist role in localStorage
+  // Function to set role and persist it
+  const setUserRole = (newRole) => {
+    try {
+      setRole(newRole);
+      localStorage.setItem("role", newRole); // Persist role
+    } catch (error) {
+      console.error("Failed to save role to localStorage:", error);
+    }
   };
 
+  // Context value
   const value = {
     role,
     setRole: setUserRole,
