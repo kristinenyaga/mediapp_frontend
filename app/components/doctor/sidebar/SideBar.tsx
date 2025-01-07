@@ -31,25 +31,25 @@ const SideBar: React.FC<SideBarProps> = ({ showSideBar, setShowSideBar }) => {
         </div>
         <div>
           <ul className='menu'>
-            <li className={`menu-item ${pathname === '/overview' ? 'active' : ''}`} >
+            <li className={`menu-item ${pathname === '/doctor/overview' ? 'active' : ''}`} >
               <Image src={patient} width={22} height={22} className='menu-icon' alt='apps icon' />
-              <Link href="/overview" className='menu-text'>Overview</Link>
+              <Link href="/doctor/overview" className='menu-text'>Overview</Link>
             </li>
-            <li className={`menu-item ${pathname === '/appointments' ? 'active' : ''}`} >
+            <li className={`menu-item ${pathname === '/doctor/appointments' ? 'active' : ''}`} >
               <Image src={patient} width={22} height={22} className='menu-icon' alt='wifi icon' />
-              <Link href="/appointments" className='menu-text'>Appointments</Link>
+              <Link href="/doctor/appointments" className='menu-text'>Appointments</Link>
             </li>
-            <li className={`menu-item ${pathname === '/patients' ? 'active' : ''}`} >
+            <li className={`menu-item ${pathname === '/doctor/patients' ? 'active' : ''}`} >
               <Image src={patient} width={22} height={22} className='menu-icon' alt='bell icon' />
-              <Link href="/patients" className='menu-text'>Patients</Link>
+              <Link href="/doctor/patients" className='menu-text'>Patients</Link>
             </li>
-            <li className={`menu-item ${pathname === '/diagnosis' ? 'active' : ''}`} >
+            <li className={`menu-item ${pathname === '/doctor/diagnosis' ? 'active' : ''}`} >
               <Image src={patient} width={22} height={22} className='menu-icon' alt='document icon' />
-              <Link href="/diagnosis" className='menu-text'>Diagnosis</Link>
+              <Link href="/doctor/diagnosis" className='menu-text'>Diagnosis</Link>
             </li>
-            <li className={`menu-item ${pathname === '/reports' ? 'active' : ''}`} >
+            <li className={`menu-item ${pathname === '/doctor/reports' ? 'active' : ''}`} >
               <Image src={patient} width={22} height={22} className='menu-icon' alt='user icon' />
-              <Link href="/reports" className='menu-text'>Reports</Link>
+              <Link href="/doctor/reports" className='menu-text'>Reports</Link>
             </li>
           </ul>
         </div>

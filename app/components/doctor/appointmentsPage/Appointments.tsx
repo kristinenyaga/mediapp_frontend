@@ -1,6 +1,6 @@
 "use client"
 import React from 'react';
-import Layout from '../../layout';
+import DoctorLayout from '../doctorLayout';
 import { HiOutlineArrowLongRight } from "react-icons/hi2";
 import EnhancedTable from './TableContainer';
 
@@ -29,14 +29,14 @@ const Appointments = () => {
   };
 
   return (
-    <Layout>
+    <DoctorLayout>
       <div className='px-5'>
         <div className='flex  justify-between items-center xl:w-[90%]' >
           <div className='flex items-center gap-5 mt-3'>
             <p className='font-medium text-[20px]'>Today&apos;s Appointments</p>
             <p className='bg-blue-100 text-blue-300 p-3 w-[150px] text-center rounded-md text-sm'>{getCurrentDate()}</p>
           </div>
-          <p className='text-blue-300 cursor-pointer hover:underline underline-offset-4 mt-5 flex gap-3 items-center'>All Appointments <HiOutlineArrowLongRight className='text-blue-300 text-2xl'/></p>
+          <p className='text-blue-300 cursor-pointer hover:underline underline-offset-4 mt-5 flex gap-3 items-center'>All Appointments <HiOutlineArrowLongRight className='text-blue-300 text-2xl' /></p>
         </div>
         <div className='mt-5 mb-5'>
           <input
@@ -47,7 +47,7 @@ const Appointments = () => {
         </div>
         <EnhancedTable />
       </div>
-    </Layout>
+    </DoctorLayout>
   );
 };
 

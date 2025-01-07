@@ -1,11 +1,11 @@
 import React from 'react'
-import Layout from '../../layout'
+import DoctorLayout from '../doctorLayout'
 
 const Reports = () => {
   return (
-    <Layout>
+    <DoctorLayout>
       <div>Reports</div>
-    </Layout>
+    </DoctorLayout>
   )
 }
 

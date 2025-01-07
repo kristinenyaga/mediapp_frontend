@@ -42,11 +42,14 @@ const SignIn = () => {
           password: initialValues.password,
         });
 
-        console.log(response)
+        console.log(response.data)
         // Handle success
         if (response.status === 200) {
-          Notify.success("Login successful!");
+          Notify.success("Credentials verified!");
           router.push('/otp')
+          // Store the JWT token in sessionStorage
+          const { accessToken } = response.data;
+          sessionStorage.setItem('access_token', accessToken); 
         } else {
           Notify.failure(response.data.message || "Login failed");
         }

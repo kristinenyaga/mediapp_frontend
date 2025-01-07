@@ -1,24 +1,28 @@
 "use client";
-import React, { useRef } from "react";
+
+import React, { useRef, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import { Notify } from "notiflix";
-import * as Yup from 'yup'
+import * as Yup from "yup";
 import axios, { AxiosError } from "axios";
+import { useAuth } from "@/app/context/authContext";
+
 const Otp = () => {
-  const inputRefs = useRef([])
-  type ErrorResponse = {
-    error: string;
-  };
+  const inputRefs = useRef([]);
+  const router = useRouter();
+  const { user } = useAuth();
+  const [isLoading, setIsLoading] = useState(true);
+
+
+
   const formik = useFormik({
     initialValues: {
-      otp:new Array(6).fill("")
+      otp: new Array(6).fill(""),
     },
     validationSchema: Yup.object({
       otp: Yup.array()
-        .of(
-          Yup.string()
-            .required("Required")
-        )
+        .of(Yup.string().required("Required"))
         .required("OTP is required"),
     }),
     onSubmit: async (values) => {
@@ -26,22 +30,19 @@ const Otp = () => {
       console.log("Entered OTP:", otpCode);
 
       try {
-        // Send OTP to the server for verification
         const response = await axios.post("http://localhost:5000/api/patient/verifyotp", {
           code: otpCode,
         });
 
-        // Handle successful response
         if (response.status === 200) {
           Notify.success("OTP Verified successfully!");
-          // Redirect or perform additional actions here
+          router.push("/patient/home");
         } else {
           Notify.failure(response.data.message || "Login failed");
         }
       } catch (error) {
-        // Handle Axios errors specifically
         if (axios.isAxiosError(error)) {
-          const axiosError = error as AxiosError<ErrorResponse>;
+          const axiosError = error as AxiosError;
           if (axiosError.response && axiosError.response.data) {
             console.error("Error:", axiosError.response.data.error);
             Notify.failure(axiosError.response.data.error);
@@ -50,27 +51,43 @@ const Otp = () => {
             Notify.failure("Something went wrong. Please try again.");
           }
         } else {
-          // Handle non-Axios errors (unexpected errors)
           console.error("Unexpected error:", error);
           Notify.failure("Something went wrong. Please try again.");
         }
       }
-    }
+    },
+  });
 
-  })
+
   const handleInputChange = (index, value) => {
     if (/^[a-zA-Z0-9]$/.test(value) || value === "") {
       const newOtp = [...formik.values.otp];
       newOtp[index] = value;
       formik.setFieldValue("otp", newOtp);
 
-      // Automatically focus the next field
       if (value !== "" && index < 5) {
         inputRefs.current[index + 1]?.focus();
       }
     }
   };
 
+  const handleResendOTP = async () => {
+    try {
+      const response = await axios.post("http://localhost:5000/api/patient/resendotp", {
+        email: user.email,
+      }, {
+        withCredentials: true,
+      });
+
+      if (response.status === 200) {
+        Notify.success("OTP resent successfully!");
+      } else {
+        Notify.failure("Failed to resend OTP. Please try again.");
+      }
+    } catch (error) {
+      Notify.failure("Failed to resend OTP. Please try again.");
+    }
+  };
 
   return (
     <div className="flex flex-col items-center space-y-32 mt-36 gap-y-8">
@@ -78,7 +95,7 @@ const Otp = () => {
         <p className="text-2xl font-medium mb-5">Two-Factor Authentication</p>
         <div className="text-[14px] font-normal mb-6 text-gray-700">
           <span>We&apos;ve sent a 6-digit code to </span>
-          <span className="font-medium text-blue-300">johndoe@gmail.com</span>.
+          <span className="font-medium text-blue-300">{user?.email}</span>.
           <div className="mt-3 text-center">Please enter the code below.</div>
         </div>
         <form onSubmit={formik.handleSubmit}>
@@ -88,7 +105,6 @@ const Otp = () => {
                 key={index}
                 id={`otp-input-${index}`}
                 type="text"
-                maxLength="1"
                 className="w-12 h-12 border-gray-400 rounded-lg border text-center"
                 value={value}
                 onChange={(e) => handleInputChange(index, e.target.value)}
@@ -106,8 +122,11 @@ const Otp = () => {
             Continue
           </button>
         </form>
-        <p className="text-xs font-medium hover:underline underline-offset-4 text-center cursor-pointer">
-          Resend code
+        <p
+          className={`text-xs font-medium hover:underline underline-offset-4 text-center cursor-pointer text-blue-300`}
+          onClick={handleResendOTP}
+        >
+          Resend Code
         </p>
       </div>
     </div>
