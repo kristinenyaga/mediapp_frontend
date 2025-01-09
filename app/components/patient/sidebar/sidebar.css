@@ -26,12 +26,14 @@
     padding: .7rem 0.5rem;
     margin-bottom: 1rem;
     border-radius: 8px;
+    margin-left: 1rem;
+    margin-right: 1rem;
     cursor: pointer;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .menu-item:hover {
-    background-color: rgba(0, 119, 182, 0.1);
+    background-color: rgba(38, 140, 255, 0.15);
 }
 
 .menu-icon {
@@ -42,29 +44,23 @@
 
 .menu-text {
     margin-left: 1rem;
-    font-size: 16px;
-    font-weight: 500;
-    color: #363d3a;
+    font-size: 14px;
+    font-weight: 400;
+    color: #050315;
 }
 
+
 .menu-item.active {
-    background-color: rgba(0, 150, 199, 0.1);
+    background-color: rgba(38, 140, 255, 0.15); 
 }
 
 .menu-item.active .menu-text {
-    color: #0077b6;
+    color: #2563eb; 
 }
 
-.menu-item.active .menu-icon {
-    color: #0077b6;
-}
 
 /* Footer Section */
-.footer_menu {
-    margin-top: auto;
-    padding-top: 1rem;
-    border-top: 1px solid #dfe1e0;
-}
+
 
 /* Media Queries */
 @media (max-width: 1280px) {

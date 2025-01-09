@@ -13,7 +13,7 @@ const HomePage = () => {
             </p>
             <p className="text-sm text-gray-500">Here’s your current status and updates</p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 mr-10">
             <div className="w-12 h-12 rounded-full bg-gray-300 flex justify-center items-center text-white text-lg font-bold">
               K
             </div>
