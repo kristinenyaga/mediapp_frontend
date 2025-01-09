@@ -39,9 +39,9 @@ const HomePage = () => {
           {/* Next Appointment */}
           <div>
             <p className="text-blue-600 text-[18px] font-medium">Upcoming Appointment</p>
-            <div className="bg-white shadow-sm rounded-lg py-4 px-2">
+            <div className=" shadow-sm rounded-lg py-4 px-2 bg-white">
               <div className="mt-2 flex flex-col gap-2">
-                <p className="text-gray-900 font-medium">Date: <span className="text-blue-600">20th Jan 2025</span></p>
+                <p className="text-gray-700">Date: <span className="">20th Jan 2025</span></p>
                 <p className="text-gray-700">Time: 10:30 AM</p>
                 <p className="text-gray-700">Room: 305</p>
               </div>
