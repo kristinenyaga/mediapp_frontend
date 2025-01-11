@@ -9,11 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@emotion/react": "^11.13.5",
+    "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.13.5",
     "@mui/icons-material": "^6.1.8",
     "@mui/material": "^6.1.8",
     "@reduxjs/toolkit": "^2.3.0",
+    "@table-library/react-table-library": "^4.1.7",
     "axios": "^1.7.9",
     "chart.js": "^4.4.6",
     "formik": "^2.4.6",

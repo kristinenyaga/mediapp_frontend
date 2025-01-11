@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import './sidebar.css';
-import { appointmentbook, appointments, calendar, home, logo, logout, notifications, patient, profile } from '@/public/constants/images';
+import { appointmentbook, calendar, home, logo, logout, notifications, patient, profile } from '@/public/constants/images';
 
 interface SideBarProps {
   showSideBar: boolean;

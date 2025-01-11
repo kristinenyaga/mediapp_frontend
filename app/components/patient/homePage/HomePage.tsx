@@ -8,8 +8,8 @@ const HomePage = () => {
         {/* Header */}
         <div className="flex justify-between items-center border-b pb-4">
           <div>
-            <p className="text-xl font-medium text-gray-900">
-              Welcome Back, <span className="text-blue-600">Kristine</span>
+            <p className="text-[18px] font-medium">
+              Welcome Back, <span className="">Kristine</span>
             </p>
             <p className="text-sm text-gray-500">Here’s your current status and updates</p>
           </div>
