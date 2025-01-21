@@ -16,11 +16,11 @@ export default function RootLayout({
     <html lang="en">
       <body
       >
-        <AuthProvider>
-          <RoleProvider>
+        <RoleProvider>
+          <AuthProvider>
             {children}
-          </RoleProvider>
-        </AuthProvider>
+          </AuthProvider>
+        </RoleProvider>
       </body>
     </html>
   );

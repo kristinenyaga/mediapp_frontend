@@ -77,7 +77,6 @@ const Profile = () => {
 
     }
     try {
-      console.log(payload)
       const response = await axios.patch(`http://localhost:5000/api/patient/${profileDetails?.id}`, payload, {
         headers: { Authorization: `Bearer ${sessionStorage.getItem('access_token')}` }
       });
@@ -222,41 +221,6 @@ const Profile = () => {
           </div>
         </section>
 
-        {/* Notifications and Preferences Section */}
-        {/* <section className="mb-4 mt-10">
-          <div className="flex items-center gap-5">
-            <h3 className="text-base font-medium text-black mb-5">Notifications & Preferences</h3>
-            <button className="mb-5 text-gray-600 hover:text-blue-300 hover:border-blue-200 cursor-pointer text-sm border border-gray-300 p-2 py-1 rounded-lg"
-              onClick={() => handleOpen(
-                'Notifications & Preferences',
-                [
-                  { name: 'appointmentReminders', label: 'Appointment Reminders', type: 'select', options: [{ value: 'enabled', label: 'Enabled' }, { value: 'disabled', label: 'Disabled' }] },
-                  { name: 'emailNotifications', label: 'Email Notifications', type: 'select', options: [{ value: 'enabled', label: 'Enabled' }, { value: 'disabled', label: 'Disabled' }] },
-                  { name: 'smsNotifications', label: 'SMS Notifications', type: 'select', options: [{ value: 'enabled', label: 'Enabled' }, { value: 'disabled', label: 'Disabled' }] },
-                ],
-                {
-                  appointmentReminders: 'enabled',
-                  emailNotifications: 'enabled',
-                  smsNotifications: 'enabled',
-                }
-              )}
-            >update</button>
-          </div>
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <label className="block text-gray-800">Appointment Reminders</label>
-              <div className=" border border-gray-200 p-2 rounded mt-2 bg-brand-100 text-gray-500">Enabled</div>
-            </div>
-            <div>
-              <label className="block text-gray-800">Email Notifications</label>
-              <div className=" border border-gray-200 p-2 rounded mt-2 bg-brand-100 text-gray-500">Enabled</div>
-            </div>
-            <div>
-              <label className="block text-gray-800">SMS Notifications</label>
-              <div className=" border border-gray-200 p-2 rounded mt-2 bg-brand-100 text-gray-500">Disabled</div>
-            </div>
-          </div>
-        </section> */}
         <UpdateModal
           open={open}
           handleClose={handleClose}

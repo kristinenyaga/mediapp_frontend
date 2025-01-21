@@ -30,7 +30,7 @@ const SignIn = () => {
         .email("invalid email address")
         .required("Email is required"),
       password: Yup.string()
-        .min(6, "Password must be greater than 6 characters")
+        .min(4, "Password must be greater than 4 characters")
         .required("Password is required")
     }),
     onSubmit: async (initialValues) => {

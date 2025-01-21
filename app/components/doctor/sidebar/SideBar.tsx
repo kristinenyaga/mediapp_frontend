@@ -82,12 +82,6 @@ const SideBar: React.FC<SideBarProps> = ({ showSideBar, setShowSideBar }) => {
                 Profile
               </Link>
             </li>
-            <li className={`menu-item mt-5 ${pathname === '/doctor/settings' ? 'active' : ''}`}>
-              <Image src={profile} width={22} height={22} className="menu-icon" alt="settings" />
-              <Link href="/doctor/settings" className="menu-text">
-                Settings
-              </Link>
-            </li>
             <li className={`menu-item`}>
               <Image src={logout} width={22} height={22} className="menu-icon" alt="Logout" />
               <p className="menu-text">
