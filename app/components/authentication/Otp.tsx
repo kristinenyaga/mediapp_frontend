@@ -7,14 +7,13 @@ import { Notify } from "notiflix";
 import * as Yup from "yup";
 import axios, { AxiosError } from "axios";
 import { useAuth } from "@/app/context/authContext";
-
+import { useRole } from "@/app/context/RoleContext";
 const Otp = () => {
   const inputRefs = useRef([]);
   const router = useRouter();
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
-
-
+  const { role } = useRole()
 
   const formik = useFormik({
     initialValues: {
@@ -36,7 +35,12 @@ const Otp = () => {
 
         if (response.status === 200) {
           Notify.success("OTP Verified successfully!");
-          router.push("/patient/home");
+          if (role === 'doctor') {
+            router.push('/doctor/overview')
+          } else {
+            router.push("/patient/home");
+
+          }
         } else {
           Notify.failure(response.data.message || "Login failed");
         }
@@ -93,8 +97,8 @@ const Otp = () => {
     <div className="flex flex-col items-center space-y-32 mt-36 gap-y-8">
       <div>
         <p className="text-2xl font-medium mb-5">Two-Factor Authentication</p>
-        <div className="text-[14px] font-normal mb-6 text-gray-700">
-          <span>We&apos;ve sent a 6-digit code to </span>
+        <div className="text-[14px] text-center font-normal mb-6 text-gray-700">
+          <span>We&apos;ve sent a 6-digit code to your email </span>
           <span className="font-medium text-blue-300">{user?.email}</span>.
           <div className="mt-3 text-center">Please enter the code below.</div>
         </div>
