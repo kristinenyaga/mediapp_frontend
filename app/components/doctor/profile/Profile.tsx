@@ -1,12 +1,21 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import DoctorLayout from "../doctorLayout";
+import axios from "axios";
+import UpdateModal from "./UpdateModal";
+import WorkingHoursModal from "./WorkingHoursModal";
+import { Notify } from "notiflix";
 
 const Profile = () => {
-  const [open, setOpen] = useState(false);
+  const [openHoursModal, setOpenHoursModal] = useState(false);
+  const [workingHours, setWorkingHours] = useState([]);
+  const [sameHours, setSameHours] = useState(false);
+  const [profileDetails, setProfileDetails] = useState(null);
   const [currentSection, setCurrentSection] = useState("");
   const [fields, setFields] = useState([]);
   const [initialValues, setInitialValues] = useState({});
+  const [open, setOpen] = useState(false);
+  const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
   const handleOpen = (section, fieldsData, initialValuesData) => {
     setCurrentSection(section);
@@ -14,17 +23,119 @@ const Profile = () => {
     setInitialValues(initialValuesData);
     setOpen(true);
   };
-
   const handleClose = () => setOpen(false);
+  const handleWorkingHoursClose = () => setOpenHoursModal(false);
 
-  const handleSubmit = (updatedValues) => {
-    console.log(`Updated ${currentSection}:`, updatedValues);
-    // TODO: Send the updated data to the backend
+const handleWorkingHourChange = (day, field, value) => {
+  const updatedHours = workingHours.map((hour) => {
+    if (hour.dayOfWeek === day) {
+      return {
+        ...hour,
+        [field]: value,
+      };
+    }
+    return hour;
+  });
+  setWorkingHours(updatedHours);
+};
+
+  const applySameHours = (start, end) => {
+    const updatedHours = daysOfWeek.map((day) => ({
+      day,
+      startTime: start,
+      endTime: end,
+    }));
+    setWorkingHours(updatedHours);
   };
+
+  // dedeplicate logic
+  const deduplicateWorkingHours = (hours) => {
+    const uniqueHours ={}
+    hours.forEach(hour =>{
+      uniqueHours[hour.dayOfWeek] = hour
+    })
+    return Object.values(uniqueHours)
+  }
+
+  const handleSaveWorkingHours = async () => {
+    console.log("Updated Working Hours:", workingHours);
+    const deduplicatedHours = (deduplicateWorkingHours(workingHours))
+    // try {
+    //   const response = await axios.post('http://localhost:5000/api/workingHours',deduplicatedHours,{
+    //     headers: { Authorization: `Bearer ${sessionStorage.getItem('access_token')}` },
+    //   });
+    //   console.log(response.data)
+    //   Notify.success('updated succesfully')
+      
+    // } catch (error) {
+    //   Notify.failure(error)
+    // }
+    setOpenHoursModal(false);
+
+  };
+
+  useEffect(() => {
+    const fetchProfileDetails = async () => {
+      const response = await axios.get('http://localhost:5000/api/doctor/profile', {
+        headers: { Authorization: `Bearer ${sessionStorage.getItem('access_token')}` },
+      });
+
+      setProfileDetails(response.data);
+      if (response.data.workinghours) {
+        setWorkingHours(response.data.workinghours);
+      }
+    };
+    fetchProfileDetails();
+  }, []);
+
+  const handleSubmit = async (updatedValues) => {
+    console.log(`Updated ${currentSection}:`, updatedValues);
+    let payload = {}
+    switch (currentSection) {
+      case "Personal Information":
+        payload = {
+          section: "Personal Information",
+          updatedValues: {
+            fullName: updatedValues?.fullName || profileDetails?.username,
+            email: updatedValues?.email || profileDetails?.email,
+            phone: updatedValues?.phone || profileDetails?.phone
+          }
+        };
+        break
+      case "Proffesional Information":
+        payload = {
+          section: "Proffesional Information",
+          updatedValues: {
+            specialization: updatedValues?.specialization || profileDetails?.specialization,
+            yearsOfExperience: updatedValues?.yearsOfExperience || profileDetails?.yearsOfExperience,
+            roomNumber: updatedValues?.roomNumber || profileDetails?.room_number
+          }
+        }
+        break
+
+    }
+    try {
+      const response = await axios.patch(`http://localhost:5000/api/doctor/update`, payload, {
+        headers: { Authorization: `Bearer ${sessionStorage.getItem('access_token')}` }
+      });
+      setProfileDetails((prev) => ({
+        ...prev,
+        ...response.data
+      }))
+      setOpen(false)
+      Notify.success('updated succesfully')
+
+    }
+    catch (error) {
+      Notify.failure(error)
+    }
+  };
+  if (!profileDetails) return <p>Loading...</p>;
+  console.log(workingHours)
 
   return (
     <DoctorLayout>
-      <div className="">
+      <div>
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <div>
@@ -39,7 +150,7 @@ const Profile = () => {
             <h3 className="text-base font-medium text-black">Personal Information</h3>
             <button
               className="text-gray-600 hover:text-blue-300 border border-gray-300 p-2 py-1 rounded-lg text-sm"
-              onClick={() =>
+              onClick={() => {
                 handleOpen(
                   "Personal Information",
                   [
@@ -47,9 +158,13 @@ const Profile = () => {
                     { name: "email", label: "Email", type: "email", required: true },
                     { name: "phone", label: "Phone", required: true },
                   ],
-                  { fullName: "Dr. Jane Doe", email: "janedoe@example.com", phone: "+254 712 345 678" }
+                  {
+                    fullName: profileDetails?.username || '',
+                    email: profileDetails?.email || '',
+                    phone: profileDetails?.phone || '',
+                  }
                 )
-              }
+              }}
             >
               Update
             </button>
@@ -57,15 +172,15 @@ const Profile = () => {
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
               <label className="block text-gray-800">Full Name</label>
-              <div className="border border-gray-300 p-2 rounded mt-2 text-gray-500">Dr. Jane Doe</div>
+              <div className="border border-gray-300 p-2 rounded mt-2 text-gray-500">{profileDetails?.username}</div>
             </div>
             <div>
               <label className="block text-gray-800">Email</label>
-              <div className="border border-gray-300 p-2 rounded mt-2 text-gray-500">janedoe@example.com</div>
+              <div className="border border-gray-300 p-2 rounded mt-2 text-gray-500">{profileDetails?.email}</div>
             </div>
             <div>
               <label className="block text-gray-800">Phone</label>
-              <div className="border border-gray-300 p-2 rounded mt-2 text-gray-500">+254 712 345 678</div>
+              <div className="border border-gray-300 p-2 rounded mt-2 text-gray-500">{profileDetails?.phone}</div>
             </div>
           </div>
         </section>
@@ -78,13 +193,18 @@ const Profile = () => {
               className="text-gray-600 hover:text-blue-300 border border-gray-300 p-2 py-1 rounded-lg text-sm"
               onClick={() =>
                 handleOpen(
-                  "Professional Information",
+                  "Proffesional Information",
                   [
-                    { name: "specialization", label: "Specialization", required: true },
-                    { name: "experience", label: "Years of Experience", type: "number", required: true },
-                    { name: "hospital", label: "Hospital Affiliation" },
+                    { name: "specialization", label: "Specialization" },
+                    { name: "yearsOfExperience", label: "Years Of Experience" },
+                    {name:"roomNumber",label:'Room Number'}
                   ],
-                  { specialization: "Cardiologist", experience: "10", hospital: "MediCare Hospital" }
+                  {
+                    specialization: profileDetails?.specialization || '',
+                    yearsOfExperience: profileDetails?.yearsOfExperience || '',
+                    roomNumber: profileDetails?.room_number || ''
+                  }
+
                 )
               }
             >
@@ -94,15 +214,15 @@ const Profile = () => {
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
               <label className="block text-gray-800">Specialization</label>
-              <div className="border border-gray-300 p-2 rounded mt-2 text-gray-500">Cardiologist</div>
+              <div className="border border-gray-300 p-2 rounded mt-2 text-gray-500">{profileDetails?.specialization || 'None'}</div>
             </div>
             <div>
               <label className="block text-gray-800">Years of Experience</label>
-              <div className="border border-gray-300 p-2 rounded mt-2 text-gray-500">10</div>
+              <div className="border border-gray-300 p-2 rounded mt-2 text-gray-500">{profileDetails?.yearsOfExperience || 'None'}</div>
             </div>
             <div>
-              <label className="block text-gray-800">Hospital Affiliation</label>
-              <div className="border border-gray-300 p-2 rounded mt-2 text-gray-500">MediCare Hospital</div>
+              <label className="block text-gray-800">Room Number</label>
+              <div className="border border-gray-300 p-2 rounded mt-2 text-gray-500">{profileDetails?.room_number || 'None'}</div>
             </div>
           </div>
         </section>
@@ -110,75 +230,43 @@ const Profile = () => {
         {/* Availability Section */}
         <section className="mb-8">
           <div className="flex items-center gap-5">
-            <h3 className="text-base font-medium text-black">Availability</h3>
+            <h3 className="text-base font-medium text-black">Working Hours</h3>
             <button
               className="text-gray-600 hover:text-blue-300 border border-gray-300 p-2 py-1 rounded-lg text-sm"
-              onClick={() =>
-                handleOpen(
-                  "Availability",
-                  [
-                    { name: "weekdays", label: "Weekdays" },
-                    { name: "weekends", label: "Weekends" },
-                  ],
-                  { weekdays: "9:00 AM - 4:00 PM", weekends: "10:00 AM - 2:00 PM" }
-                )
-              }
+              onClick={() => setOpenHoursModal(true)}
             >
               Update
             </button>
           </div>
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <label className="block text-gray-800">Weekdays</label>
-              <div className="border border-gray-300 p-2 rounded mt-2 text-gray-500">9:00 AM - 4:00 PM</div>
-            </div>
-            <div>
-              <label className="block text-gray-800">Weekends</label>
-              <div className="border border-gray-300 p-2 rounded mt-2 text-gray-500">10:00 AM - 2:00 PM</div>
-            </div>
+          <div className="grid grid-cols-2 gap-4 mt-4 text-sm">
+            {workingHours.map((hour, index) => (
+              <div key={hour.dayOfWeek} className="flex items-center gap-3">
+                <span className="w-24">{hour.dayOfWeek}</span>
+                <span className="text-gray-500">{hour.startTime || "N/A"} - {hour.endTime || "N/A"}</span>
+              </div>
+            ))}
           </div>
         </section>
+        <WorkingHoursModal
+          open={openHoursModal}
+          handleClose={handleWorkingHoursClose}
+          sameHours={sameHours}
+          setSameHours={setSameHours}
+          applySameHours={applySameHours}
+          handleSaveWorkingHours={handleSaveWorkingHours}
+          daysOfWeek={daysOfWeek}
+          workingHours={workingHours}
+          handleWorkingHourChange={handleWorkingHourChange}
+        />
 
-        {/* Notifications & Preferences */}
-        <section>
-          <div className="flex items-center gap-5">
-            <h3 className="text-base font-medium text-black">Notifications & Preferences</h3>
-            <button
-              className="text-gray-600 hover:text-blue-300 border border-gray-300 p-2 py-1 rounded-lg text-sm"
-              onClick={() =>
-                handleOpen(
-                  "Notifications & Preferences",
-                  [
-                    { name: "emailNotifications", label: "Email Notifications", type: "select", options: [{ value: "enabled", label: "Enabled" }, { value: "disabled", label: "Disabled" }] },
-                    { name: "smsNotifications", label: "SMS Notifications", type: "select", options: [{ value: "enabled", label: "Enabled" }, { value: "disabled", label: "Disabled" }] },
-                  ],
-                  { emailNotifications: "enabled", smsNotifications: "disabled" }
-                )
-              }
-            >
-              Update
-            </button>
-          </div>
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <label className="block text-gray-800">Email Notifications</label>
-              <div className="border border-gray-300 p-2 rounded mt-2 text-gray-500">Enabled</div>
-            </div>
-            <div>
-              <label className="block text-gray-800">SMS Notifications</label>
-              <div className="border border-gray-300 p-2 rounded mt-2 text-gray-500">Disabled</div>
-            </div>
-          </div>
-        </section>
-
-        {/* <UpdateModal
+        <UpdateModal
           open={open}
           handleClose={handleClose}
           section={currentSection}
           fields={fields}
           initialValues={initialValues}
           onSubmit={handleSubmit}
-        /> */}
+        />
       </div>
     </DoctorLayout>
   );
