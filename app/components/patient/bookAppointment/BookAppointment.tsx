@@ -4,6 +4,7 @@ import PatientLayout from '../patientLayout';
 import axios from 'axios';
 import { Notify } from 'notiflix';
 import { useRouter } from 'next/navigation';
+import DoctorCard from './DoctorCard';
 const BookAppointment = () => {
   const [selectedDoctor, setSelectedDoctor] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
@@ -99,13 +100,11 @@ const BookAppointment = () => {
   }, []);
 
 
-  // Fetch available timeslots
-
-  console.log(availableTimeslots)
   const handleSubmit = (e) => {
     e.preventDefault();
 
     const bookAppointment = async () => {
+      console.log('triggered')
       const response = await axios.post('http://localhost:5000/api/appointment/book', {
         date: selectedDate,
         selectedTime,
@@ -124,7 +123,6 @@ const BookAppointment = () => {
   return (
     <PatientLayout>
       <div className="bg-white">
-        {/* Header */}
         <div className="flex justify-between items-center border-b pb-6 mb-4">
           <div>
             <p className="text-2xl font-medium text-blue-600">Book Appointment</p>
@@ -133,105 +131,113 @@ const BookAppointment = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Ask if Doctor is Required */}
           <div className="bg-white rounded-lg mb-9">
             <label className="block text-gray-900 text-[16px]">Would you like to select a doctor?</label>
-            <div className="flex items-center mt-2">
-              <input
-                type="checkbox"
-                checked={isDoctorRequired}
-                onChange={() => setIsDoctorRequired(!isDoctorRequired)}
-                className="mr-2"
-              />
-              <span className="text-gray-600 text-sm">Yes, I want to select a doctor.</span>
-            </div>
-          </div>
-
-          {/* Select Date */}
-          <div className="bg-white rounded-lg">
-            <label className="block text-gray-900 text-base">Select Date:</label>
-            <select
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              className="w-full p-3 mt-2 border rounded-lg outline-none focus:outline-none"
-            >
-              <option value="">Choose a Date</option>
-              {dates.map((date, index) => (
-                <option key={index} value={date.toISOString().split('T')[0]}>
-                  {formatDate(date)}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Select Doctor (if required) */}
-          {isDoctorRequired && selectedDate && (
-            <div className="bg-white shadow-sm rounded-lg py-4">
-              <label className="block text-gray-900 text-base">Select Doctor:</label>
-              <select
-                value={selectedDoctor}
-                onChange={(e) => setSelectedDoctor(e.target.value)}
-                className="w-full p-3 mt-2 border rounded-lg outline-none focus:outline-none"
+            <div className="flex items-center mt-2 space-x-4">
+              <button
+                type="button"
+                onClick={() => setIsDoctorRequired(true)}
+                className={`py-2 px-4 rounded-lg ${isDoctorRequired ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
               >
-                <option value="">Choose a Doctor</option>
-                {doctors.map((doctor) => (
-                  <option key={doctor.id} value={doctor.id}>
-                    {doctor.username}
-                  </option>
-                ))}
-              </select>
+                Yes
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsDoctorRequired(false)}
+                className={`py-2 px-4 rounded-lg ${!isDoctorRequired ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
+              >
+                No
+              </button>
             </div>
-          )}
+          </div>
 
-          {/* Select Time */}
-          {selectedDate && (
-            <div className="bg-white shadow-sm rounded-lg py-4">
-              <label className="block text-gray-900 text-base">Select Time:</label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
-                <div className="w-full">
-                  <p className="text-gray-700 pl-1 text-sm font-medium">Morning Hours</p>
-                  <select
-                    value={selectedTime}
-                    onChange={(e) => setSelectedTime(e.target.value)}
-                    className="w-full p-3 mt-2 border rounded-lg"
-                  >
-                    <option value="">Select a Morning Slot</option>
-                    {availableTimeslots.morning.map((slot, index) => (
-                      <option key={index} value={`${slot.startTime}-${slot.endTime}`}>
-                        {slot.startTime} - {slot.endTime}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="w-full">
-                  <p className="text-gray-700 pl-1 text-sm font-medium">Afternoon Hours</p>
-                  <select
-                    value={selectedTime}
-                    onChange={(e) => setSelectedTime(e.target.value)}
-                    className="w-full p-3 mt-2 border rounded-lg"
-                  >
-                    <option value="">Select an Afternoon Slot</option>
-                    {availableTimeslots.afternoon.map((slot, index) => (
-                      <option key={index} value={`${slot.startTime}-${slot.endTime}`}>
-                        {slot.startTime} - {slot.endTime}
-                      </option>
-                    ))}
-                  </select>
+          {
+            isDoctorRequired ? (
+              <div className="bg-white shadow-sm rounded-lg py-4">
+                <label className="block text-black text-xl mb-5">Available Doctors</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {doctors.map((doctor) => (
+                    <DoctorCard
+                      key={doctor.id}
+                      doctor={doctor}
+                      onSelect={(id) => setSelectedDoctor(id)}
+                    />
+                  ))}
                 </div>
               </div>
-            </div>
-          )}
+            ) : (
+              <div>
+                {/* Date Selection */}
+                <div className="bg-white rounded-lg">
+                  <label className="block text-gray-900 text-base">Select Date:</label>
+                  <select
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                    className="w-full p-3 mt-2 border rounded-lg outline-none focus:outline-none"
+                  >
+                    <option value="">Choose a Date</option>
+                    {dates.map((date, index) => (
+                      <option key={index} value={date.toISOString().split('T')[0]}>
+                        {formatDate(date)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-          {/* Submit Button */}
-          <div className="flex justify-center">
-            <button
-              type="submit"
-              className="bg-blue-600 text-white py-3 px-6 rounded-lg shadow-md hover:bg-blue-700 transition duration-200"
-            >
-              Book Appointment
-            </button>
-          </div>
+                {/* Time Slot Selection */}
+                {selectedDate && (
+                  <div className="bg-white shadow-sm rounded-lg py-4">
+                    <label className="block text-gray-900 text-base">Select Time:</label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
+                      <div className="w-full">
+                        <p className="text-gray-700 pl-1 text-sm font-medium">Morning Hours</p>
+                        <select
+                          value={selectedTime}
+                          onChange={(e) => setSelectedTime(e.target.value)}
+                          className="w-full p-3 mt-2 border rounded-lg"
+                        >
+                          <option value="">Select a Morning Slot</option>
+                          {availableTimeslots.morning.map((slot, index) => (
+                            <option key={index} value={`${slot.startTime}-${slot.endTime}`}>
+                              {slot.startTime} - {slot.endTime}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="w-full">
+                        <p className="text-gray-700 pl-1 text-sm font-medium">Afternoon Hours</p>
+                        <select
+                          value={selectedTime}
+                          onChange={(e) => setSelectedTime(e.target.value)}
+                          className="w-full p-3 mt-2 border rounded-lg"
+                        >
+                          <option value="">Select an Afternoon Slot</option>
+                          {availableTimeslots.afternoon.map((slot, index) => (
+                            <option key={index} value={`${slot.startTime}-${slot.endTime}`}>
+                              {slot.startTime} - {slot.endTime}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  )}
+                  {
+                    selectedDate && selectedTime && (
+                      <div className="flex justify-center">
+                        <button
+                          type="submit"
+                          className="bg-blue-600 text-white py-3 px-6 rounded-lg shadow-md hover:bg-blue-700 transition duration-200"
+                        >
+                          Book Appointment
+                        </button>
+                      </div>
+                    )
+                  }
+              </div>
+            )
+          }
         </form>
       </div>
     </PatientLayout>
