@@ -8,11 +8,12 @@ import * as Yup from "yup";
 import axios, { AxiosError } from "axios";
 import { useAuth } from "@/app/context/authContext";
 import { useRole } from "@/app/context/RoleContext";
+import LoadingScreen from "../loader/Loader";
 const Otp = () => {
   const inputRefs = useRef([]);
   const router = useRouter();
   const { user } = useAuth();
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const { role } = useRole()
 
   const formik = useFormik({
@@ -25,15 +26,15 @@ const Otp = () => {
         .required("OTP is required"),
     }),
     onSubmit: async (values) => {
-      const otpCode = values.otp.join(""); // Join OTP array into a single string
-      console.log("Entered OTP:", otpCode);
-
+      const otpCode = values.otp.join(""); 
+      setIsLoading(true)
       try {
         const response = await axios.post("http://localhost:5000/api/patient/verifyotp", {
           code: otpCode,
         });
 
         if (response.status === 200) {
+          setIsLoading(false)
           Notify.success("OTP Verified successfully!");
           if (role === 'doctor') {
             router.push('/doctor/overview')
@@ -93,6 +94,7 @@ const Otp = () => {
     }
   };
 
+  if(isLoading) return <LoadingScreen />
   return (
     <div className="flex flex-col items-center space-y-32 mt-36 gap-y-8">
       <div>

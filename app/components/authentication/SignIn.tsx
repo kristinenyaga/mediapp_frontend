@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React,{useState} from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useFormik } from 'formik'
@@ -7,9 +7,11 @@ import axios from 'axios'
 import { Notify } from 'notiflix'
 import * as Yup from 'yup'
 import { useRole } from "@/app/context/RoleContext";
+import LoadingScreen from "@/app/components/loader/Loader";
 const SignIn = () => {
   const router = useRouter()
   const { role } = useRole()
+  const [loading,setLoading] = useState(false)
 
   const handleSignUp = () => {
     router.push('/sign-up')
@@ -36,6 +38,7 @@ const SignIn = () => {
     onSubmit: async (initialValues) => {
       try {
         // Make API call
+        setLoading(true)
         const url = role === 'patient' ? "http://localhost:5000/api/patient/login" :"http://localhost:5000/api/doctor/login"
         const response = await axios.post(url, {
           email: initialValues.email,
@@ -45,12 +48,14 @@ const SignIn = () => {
         console.log(response.data)
         // Handle success
         if (response.status === 200) {
-          Notify.success("Credentials verified!");
+          setLoading(false)
           router.push('/otp')
+          Notify.success("Credentials verified!");
           // Store the JWT token in sessionStorage
           const { accessToken } = response.data;
           sessionStorage.setItem('access_token', accessToken); 
         } else {
+          setLoading(false)
           Notify.failure(response.data.message || "Login failed");
         }
       } catch (error:any) {
@@ -73,6 +78,10 @@ const SignIn = () => {
       }
     }
   })
+
+  if (loading){
+    return <LoadingScreen />
+  }
 
   return (
     <>

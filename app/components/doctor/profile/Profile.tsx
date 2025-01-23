@@ -5,6 +5,7 @@ import axios from "axios";
 import UpdateModal from "./UpdateModal";
 import WorkingHoursModal from "./WorkingHoursModal";
 import { Notify } from "notiflix";
+import LoadingScreen from "../../loader/Loader";
 
 const Profile = () => {
   const [openHoursModal, setOpenHoursModal] = useState(false);
@@ -15,6 +16,7 @@ const Profile = () => {
   const [fields, setFields] = useState([]);
   const [initialValues, setInitialValues] = useState({});
   const [open, setOpen] = useState(false);
+  const [isloading,setIsLoading] = useState(false)
   const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
   const handleOpen = (section, fieldsData, initialValuesData) => {
@@ -60,21 +62,22 @@ const handleWorkingHourChange = (day, field, value) => {
   const handleSaveWorkingHours = async () => {
     console.log("Updated Working Hours:", workingHours);
     const deduplicatedHours = (deduplicateWorkingHours(workingHours))
-    // try {
-    //   const response = await axios.post('http://localhost:5000/api/workingHours',deduplicatedHours,{
-    //     headers: { Authorization: `Bearer ${sessionStorage.getItem('access_token')}` },
-    //   });
-    //   console.log(response.data)
-    //   Notify.success('updated succesfully')
+    try {
+      const response = await axios.post('http://localhost:5000/api/workingHours',deduplicatedHours,{
+        headers: { Authorization: `Bearer ${sessionStorage.getItem('access_token')}` },
+      });
+      console.log(response.data)
+      Notify.success('updated succesfully')
       
-    // } catch (error) {
-    //   Notify.failure(error)
-    // }
+    } catch (error) {
+      Notify.failure(error)
+    }
     setOpenHoursModal(false);
 
   };
 
   useEffect(() => {
+    setIsLoading(true)
     const fetchProfileDetails = async () => {
       const response = await axios.get('http://localhost:5000/api/doctor/profile', {
         headers: { Authorization: `Bearer ${sessionStorage.getItem('access_token')}` },
@@ -84,6 +87,7 @@ const handleWorkingHourChange = (day, field, value) => {
       if (response.data.workinghours) {
         setWorkingHours(response.data.workinghours);
       }
+      setIsLoading(false)
     };
     fetchProfileDetails();
   }, []);
@@ -130,9 +134,7 @@ const handleWorkingHourChange = (day, field, value) => {
       Notify.failure(error)
     }
   };
-  if (!profileDetails) return <p>Loading...</p>;
-  console.log(workingHours)
-
+  if(isloading) return <LoadingScreen />
   return (
     <DoctorLayout>
       <div>

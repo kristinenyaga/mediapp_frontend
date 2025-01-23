@@ -1,6 +1,7 @@
 'use client'
 import React, { useState,useEffect } from 'react'
 import DoctorLayout from '../doctorLayout'
+import axios from 'axios'
 import UnfoldMoreOutlinedIcon from "@mui/icons-material/UnfoldMoreOutlined";
 import KeyboardArrowUpOutlinedIcon from "@mui/icons-material/KeyboardArrowUpOutlined";
 import KeyboardArrowDownOutlinedIcon from "@mui/icons-material/KeyboardArrowDownOutlined";
@@ -25,16 +26,17 @@ import {
 import { useTheme } from '@table-library/react-table-library/theme';
 import { getTheme } from '@table-library/react-table-library/baseline';
 import { usePagination } from '@table-library/react-table-library/pagination';
-import { nodes } from './data';
 import DiagnosisModal from './diagnosisModal';
+import LoadingScreen from '../../loader/Loader';
 
 const key = 'Composed Table';
 const Appointments = () => {
   const [search, setSearch] = useState('');
-  const [data, setData] = useState({ nodes });
+  const [data, setData] = useState({ nodes:[] });
   const [statusFilter, setStatusFilter] = useState('')
   const [open, setOpen] = useState(false);
-
+  const [loading, setIsLoading] = useState(false)
+  
   const handleOpen = () => {
     setOpen(true);
   };
@@ -44,7 +46,7 @@ const Appointments = () => {
   const pagination = usePagination(data, {
     state: {
       page: 0,
-      size: 2,
+      size: 5,
     },
     onChange: onPaginationChange,
   });
@@ -101,7 +103,7 @@ const Appointments = () => {
         (!search || item.name.toLowerCase().includes(search.toLowerCase())) &&
         (!statusFilter || item.status === statusFilter)
       )
-    }):nodes
+    }):data.nodes
     setData({ nodes: filteredNodes })
     pagination.fns.onSetPage(0);
   },[search,statusFilter])
@@ -136,13 +138,29 @@ const Appointments = () => {
 
   });
 
+  useEffect(() => {
+    setIsLoading(true)
+    const fetchAppointments = async ()=>{
+      try{
+        const response = await axios.get('http://localhost:5000/api/appointment/doctor-appointments',{
+          headers:{Authorization: `Bearer ${sessionStorage.getItem('access_token')}`}
+        })
+        setData({ nodes: response?.data })
+        setIsLoading(false)
+      }catch(error){
+        console.log(error)
+      }
+    }
+    fetchAppointments()
+  }, [])
+  if(loading) return <LoadingScreen />
   return (
     <DoctorLayout>
       <div className='flex flex-col gap-5'>
         <div className='flex items-center justify-between w-[98%]'>
           <div className='mt-3 mb-8'>
-            <p className='text-[22px] font-medium'>Today&apos;s Appointments</p>
-            <p className='text-sm text-gray-500'>an overview of todays appointment details</p>
+            <p className='text-[24px] font-medium text-blue-600'>Today&apos;s Appointments</p>
+            <p className='text-sm text-gray-500 pl-1'>an overview of todays appointment details</p>
           </div>
           <p className='text-blue-500 font-medium text-base flex items-center gap-1 cursor-pointer hover:text-[18px]'>view all appointments <MdOutlineArrowRightAlt className=' text-3xl'/> </p>
         </div>
@@ -182,15 +200,15 @@ const Appointments = () => {
                 {tableList.map((item) => (
                   <Row key={item.id} item={item}>
                     <Cell>
-                      {item.date.toLocaleDateString('en-US', {
+                      {new Date(item.date).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: '2-digit',
                         day: '2-digit',
-                      })}
-                    </Cell>
-                    <Cell>{item.time}</Cell>
-                    <Cell>{item.name}</Cell>
-                    <Cell>{item.room_no}</Cell>
+                        })}
+                      </Cell>
+                    <Cell>{`${item.startTime} - ${item.endTime}`}</Cell>
+                    <Cell>{item?.patient?.username}</Cell>
+                    <Cell>{item?.doctor?.room_number}</Cell>
                     <Cell className={`
                     ${item.status === 'pending' ? 'bg-[#faedde5f] text-[#d97706]' : ''}
                     ${item.status === 'completed' ? 'text-brand-500 bg-brand-100' : ''}
