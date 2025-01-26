@@ -3,13 +3,32 @@ import React, { useEffect, useState } from 'react';
 import PatientLayout from '../patientLayout';
 import { useParams } from 'next/navigation';
 import axios from 'axios';
+import SymptomSelector from './SymptomSelector';
+import LoadingScreen from '../../loader/Loader';
 
 const AppointmentDetails = () => {
-  const { id } = useParams();
+  const { id } = useParams(); // Use for client-side routing
   const [appointment, setAppointment] = useState(null);
+  const [symptoms, setSymptoms] = useState([]);
+  const [isLoading, setIsLoading] = useState();
+  const data =
+  {
+    "symptoms": [
+      "fever",
+      "cough",
+      "headache",
+      "fatigue",
+      "shortness of breath",
+      "nausea",
+      "rash",
+      "chills"
+    ]
+  }
+  const username = 'Dr. Smith';
 
   useEffect(() => {
     const fetchAppointment = async () => {
+      setIsLoading(true)
       try {
         const response = await axios.get(`http://localhost:5000/api/appointment/${id}`, {
           headers: { Authorization: `Bearer ${sessionStorage.getItem('access_token')}` },
@@ -17,37 +36,65 @@ const AppointmentDetails = () => {
         setAppointment(response.data.appointment);
       } catch (error) {
         console.error('Error fetching appointment details:', error);
+        setIsLoading(false);
       }
     };
+
+    const fetchSymptoms = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/symptoms');
+        setSymptoms(response.data);
+        setIsLoading(false)
+      } catch (error) {
+        setIsLoading(false)
+        console.error('Error fetching symptoms:', error);
+      }
+    };
+
     fetchAppointment();
+    fetchSymptoms();
   }, [id]);
 
-  if (!appointment) return <p>Loading...</p>;
-
-  const {
-    date,
-    startTime,
-    endTime,
-    appointmentDuration,
-    status,
-    doctor: { username, email, phone },
-  } = appointment;
-
   const handleCancel = () => {
-    // Handle cancel logic (could involve an API call to update the appointment status to 'cancelled')
     alert('Appointment has been cancelled');
   };
 
   const handleUpdate = () => {
-    // Navigate to the update page or open a modal for editing
     alert('Redirect to update page');
   };
 
+  const onSubmit = (symptomInfo) => {
+    console.log(symptomInfo.symptomList);
+    const submitSymptoms = async () => {
+      try {
+        const response = await axios.post('http://localhost:5000/api/patientsymptoms/submit-symptoms', {
+          appointmentId: id,
+          symptoms: symptomInfo.symptomList,
+          additionalInfo: symptomInfo.additionalInfo
+        })
+        console.log(response.data)
+      } catch (error) {
+
+      } 
+    }
+    submitSymptoms()
+  };
+
+  if (isLoading) return <LoadingScreen />;
+
+  if (!appointment) {
+    return (
+      <PatientLayout>
+        <div className="text-center text-gray-500">No appointment details available.</div>
+      </PatientLayout>
+    );
+  }
+
   return (
     <PatientLayout>
-      <div className="">
-        <div className='flex justify-between w-[95%] items-center'>
-          <div className='flex items-center gap-5'>
+      <div className="max-w-[90%]">
+        <div className="flex justify-between w-[95%] items-center">
+          <div className="flex items-center gap-5">
             <h1 className="text-2xl font-medium text-blue-600">Appointment Details</h1>
 
             <button
@@ -65,51 +112,37 @@ const AppointmentDetails = () => {
           </button>
         </div>
 
-
-        {/* Appointment Information */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 mt-7 pl-1">
-          <div className="text-gray-700">
-            <p className="font-medium text-base text-gray-500">Appointment Date</p>
-            <p className='mt-2'>{date}</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 mt-7 pl-1 border-b border-gray-200 p-4">
+          <div>
+            <p className="text-base text-gray-500">Appointment Date</p>
+            <p className="mt-3">{appointment?.date}</p>
           </div>
-          <div className="text-gray-700">
-            <p className="font-medium text-base text-gray-500">Start Time</p>
-            <p className='mt-2'>{startTime}</p>
+          <div>
+            <p className="text-base text-gray-500">Appointment Time</p>
+            <p className="mt-3">{`${appointment?.startTime} - ${appointment?.endTime}`}</p>
           </div>
-          <div className="text-gray-700">
-            <p className="font-medium text-base text-gray-500">End Time</p>
-            <p className='mt-2'>{endTime}</p>
-          </div>
-          <div className="text-gray-700">
-            <p className="font-medium text-base text-gray-500">Duration</p>
-            <p className='mt-2'>{appointmentDuration} minutes</p>
-          </div>
-          <div className="text-gray-700">
-            <p className="font-medium text-base text-gray-500">Status</p>
+          <div>
+            <p className="text-base text-gray-500">Status</p>
             <p
-              className={`${status === 'pending'
-                  ? 'text-yellow-600'
-                  : status === 'confirmed'
-                    ? 'text-green-600'
-                    : 'text-red-600'
+              className={`${appointment?.status === 'pending'
+                ? 'text-yellow-600'
+                : appointment?.status === 'confirmed'
+                  ? 'text-green-600'
+                  : 'text-red-600'
                 } font-medium mt-2`}
             >
-              {status}
+              {appointment?.status}
+            </p>
+          </div>
+          <div>
+            <p className="text-base text-gray-500">Doctor</p>
+            <p className="mt-3">
+              {username} <span className="text-blue-600 font-medium">- room 7</span>
             </p>
           </div>
         </div>
-
-        {/* Doctor Information */}
-        <h2 className="text-lg font-medium text-blue-600 mb-4">Doctor Information</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-1">
-          <div className="text-gray-700">
-            <p className="font-medium text-base text-gray-500">Doctor's Name</p>
-            <p className='mt-2'>{username}</p>
-          </div>
-
-        </div>
-
       </div>
+      {symptoms && <SymptomSelector symptoms={symptoms} onSubmit={onSubmit} />}
     </PatientLayout>
   );
 };
