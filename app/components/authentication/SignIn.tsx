@@ -64,14 +64,18 @@ const SignIn = () => {
           console.error("Error response data:", error.response.data);
 
           if (error.response.status === 401) {
+            setLoading(false)
             Notify.failure(error.response.data.message || "Unauthorized: Invalid credentials.");
           } else if (error.response.status === 400) {
+            setLoading(false)
             Notify.failure(error.response.data.message || "Bad request.");
           } else {
+            setLoading(false)
             Notify.failure(error.response.data.message || "An error occurred.");
           }
         } else {
           // Handle network errors or unexpected issues
+          setLoading(false)
           console.error("Unexpected error:", error);
           Notify.failure("A network error occurred. Please try again later.");
         }
