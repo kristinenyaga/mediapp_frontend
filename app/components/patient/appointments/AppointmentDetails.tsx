@@ -2,37 +2,23 @@
 import React, { useEffect, useState } from 'react';
 import PatientLayout from '../patientLayout';
 import { useParams } from 'next/navigation';
-import axios from 'axios';
 import SymptomSelector from './SymptomSelector';
 import LoadingScreen from '../../loader/Loader';
+import api from '@/app/utils/axiosInstance';
 
 const AppointmentDetails = () => {
   const { id } = useParams(); // Use for client-side routing
   const [appointment, setAppointment] = useState(null);
   const [symptoms, setSymptoms] = useState([]);
-  const [isLoading, setIsLoading] = useState();
-  const data =
-  {
-    "symptoms": [
-      "fever",
-      "cough",
-      "headache",
-      "fatigue",
-      "shortness of breath",
-      "nausea",
-      "rash",
-      "chills"
-    ]
-  }
+  const [isLoading, setIsLoading] = useState(false);
+
   const username = 'Dr. Smith';
 
   useEffect(() => {
     const fetchAppointment = async () => {
       setIsLoading(true)
       try {
-        const response = await axios.get(`http://localhost:5000/api/appointment/${id}`, {
-          headers: { Authorization: `Bearer ${sessionStorage.getItem('access_token')}` },
-        });
+        const response = await api.get(`/api/appointment/${id}`);
         setAppointment(response.data.appointment);
       } catch (error) {
         console.error('Error fetching appointment details:', error);
@@ -42,7 +28,7 @@ const AppointmentDetails = () => {
 
     const fetchSymptoms = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/symptoms');
+        const response = await api.get('/api/symptoms');
         setSymptoms(response.data);
         setIsLoading(false)
       } catch (error) {
@@ -64,10 +50,9 @@ const AppointmentDetails = () => {
   };
 
   const onSubmit = (symptomInfo) => {
-    console.log(symptomInfo.symptomList);
     const submitSymptoms = async () => {
       try {
-        const response = await axios.post('http://localhost:5000/api/patientsymptoms/submit-symptoms', {
+        const response = await api.post('/api/patientsymptoms/submit-symptoms', {
           appointmentId: id,
           symptoms: symptomInfo.symptomList,
           additionalInfo: symptomInfo.additionalInfo

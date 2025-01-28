@@ -3,8 +3,8 @@ import React, { useEffect, useState } from "react";
 import PatientLayout from "../patientLayout";
 import UpdateModal from "./UpdateModal";
 import { useAuth } from "@/app/context/authContext";
-import axios from "axios";
 import { Notify } from "notiflix";
+import api from "@/app/utils/axiosInstance";
 interface EmergencyContact {
   id: number;
   patientId: number;
@@ -77,9 +77,7 @@ const Profile = () => {
 
     }
     try {
-      const response = await axios.patch(`http://localhost:5000/api/patient/${profileDetails?.id}`, payload, {
-        headers: { Authorization: `Bearer ${sessionStorage.getItem('access_token')}` }
-      });
+      const response = await api.patch(`/api/patient/${profileDetails?.id}`, payload);
       setProfileDetails((prev) => ({
         ...prev,
         ...response.data
@@ -93,9 +91,7 @@ const Profile = () => {
   };
   useEffect(() => {
     const fetchProfileDetails = async () => {
-      const response = await axios.get('http://localhost:5000/api/patient/profile', {
-        headers: { Authorization: `Bearer ${sessionStorage.getItem('access_token')}` },
-      });
+      const response = await api.get('/api/patient/profile');
       
       setProfileDetails(response.data);
     }

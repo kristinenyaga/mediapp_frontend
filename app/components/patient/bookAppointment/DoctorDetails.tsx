@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useParams } from 'next/navigation';
 import { Notify } from 'notiflix';
 import { useRouter } from 'next/navigation';
+import api from '@/app/utils/axiosInstance';
 const DoctorDetails = () => {
     const [selectedDate, setSelectedDate] = useState('');
     const [selectedTime, setSelectedTime] = useState('');
@@ -37,14 +38,11 @@ const DoctorDetails = () => {
     const fetchTimeslots = async () => {
       if (selectedDate) {
         try {
-          const response = await axios.post(
-            "http://localhost:5000/api/appointment/available-slots",
+          const response = await api.post(
+            "/api/appointment/available-slots",
             {
               doctorId,
               date: selectedDate,
-            },
-            {
-              headers: { Authorization: `Bearer ${sessionStorage.getItem("access_token")}` },
             }
           );
           const slots = response.data.slots || [];
@@ -83,12 +81,10 @@ const DoctorDetails = () => {
 
     const bookAppointment = async () => {
       console.log('triggered')
-      const response = await axios.post('http://localhost:5000/api/appointment/book', {
+      const response = await api.post('/api/appointment/book', {
         date: selectedDate,
         selectedTime,
         doctorId
-      }, {
-        headers: { Authorization: `Bearer ${sessionStorage.getItem('access_token')}` }
       })
       if (response.status === 201) {
         Notify.success("appointment booked successfully")

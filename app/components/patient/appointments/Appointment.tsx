@@ -1,9 +1,8 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import PatientLayout from '../patientLayout';
-import axios from 'axios';
 import { useRouter } from 'next/navigation';
-
+import api from '@/app/utils/axiosInstance';
 const Appointment = () => {
   const [appointments, setAppointments] = useState([]);
   const router = useRouter();
@@ -11,9 +10,7 @@ const Appointment = () => {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/appointment/patient-appointments', {
-          headers: { Authorization: `Bearer ${sessionStorage.getItem('access_token')}` },
-        });
+        const response = await api.get('/api/appointment/patient-appointments');
         setAppointments(response.data.appointments);
       } catch (error) {
         console.error('Error fetching appointments:', error);

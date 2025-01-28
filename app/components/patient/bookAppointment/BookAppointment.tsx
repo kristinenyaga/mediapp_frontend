@@ -5,6 +5,7 @@ import axios from 'axios';
 import { Notify } from 'notiflix';
 import { useRouter } from 'next/navigation';
 import DoctorCard from './DoctorCard';
+import api from '@/app/utils/axiosInstance';
 const BookAppointment = () => {
   const [selectedDoctor, setSelectedDoctor] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
@@ -43,14 +44,11 @@ const BookAppointment = () => {
     const fetchTimeslots = async () => {
       if (selectedDate && (!isDoctorRequired || selectedDoctor)) {
         try {
-          const response = await axios.post(
-            "http://localhost:5000/api/appointment/available-slots",
+          const response = await api.post(
+            "/api/appointment/available-slots",
             {
               doctorId: isDoctorRequired ? selectedDoctor : null,
               date: selectedDate,
-            },
-            {
-              headers: { Authorization: `Bearer ${sessionStorage.getItem("access_token")}` },
             }
           );
           const slots = response.data.slots || [];
@@ -87,9 +85,7 @@ const BookAppointment = () => {
   useEffect(() => {
     const fetchAllDoctors = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/doctor", {
-          headers: { Authorization: `Bearer ${sessionStorage.getItem("access_token")}` },
-        });
+        const response = await api.get("/api/doctor");
         setDoctors(response.data);
       } catch (error) {
         console.error("Error fetching doctors:", error);
@@ -105,12 +101,10 @@ const BookAppointment = () => {
 
     const bookAppointment = async () => {
       console.log('triggered')
-      const response = await axios.post('http://localhost:5000/api/appointment/book', {
+      const response = await api.post('/api/appointment/book', {
         date: selectedDate,
         selectedTime,
         doctorId:selectedDoctor
-      }, {
-        headers:{Authorization:`Bearer ${sessionStorage.getItem('access_token')}`}
       })
       if (response.status === 201) {
         Notify.success("appointment booked successfully")
