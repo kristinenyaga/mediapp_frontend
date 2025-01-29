@@ -9,7 +9,6 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const { role } = useRole()
-  console.log(role)
   const fetchUserDetails = async () => {
   try {
     if (!role) return;

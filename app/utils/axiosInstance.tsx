@@ -1,6 +1,4 @@
 import axios from "axios";
-import { useRole } from "../context/RoleContext";
-
 
 const api = axios.create({
   baseURL: 'http://localhost:5000',
@@ -19,12 +17,15 @@ api.interceptors.request.use((req) => {
 api.interceptors.response.use(
   response => response,
   async (error) => {
-    const { role } = useRole()
+
     const originalRequest = error.config
-    const url = role === 'patient' ? 'http://localhost:5000/api/patient/refreshtoken' :'http://localhost:5000/api/doctor/refreshtoken'
+
 
     if (error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
+      const role = originalRequest._role || 'patient'
+      const url = role === 'patient' ? 'http://localhost:5000/api/patient/refreshtoken' : 'http://localhost:5000/api/doctor/refreshtoken'
+
       const response = await axios.post(url, {
         token: sessionStorage.getItem('refreshtoken')
         
