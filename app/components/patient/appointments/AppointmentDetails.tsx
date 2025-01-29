@@ -5,12 +5,14 @@ import { useParams } from 'next/navigation';
 import SymptomSelector from './SymptomSelector';
 import LoadingScreen from '../../loader/Loader';
 import api from '@/app/utils/axiosInstance';
+import { useRole } from '@/app/context/RoleContext';
 
 const AppointmentDetails = () => {
-  const { id } = useParams(); // Use for client-side routing
+  const { id } = useParams(); 
   const [appointment, setAppointment] = useState(null);
   const [symptoms, setSymptoms] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const { role } = useRole()
 
   const username = 'Dr. Smith';
 
@@ -18,7 +20,9 @@ const AppointmentDetails = () => {
     const fetchAppointment = async () => {
       setIsLoading(true)
       try {
-        const response = await api.get(`/api/appointment/${id}`);
+        const response = await api.get(`/api/appointment/${id}`, {
+          _role:role
+        });
         setAppointment(response.data.appointment);
       } catch (error) {
         console.error('Error fetching appointment details:', error);
@@ -28,7 +32,9 @@ const AppointmentDetails = () => {
 
     const fetchSymptoms = async () => {
       try {
-        const response = await api.get('/api/symptoms');
+        const response = await api.get('/api/symptoms', {
+          _role: role
+        });
         setSymptoms(response.data);
         setIsLoading(false)
       } catch (error) {
@@ -56,6 +62,8 @@ const AppointmentDetails = () => {
           appointmentId: id,
           symptoms: symptomInfo.symptomList,
           additionalInfo: symptomInfo.additionalInfo
+        }, {
+          _role: role
         })
         console.log(response.data)
       } catch (error) {

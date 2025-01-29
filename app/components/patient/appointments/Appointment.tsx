@@ -3,14 +3,19 @@ import React, { useEffect, useState } from 'react';
 import PatientLayout from '../patientLayout';
 import { useRouter } from 'next/navigation';
 import api from '@/app/utils/axiosInstance';
+import { useRole } from '@/app/context/RoleContext';
 const Appointment = () => {
   const [appointments, setAppointments] = useState([]);
   const router = useRouter();
+  const { role } = useRole()
+  
 
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        const response = await api.get('/api/appointment/patient-appointments');
+        const response = await api.get('/api/appointment/patient-appointments', {
+          _role:role
+        });
         setAppointments(response.data.appointments);
       } catch (error) {
         console.error('Error fetching appointments:', error);
@@ -27,8 +32,8 @@ const Appointment = () => {
     <PatientLayout>
       <div className="">
         <h1 className="text-2xl font-medium text-blue-600"> Appointments</h1>
-        <p className='text-gray-500 mb-7'>These are all your appointments</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <p className='text-gray-500 mb-10'>These are all your appointments</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
           {appointments.map((appointment,index) => (
             <div
               key={appointment.id}

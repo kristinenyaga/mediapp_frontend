@@ -6,6 +6,8 @@ import { Notify } from 'notiflix';
 import { useRouter } from 'next/navigation';
 import DoctorCard from './DoctorCard';
 import api from '@/app/utils/axiosInstance';
+import { useRole } from '@/app/context/RoleContext';
+
 const BookAppointment = () => {
   const [selectedDoctor, setSelectedDoctor] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
@@ -17,6 +19,8 @@ const BookAppointment = () => {
   });
   const [doctors, setDoctors] = useState([]);
   const router = useRouter()
+  const { role } = useRole()
+  
 
   // Mock timeslots for each doctor
   const getDateOptions = () => {
@@ -49,7 +53,9 @@ const BookAppointment = () => {
             {
               doctorId: isDoctorRequired ? selectedDoctor : null,
               date: selectedDate,
-            }
+            }, {
+            _role: role
+          }
           );
           const slots = response.data.slots || [];
           const currentTime = new Date();
@@ -85,7 +91,9 @@ const BookAppointment = () => {
   useEffect(() => {
     const fetchAllDoctors = async () => {
       try {
-        const response = await api.get("/api/doctor");
+        const response = await api.get("/api/doctor", {
+          _role: role
+        });
         setDoctors(response.data);
       } catch (error) {
         console.error("Error fetching doctors:", error);
@@ -105,6 +113,8 @@ const BookAppointment = () => {
         date: selectedDate,
         selectedTime,
         doctorId:selectedDoctor
+      },{
+        _role: role
       })
       if (response.status === 201) {
         Notify.success("appointment booked successfully")
@@ -119,7 +129,7 @@ const BookAppointment = () => {
       <div className="bg-white">
         <div className="flex justify-between items-center border-b pb-6 mb-4">
           <div>
-            <p className="text-2xl font-medium text-blue-600">Book Appointment</p>
+            <p className="text-2xl font-medium text-blue-600 mt-3">Book Appointment</p>
             <p className="text-sm text-gray-500">Please fill out the details below to book your next appointment</p>
           </div>
         </div>
