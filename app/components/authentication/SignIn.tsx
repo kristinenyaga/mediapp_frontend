@@ -52,8 +52,9 @@ const SignIn = () => {
           router.push('/otp')
           Notify.success("Credentials verified!");
           // Store the JWT token in sessionStorage
-          const { accessToken } = response.data;
+          const { accessToken,refreshToken } = response.data;
           sessionStorage.setItem('access_token', accessToken); 
+          sessionStorage.setItem('refreshtoken', refreshToken)
         } else {
           setLoading(false)
           Notify.failure(response.data.message || "Login failed");
