@@ -5,6 +5,7 @@ import UpdateModal from "./UpdateModal";
 import { useAuth } from "@/app/context/authContext";
 import { Notify } from "notiflix";
 import api from "@/app/utils/axiosInstance";
+import LoadingScreen from "../../loader/Loader";
 interface EmergencyContact {
   id: number;
   patientId: number;
@@ -97,7 +98,7 @@ const Profile = () => {
     }
     fetchProfileDetails()
   },[profileDetails])
-  if (!profileDetails) return <p>Loading...</p>;
+  if (!profileDetails) return <LoadingScreen />;
   const emergencyContact = profileDetails?.emergencycontact
   return (
     <PatientLayout>
