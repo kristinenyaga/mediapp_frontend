@@ -11,6 +11,12 @@ import profile from '../images/user.png'
 import appointments from '../images/appointments.png'
 import calendar from '../images/calendar.png'
 import logo from '../images/logo.png'
+import faq from '../images/faq.png'
+import vector from '../images/Vector.png'
+import heroImage from '../images/heroImage.png'
+import stethoscope from '../images/stethoscope.png'
+import booking from '../images/booking.png'
+import heartBeat from '../images/heartBeat.png'
 export {
   patient,
   doctor,
@@ -24,5 +30,11 @@ export {
   profile,
   appointments,
   calendar,
-  logo
+  logo,
+  faq,
+  vector,
+  heroImage,
+  stethoscope,
+  booking,
+  heartBeat
 }
