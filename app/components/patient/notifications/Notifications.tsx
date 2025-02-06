@@ -31,7 +31,7 @@ const Notifications = () => {
 
   return (
     <PatientLayout>
-      <h1 className="text-2xl font-medium text-blue-600">Notifications</h1>
+      <h1 className="text-2xl font-medium text-secondary">Notifications</h1>
       <p className="text-gray-500 mb-5">
         These are all notifications about your appointments
       </p>
@@ -41,18 +41,18 @@ const Notifications = () => {
             key={index}
             className={`border border-gray-300 rounded-lg p-4 bg-white flex flex-col gap-2 hover:bg-blue-50 transition-colors relative`}
           >
-            <div className='w-5 h-5 bg-brand-500 rounded-full absolute -right-[2px] -top-[2px]'></div>
+            <div className='w-5 h-5 bg-brand-300 rounded-full absolute -right-[2px] -top-[2px]'></div>
             <div
               className={`text-base font-medium ${notification.type === "urgent"
                   ? "text-red-600"
-                  : "text-blue-600"
+                  : "text-secondary"
                 }`}
             >
               {notification.type}
             </div>
-            <p className="text-gray-500 text-sm">{notification.message}</p>
-            <p className="text-xs text-blue-500 mt-2 font-medium">
-              <span className="text-gray-500">sent</span> {new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", year: "numeric" }).format(new Date(notification.createdAt))}
+            <p className=" text-sm">{notification.message}</p>
+            <p className="text-xs text-yellow-600 mt-2 font-medium">
+              <span className="text-gray-700">sent</span> {new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", year: "numeric" }).format(new Date(notification.createdAt))}
             </p>
           </div>
         ))}

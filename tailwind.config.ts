@@ -40,7 +40,8 @@ export default {
           200: '#FE8F83',
           300: '#ED2B2A',
         },
-        green: '#89C53F'
+        green: '#89C53F',
+        secondary:'#6B4DE6'
       },
       fontSize: {
         'display-lg': ['3rem', { lineHeight: '3.75rem', letterSpacing: '-2%' }],
