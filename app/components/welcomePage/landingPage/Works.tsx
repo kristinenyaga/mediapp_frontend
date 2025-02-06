@@ -48,7 +48,7 @@ const ProgressiveStack = () => {
         {steps.map((step, index) => (
           <div
             key={index}
-            className={`relative p-8 rounded-lg border border-gray-300 shadow-md transform transition-all hover:scale-105 hover:shadow-lg ${index % 2 === 0 ? "rotate-2" : "-rotate-2"} bg-white`}
+            className={`relative p-8 rounded-lg border border-gray-300 shadow-md transform transition-all hover:scale-105 hover:shadow-lg ${index % 2 === 0 ? "rotate-2 hover:-rotate-3" : "-rotate-2 hover:rotate-3"} bg-white`}
             style={{ top: `${index * 50}px` }}
           >
             <div className="flex items-center gap-4">
