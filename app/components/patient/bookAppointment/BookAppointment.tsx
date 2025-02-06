@@ -1,7 +1,6 @@
 "use client"
 import React, { useState, useEffect } from 'react';
 import PatientLayout from '../patientLayout';
-import axios from 'axios';
 import { Notify } from 'notiflix';
 import { useRouter } from 'next/navigation';
 import DoctorCard from './DoctorCard';
@@ -12,7 +11,7 @@ const BookAppointment = () => {
   const [selectedDoctor, setSelectedDoctor] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
-  const [isDoctorRequired, setIsDoctorRequired] = useState(false);
+  const [isDoctorRequired, setIsDoctorRequired] = useState(true);
   const [availableTimeslots, setAvailableTimeslots] = useState({
     morning: [],
     afternoon:[]
@@ -22,7 +21,6 @@ const BookAppointment = () => {
   const { role } = useRole()
   
 
-  // Mock timeslots for each doctor
   const getDateOptions = () => {
     const dates = [];
     const today = new Date();
@@ -41,9 +39,6 @@ const BookAppointment = () => {
     return new Intl.DateTimeFormat('en-GB', options).format(date);
   };
 
-  const handleTimeChange = (time) => {
-    setSelectedTime(time);
-  };
   useEffect(() => {
     const fetchTimeslots = async () => {
       if (selectedDate && (!isDoctorRequired || selectedDoctor)) {
@@ -87,7 +82,7 @@ const BookAppointment = () => {
 
     fetchTimeslots();
   }, [selectedDate, selectedDoctor, isDoctorRequired]);
-  // Fetch available doctors on component mount
+
   useEffect(() => {
     const fetchAllDoctors = async () => {
       try {
@@ -129,7 +124,7 @@ const BookAppointment = () => {
       <div className="bg-white">
         <div className="flex justify-between items-center border-b pb-6 mb-4">
           <div>
-            <p className="text-2xl font-medium text-blue-600 mt-3">Book Appointment</p>
+            <p className="text-2xl font-medium text-secondary mt-3">Book Appointment</p>
             <p className="text-sm text-gray-500">Please fill out the details below to book your next appointment</p>
           </div>
         </div>
@@ -141,14 +136,14 @@ const BookAppointment = () => {
               <button
                 type="button"
                 onClick={() => setIsDoctorRequired(true)}
-                className={`py-2 px-4 rounded-lg ${isDoctorRequired ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
+                className={`py-2 px-4 rounded-lg ${isDoctorRequired ? 'bg-secondary text-white' : 'bg-gray-200 text-gray-700'}`}
               >
                 Yes
               </button>
               <button
                 type="button"
                 onClick={() => setIsDoctorRequired(false)}
-                className={`py-2 px-4 rounded-lg ${!isDoctorRequired ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
+                className={`py-2 px-4 rounded-lg ${!isDoctorRequired ? 'bg-secondary text-white' : 'bg-gray-200 text-gray-700'}`}
               >
                 No
               </button>
@@ -232,7 +227,7 @@ const BookAppointment = () => {
                       <div className="flex justify-center">
                         <button
                           type="submit"
-                          className="bg-blue-600 text-white py-3 px-6 rounded-lg shadow-md hover:bg-blue-700 transition duration-200"
+                          className="bg-secondary text-white py-3 px-6 rounded-lg shadow-md hover:bg-blue-700 transition duration-200"
                         >
                           Book Appointment
                         </button>
