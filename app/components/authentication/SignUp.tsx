@@ -70,22 +70,19 @@ const SignUp = () => {
         <div></div>
         <div>
           <div className="mb-6 flex flex-col gap-2">
-            <p className="text-[28px] font-medium">Sign Up</p>
-            <p className="text-xs text-gray-500 font-normal mb-5">
+            <p className="text-[32px] font-medium">Sign Up</p>
+            <p className="text-sm text-gray-500 font-normal mb-5">
               Get started with us !
             </p>
             <form onSubmit={formik.handleSubmit}>
-              <label htmlFor="username" className="text-xs font-normal">
+              <label htmlFor="username" className="text-sm font-normal">
                 Username*
               </label>
               <br />
               <input
                 name="username"
                 type="username"
-                className={`w-[400px] h-[50px] border outline-none rounded-md px-2 placeholder:text-sm text-sm text-gray-700 mb-2 ${formik.touched.username && formik.errors.username
-                  ? "border-red-500"
-                  : "border-gray-700"
-                  }`}
+                className={`w-[400px] h-12 border rounded-md px-3 mt-2 mb-5 text-sm ${formik.touched.password && formik.errors.password ? "border-red-500 focus:outline-red-500" : "border-gray-400"} focus: outline-[#6B4DE6] placeholder:text-gray-500`}
                 placeholder="Enter your username"
                 value={formik.values.username}
                 onChange={formik.handleChange}
@@ -95,17 +92,14 @@ const SignUp = () => {
                 <p className="text-red-500 text-xs">{formik.errors.username}</p>
               )}
               <br />
-              <label htmlFor="email" className="text-xs font-normal">
+              <label htmlFor="email" className="text-sm font-normal">
                 Email*
               </label>
               <br />
               <input
                 name="email"
                 type="email"
-                className={`w-[400px] h-[50px] border outline-none rounded-md px-2 placeholder:text-sm text-sm text-gray-700 mb-2 ${formik.touched.email && formik.errors.email
-                  ? "border-red-500"
-                  : "border-gray-700"
-                  }`}
+                className={`w-[400px] h-12 border rounded-md px-3 mt-2 mb-5 text-sm ${formik.touched.password && formik.errors.password ? "border-red-500 focus:outline-red-500" : "border-gray-400"} focus: outline-[#6B4DE6] placeholder:text-gray-500`}
                 placeholder="johndoe@gmail.com"
                 value={formik.values.email}
                 onChange={formik.handleChange}
@@ -115,17 +109,14 @@ const SignUp = () => {
                 <p className="text-red-500 text-xs">{formik.errors.email}</p>
               )}
               <br />
-              <label htmlFor="password" className="text-xs font-normal w-80 pt-5">
+              <label htmlFor="password" className="text-sm font-normal w-80">
                 Password*
               </label>
               <br />
               <input
                 name="password"
                 type="password"
-                className={`w-[400px] h-[50px] border outline-none rounded-md px-2 text-sm placeholder:text-sm ${formik.touched.password && formik.errors.password
-                  ? "border-red-500"
-                  : "border-gray-700"
-                  }`}
+                className={`w-[400px] h-12 border rounded-md px-3 mt-2 mb-5 text-sm ${formik.touched.password && formik.errors.password ? "border-red-500 focus:outline-red-500" : "border-gray-400"} focus: outline-[#6B4DE6] placeholder:text-gray-500`}
                 placeholder="Enter your password"
                 value={formik.values.password}
                 onChange={formik.handleChange}
@@ -136,15 +127,15 @@ const SignUp = () => {
               )}
               <br />
               <button
-                className="bg-blue-300 rounded-[8px] w-[400px] h-12 text-white text-base font-medium mt-8"
+                className="w-full bg-gradient-to-r from-[#6B4DE6] to-[#927de7] text-white h-12 rounded-md mt-8 font-semibold transition-all hover:scale-105"
                 type="submit"
               >
                 Sign in
               </button>
             </form>
-            <div className="mt-5 flex items-center gap-1 justify-center text-[14px]">
+            <div className="mt-5 text-center items-center gap-1 justify-center text-[14px]">
               <p>Already have an account ?</p>
-              <p className="hover:underline underline-offset-4 cursor-pointer text-blue-300" onClick={() => router.push('/sign-in')}>Sign In</p>
+              <p className="hover:underline underline-offset-4 cursor-pointer text-[#6B4DE6] mt-1" onClick={() => router.push('/sign-in')}>Sign In</p>
             </div>
           </div>
         </div>
