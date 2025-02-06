@@ -17,6 +17,7 @@ import heroImage from '../images/heroImage.png'
 import stethoscope from '../images/stethoscope.png'
 import booking from '../images/booking.png'
 import heartBeat from '../images/heartBeat.png'
+import hospital from '../images/hospital.png'
 export {
   patient,
   doctor,
@@ -36,5 +37,6 @@ export {
   heroImage,
   stethoscope,
   booking,
-  heartBeat
+  heartBeat,
+  hospital
 }
