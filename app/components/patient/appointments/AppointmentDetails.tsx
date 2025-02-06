@@ -2,10 +2,10 @@
 import React, { useEffect, useState } from 'react';
 import PatientLayout from '../patientLayout';
 import { useParams } from 'next/navigation';
-import SymptomSelector from './SymptomSelector';
 import LoadingScreen from '../../loader/Loader';
 import api from '@/app/utils/axiosInstance';
 import { useRole } from '@/app/context/RoleContext';
+import UpdateAppointment from './UpdateAppointment';
 
 const AppointmentDetails = () => {
   const { id } = useParams(); 
@@ -13,8 +13,11 @@ const AppointmentDetails = () => {
   const [symptoms, setSymptoms] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const { role } = useRole()
+  const [open,setOpen] = useState(false)
 
-  const username = 'Dr. Smith';
+  const handleClose =() => {
+    setOpen(false)
+  }
 
   useEffect(() => {
     const fetchAppointment = async () => {
@@ -52,7 +55,7 @@ const AppointmentDetails = () => {
   };
 
   const handleUpdate = () => {
-    alert('Redirect to update page');
+    setOpen(true)
   };
 
   const onSubmit = (symptomInfo) => {
@@ -82,17 +85,24 @@ const AppointmentDetails = () => {
       </PatientLayout>
     );
   }
-
+  const formatTime = (timestring) => {
+    const [hours, minutes] = timestring.split(':')
+    const date = new Date
+    date.setHours(hours, minutes, 0)
+    return date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+  }
+  const patientSymptoms = appointment?.patientSymptom.symptoms
   return (
     <PatientLayout>
       <div className="max-w-[90%]">
         <div className="flex justify-between w-[95%] items-center">
           <div className="flex items-center gap-5">
-            <h1 className="text-2xl font-medium text-blue-600">Appointment Details</h1>
+            <h1 className="text-2xl font-medium text-secondary">Appointment Details</h1>
 
             <button
               onClick={handleUpdate}
-              className="px-4 py-2 border border-gray-400 text-sm text-gray-600 hover:text-white rounded-md hover:bg-blue-600"
+              className="px-4 py-2 border border-gray-400 text-sm text-gray-600 hover:text-white rounded-md hover:bg-secondary"
+              
             >
               Update Appointment
             </button>
@@ -107,15 +117,15 @@ const AppointmentDetails = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 mt-7 pl-1 border-b border-gray-200 p-4">
           <div>
-            <p className="text-base text-gray-500">Appointment Date</p>
-            <p className="mt-3">{appointment?.date}</p>
+            <p className="text-base ">Appointment Date</p>
+            <p className="mt-3 text-gray-600">{new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", year: "numeric" }).format(new Date(appointment?.date))}</p>
           </div>
           <div>
-            <p className="text-base text-gray-500">Appointment Time</p>
-            <p className="mt-3">{`${appointment?.startTime} - ${appointment?.endTime}`}</p>
+            <p className="text-base ">Appointment Time</p>
+            <p className="mt-3 text-gray-600">{formatTime(appointment?.startTime)} - {formatTime(appointment?.endTime)}</p>
           </div>
           <div>
-            <p className="text-base text-gray-500">Status</p>
+            <p className="text-base ">Status</p>
             <p
               className={`${appointment?.status === 'pending'
                 ? 'text-yellow-600'
@@ -128,14 +138,33 @@ const AppointmentDetails = () => {
             </p>
           </div>
           <div>
-            <p className="text-base text-gray-500">Doctor</p>
-            <p className="mt-3">
-              {username} <span className="text-blue-600 font-medium">- room 7</span>
+            <p className="text-base">Doctor</p>
+            <p className="mt-3 text-gray-600">
+              {appointment?.doctor?.username} <span className="text-secondary font-medium">- room 7</span>
             </p>
           </div>
         </div>
       </div>
-      {symptoms && <SymptomSelector symptoms={symptoms} onSubmit={onSubmit} />}
+      <div className=''>
+        <p className='mb-5'>Symptoms</p>
+        {
+          patientSymptoms.map((symptom, index) => (
+            <div key={index} className='mt-2 text-gray-600 border-b border-gray-300 w-fit list-disc'>
+              <p>{ symptom.name}</p>
+            </div>
+          ))
+        }
+      </div>
+      <UpdateAppointment
+        open={open}
+        handleClose={handleClose}
+        date={appointment?.date}
+        role={role}
+        doctor={appointment?.doctorId}
+        symptoms={symptoms}
+        onSubmit={onSubmit}
+        patientSymptoms = {patientSymptoms}
+      />
     </PatientLayout>
   );
 };
