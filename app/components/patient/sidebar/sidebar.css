@@ -5,7 +5,7 @@
     height: 100%;
     z-index: 100;
     overflow-y: auto;
-    border-right: 1px solid #dfe1e0;
+    border-right: 1px solid #f0f0f0;
     transition: transform 0.3s ease-in-out;
 }
 
@@ -33,7 +33,7 @@
 }
 
 .menu-item:hover {
-    background-color: rgba(38, 140, 255, 0.15);
+    background-color: #6c4de612;
 }
 
 .menu-icon {
@@ -51,11 +51,11 @@
 
 
 .menu-item.active {
-    background-color: rgba(38, 140, 255, 0.15); 
+    background-color: #6c4de612; 
 }
 
 .menu-item.active .menu-text {
-    color: #2563eb; 
+    color: #6B4DE6; 
 }
 
 
