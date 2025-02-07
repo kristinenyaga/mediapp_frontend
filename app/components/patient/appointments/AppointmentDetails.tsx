@@ -6,6 +6,7 @@ import LoadingScreen from '../../loader/Loader';
 import api from '@/app/utils/axiosInstance';
 import { useRole } from '@/app/context/RoleContext';
 import UpdateAppointment from './UpdateAppointment';
+import { CiNoWaitingSign } from "react-icons/ci";
 
 const AppointmentDetails = () => {
   const { id } = useParams(); 
@@ -19,19 +20,21 @@ const AppointmentDetails = () => {
     setOpen(false)
   }
 
+  const fetchAppointment = async () => {
+    setIsLoading(true)
+    try {
+      const response = await api.get(`/api/appointment/${id}`, {
+        _role: role
+      });
+      setAppointment(response.data.appointment);
+    } catch (error) {
+      console.error('Error fetching appointment details:', error);
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchAppointment = async () => {
-      setIsLoading(true)
-      try {
-        const response = await api.get(`/api/appointment/${id}`, {
-          _role:role
-        });
-        setAppointment(response.data.appointment);
-      } catch (error) {
-        console.error('Error fetching appointment details:', error);
-        setIsLoading(false);
-      }
-    };
+
 
     const fetchSymptoms = async () => {
       try {
@@ -58,25 +61,8 @@ const AppointmentDetails = () => {
     setOpen(true)
   };
 
-  const onSubmit = (symptomInfo) => {
-    const submitSymptoms = async () => {
-      try {
-        const response = await api.post('/api/patientsymptoms/submit-symptoms', {
-          appointmentId: id,
-          symptoms: symptomInfo.symptomList,
-          additionalInfo: symptomInfo.additionalInfo
-        }, {
-          _role: role
-        })
-        console.log(response.data)
-      } catch (error) {
 
-      } 
-    }
-    submitSymptoms()
-  };
-
-  if (isLoading) return <LoadingScreen />;
+  if (isLoading && !appointment) return <LoadingScreen />;
 
   if (!appointment) {
     return (
@@ -91,7 +77,8 @@ const AppointmentDetails = () => {
     date.setHours(hours, minutes, 0)
     return date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
   }
-  const patientSymptoms = appointment?.patientSymptom.symptoms
+  const patientSymptoms = appointment?.patientSymptom?.symptoms 
+  const symptomId = appointment?.patientSymptom?.id
   return (
     <PatientLayout>
       <div className="max-w-[90%]">
@@ -109,7 +96,7 @@ const AppointmentDetails = () => {
           </div>
           <button
             onClick={handleCancel}
-            className="px-4 py-2.5 bg-red-500 text-white text-sm rounded-md font-semibold hover:bg-red-600"
+            className="px-4 py-2.5 bg-red-300 text-white text-sm rounded-md font-semibold hover:bg-red-600"
           >
             Cancel Appointment
           </button>
@@ -148,11 +135,12 @@ const AppointmentDetails = () => {
       <div className=''>
         <p className='mb-5'>Symptoms</p>
         {
-          patientSymptoms.map((symptom, index) => (
+          patientSymptoms ? (patientSymptoms.map((symptom, index) => (
             <div key={index} className='mt-2 text-gray-600 border-b border-gray-300 w-fit list-disc'>
-              <p>{ symptom.name}</p>
+              <p>{symptom.name}</p>
             </div>
-          ))
+          ))) : (<p className='text-red-200 text-sm flex items-center gap-2'><CiNoWaitingSign className='font-bold'/>no symptoms</p>)
+
         }
       </div>
       <UpdateAppointment
@@ -162,8 +150,10 @@ const AppointmentDetails = () => {
         role={role}
         doctor={appointment?.doctorId}
         symptoms={symptoms}
-        onSubmit={onSubmit}
-        patientSymptoms = {patientSymptoms}
+        patientSymptoms={patientSymptoms}
+        appointmentId={id}
+        symptomId={symptomId}
+        refreshData={fetchAppointment}
       />
     </PatientLayout>
   );
