@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import DoctorCard from './DoctorCard';
 import api from '@/app/utils/axiosInstance';
 import { useRole } from '@/app/context/RoleContext';
+import SymptomSelector from '../appointments/SymptomSelector';
 
 const BookAppointment = () => {
   const [selectedDoctor, setSelectedDoctor] = useState('');
@@ -17,6 +18,9 @@ const BookAppointment = () => {
     afternoon:[]
   });
   const [doctors, setDoctors] = useState([]);
+  const [symptoms, setSymptoms] = useState([])
+  const [selectedSymptoms, setSelectedSymptoms] = useState([]);
+  const [additionalInfo, setAdditionalInfo] = useState("");
   const router = useRouter()
   const { role } = useRole()
   
@@ -34,7 +38,7 @@ const BookAppointment = () => {
 
   const dates = getDateOptions();
 
-  const formatDate = (date) => {
+  const formatDate = (date: number | Date | undefined) => {
     const options = { day: 'numeric', month: 'short', year: 'numeric' };
     return new Intl.DateTimeFormat('en-GB', options).format(date);
   };
@@ -84,6 +88,20 @@ const BookAppointment = () => {
   }, [selectedDate, selectedDoctor, isDoctorRequired]);
 
   useEffect(() => {
+    const fetchSymptoms = async () => {
+      try {
+        const response = await api.get('/api/symptoms', {
+          _role: role
+        });
+        setSymptoms(response.data);
+      } catch (error) {
+        console.error('Error fetching symptoms:', error);
+      }
+    };
+    fetchSymptoms()
+  },[])
+
+  useEffect(() => {
     const fetchAllDoctors = async () => {
       try {
         const response = await api.get("/api/doctor", {
@@ -104,6 +122,8 @@ const BookAppointment = () => {
 
     const bookAppointment = async () => {
       console.log('triggered')
+      console.log('symptoms', selectedSymptoms)
+      console.log('add info',additionalInfo)
       const response = await api.post('/api/appointment/book', {
         date: selectedDate,
         selectedTime,
@@ -111,14 +131,34 @@ const BookAppointment = () => {
       },{
         _role: role
       })
-      if (response.status === 201) {
-        Notify.success("appointment booked successfully")
-        router.push(`appointments/${response?.data?.appointment.id}`)
+      if (response.status === 201 && selectedSymptoms) {
+        submitSymptoms(response?.data?.appointment.id)
       }
     }
     bookAppointment()
   };
 
+  const submitSymptoms = async (id) => {
+    const symptomList = selectedSymptoms?.map((symptom) => symptom.value); 
+      try {
+        const response = await api.post('/api/patientsymptoms/submit-symptoms', {
+          appointmentId: id,
+          symptoms: symptomList,
+          additionalInfo: additionalInfo
+        }, {
+          _role: role
+        })
+        if (response.status === 200) {
+          Notify.success("appointment booked successfully")
+          router.push(`/patient/appointments/${id}`)
+        }
+        console.log(response.data)
+      } catch (error) {
+        console.log(error)
+      }
+  }
+  
+  const patientSymptoms: unknown = []
   return (
     <PatientLayout>
       <div className="bg-white">
@@ -172,7 +212,7 @@ const BookAppointment = () => {
                   <select
                     value={selectedDate}
                     onChange={(e) => setSelectedDate(e.target.value)}
-                    className="w-full p-3 mt-2 border rounded-lg outline-none focus:outline-none"
+                    className=" w-[90%] p-3 mt-2 border border-gray-300 rounded-md outline-none focus:outline-none"
                   >
                     <option value="">Choose a Date</option>
                     {dates.map((date, index) => (
@@ -186,45 +226,55 @@ const BookAppointment = () => {
                 {/* Time Slot Selection */}
                 {selectedDate && (
                   <div className="bg-white shadow-sm rounded-lg py-4">
-                    <label className="block text-gray-900 text-base">Select Time:</label>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
-                      <div className="w-full">
-                        <p className="text-gray-700 pl-1 text-sm font-medium">Morning Hours</p>
-                        <select
-                          value={selectedTime}
-                          onChange={(e) => setSelectedTime(e.target.value)}
-                          className="w-full p-3 mt-2 border rounded-lg"
-                        >
-                          <option value="">Select a Morning Slot</option>
-                          {availableTimeslots.morning.map((slot, index) => (
-                            <option key={index} value={`${slot.startTime}-${slot.endTime}`}>
-                              {slot.startTime} - {slot.endTime}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
+                    <label className="block text-gray-900 text-base mt-4">Select Time:</label>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4 w-[90%]">
+                        <div className="w-full">
+                          <p className="text-gray-700 pl-1 text-sm font-medium">Morning Hours</p>
+                          <select
+                            value={selectedTime}
+                            onChange={(e) => setSelectedTime(e.target.value)}
+                            className="w-full p-3 mt-2 border rounded-lg"
+                          >
+                            <option value="">Select a Morning Slot</option>
+                            {availableTimeslots.morning.map((slot, index) => (
+                              <option key={index} value={`${slot.startTime}-${slot.endTime}`}>
+                                {slot.startTime} - {slot.endTime}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
 
-                      <div className="w-full">
-                        <p className="text-gray-700 pl-1 text-sm font-medium">Afternoon Hours</p>
-                        <select
-                          value={selectedTime}
-                          onChange={(e) => setSelectedTime(e.target.value)}
-                          className="w-full p-3 mt-2 border rounded-lg"
-                        >
-                          <option value="">Select an Afternoon Slot</option>
-                          {availableTimeslots.afternoon.map((slot, index) => (
-                            <option key={index} value={`${slot.startTime}-${slot.endTime}`}>
-                              {slot.startTime} - {slot.endTime}
-                            </option>
-                          ))}
-                        </select>
+                        <div className="w-full">
+                          <p className="text-gray-700 pl-1 text-sm font-medium">Afternoon Hours</p>
+                          <select
+                            value={selectedTime}
+                            onChange={(e) => setSelectedTime(e.target.value)}
+                            className="w-full p-3 mt-2 border rounded-lg"
+                          >
+                            <option value="">Select an Afternoon Slot</option>
+                            {availableTimeslots.afternoon.map((slot, index) => (
+                              <option key={index} value={`${slot.startTime}-${slot.endTime}`}>
+                                {slot.startTime} - {slot.endTime}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
                       </div>
-                    </div>
+                      <div className=''>
+                        {symptoms && <SymptomSelector
+                          symptoms={symptoms}
+                          patientSymptoms={patientSymptoms}
+                          selectedSymptoms={selectedSymptoms}
+                          setSelectedSymptoms={setSelectedSymptoms}
+                          additionalInfo={additionalInfo}
+                          setAdditionalInfo={setAdditionalInfo}
+                        />}
+                      </div>
                   </div>
                   )}
                   {
                     selectedDate && selectedTime && (
-                      <div className="flex justify-center">
+                      <div className="">
                         <button
                           type="submit"
                           className="bg-secondary text-white py-3 px-6 rounded-lg shadow-md hover:bg-blue-700 transition duration-200"

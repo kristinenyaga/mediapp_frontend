@@ -6,16 +6,23 @@ import { useParams } from 'next/navigation';
 import { Notify } from 'notiflix';
 import { useRouter } from 'next/navigation';
 import api from '@/app/utils/axiosInstance';
+import SymptomSelector from '../appointments/SymptomSelector';
+import { useRole } from '@/app/context/RoleContext';
 const DoctorDetails = () => {
-    const [selectedDate, setSelectedDate] = useState('');
-    const [selectedTime, setSelectedTime] = useState('');
-    const [availableTimeslots, setAvailableTimeslots] = useState({
-      morning: [],
-      afternoon:[]
-    });
+  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedTime, setSelectedTime] = useState('');
+  const [availableTimeslots, setAvailableTimeslots] = useState({
+    morning: [],
+    afternoon: []
+  });
+  const [symptoms, setSymptoms] = useState([])
+  const [selectedSymptoms, setSelectedSymptoms] = useState([]);
+  const [additionalInfo, setAdditionalInfo] = useState("");
+  
   const { id } = useParams()
   const doctorId = id
   const router = useRouter()
+  const { role } = useRole()
 
   const getDateOptions = () => {
     const dates = [];
@@ -34,6 +41,20 @@ const DoctorDetails = () => {
     const options = { day: 'numeric', month: 'short', year: 'numeric' };
     return new Intl.DateTimeFormat('en-GB', options).format(date);
   };
+  useEffect(() => {
+    const fetchSymptoms = async () => {
+      try {
+        const response = await api.get('/api/symptoms', {
+          _role: role
+        });
+        setSymptoms(response.data);
+      } catch (error) {
+        console.error('Error fetching symptoms:', error);
+      }
+    };
+    fetchSymptoms()
+  }, [selectedDate])
+
   useEffect(() => {
     const fetchTimeslots = async () => {
       if (selectedDate) {
@@ -80,34 +101,56 @@ const DoctorDetails = () => {
     e.preventDefault();
 
     const bookAppointment = async () => {
-      console.log('triggered')
+
       const response = await api.post('/api/appointment/book', {
         date: selectedDate,
         selectedTime,
         doctorId
+      }, {
+        _role: role
       })
-      if (response.status === 201) {
-        Notify.success("appointment booked successfully")
-        router.push(`/patient/appointments/${response?.data?.appointment.id}`)
+      if (response.status === 201 && selectedSymptoms) {
+        submitSymptoms(response?.data?.appointment.id)
       }
     }
     bookAppointment()
   };
+
+  const submitSymptoms = async (id) => {
+    const symptomList = selectedSymptoms?.map((symptom) => symptom.value);
+    try {
+      const response = await api.post('/api/patientsymptoms/submit-symptoms', {
+        appointmentId: id,
+        symptoms: symptomList,
+        additionalInfo: additionalInfo
+      }, {
+        _role: role
+      })
+      if (response.status === 200) {
+        Notify.success("appointment booked successfully")
+        router.push(`/patient/appointments/${id}`)
+      }
+      console.log(response.data)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  const patientSymptoms: unknown = []
   return (
     <PatientLayout>
-      <div className='flex items-center gap-10 w-[100%]'>
+      <div className='flex items-center gap-10 '>
         <div className='w-[20%] hidden h-[25vh] bg-gray-200 rounded-lg flex justify-center items-center'>
           KN
         </div>
-        <div className='w-[70%] h-[25vh] rounded-lg border border-gray-300 p-5'>
+        <div className='w-[93%] h-[25vh] rounded-lg border border-gray-300 p-5'>
           <p className='text-[22px] font-medium text-gray-700'>Dr. Kristine Nyaga</p>
-          <p className=' text-blue-600 text-[18px]'>General Practioner</p>
+          <p className=' text-secondary text-[18px]'>General Practioner</p>
 
           <div className='flex items-center gap-1 text-xs mt-2 border text-gray-500 border-gray-300 w-[170px] pl-4 p-1 rounded-full'>
             <p>5+</p>
             <p>years of experience</p>
           </div>
-          <p className='text-xs text-black mt-4 font-semibold'>About</p>
+          <p className='text-xs text-black mt-6 font-semibold'>About</p>
           <p className='text-[14px] max-w-[80%] mt-2'>Dr. Jane Doe is a highly experienced cardiologist with over 15 years of
             experience in diagnosing and treating heart-related conditions. She is
             passionate about providing personalized care to her patients.</p>
@@ -116,7 +159,7 @@ const DoctorDetails = () => {
       <form onSubmit={handleSubmit}>
         <div className='mt-10 w-[93%]'>
           {/* Date Selection */}
-          <p className='text-blue-600 text-[20px] font-medium mb-5'>Book Appointment</p>
+          <p className='text-secondary text-[20px] font-medium mb-5'>Book Appointment</p>
           <div className="bg-white rounded-lg">
             <label className="block text-gray-900 text-base">Select Date:</label>
             <select
@@ -170,6 +213,16 @@ const DoctorDetails = () => {
                   </select>
                 </div>
               </div>
+              <div className=''>
+                {symptoms && <SymptomSelector
+                  symptoms={symptoms}
+                  patientSymptoms={patientSymptoms}
+                  selectedSymptoms={selectedSymptoms}
+                  setSelectedSymptoms={setSelectedSymptoms}
+                  additionalInfo={additionalInfo}
+                  setAdditionalInfo={setAdditionalInfo}
+                />}
+              </div>
             </div>
           )}
           {
@@ -177,7 +230,7 @@ const DoctorDetails = () => {
               <div className="flex justify-center mt-10">
                 <button
                   type="submit"
-                  className="bg-blue-600 text-white py-3 px-6 rounded-lg shadow-md hover:bg-blue-700 transition duration-200"
+                  className="bg-secondary text-white py-3 px-6 rounded-lg shadow-md hover:bg-blue-700 transition duration-200"
                 >
                   Book Appointment
                 </button>

@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
-import Select from 'react-select'; // Ensure react-select is installed
+import Select from 'react-select'; 
 
-const SymptomSelector = ({ symptoms, onSubmit }) => {
-  const [selectedSymptoms, setSelectedSymptoms] = useState([]);
-  const [additionalInfo, setAdditionalInfo] = useState("");
+const SymptomSelector = ({ symptoms, patientSymptoms,selectedSymptoms,setSelectedSymptoms,additionalInfo,setAdditionalInfo }) => {
+
+  // const updatedPatientSymptoms = patientSymptoms?.map((symptom) => ({
+  //   label: symptom.name,
+  //   value:symptom.id
+  // }))
+  // const [selectedSymptoms, setSelectedSymptoms] = useState(updatedPatientSymptoms);
+  // const [additionalInfo, setAdditionalInfo] = useState("");
 
   const symptomOptions = symptoms?.map((symptom) => ({
     label: symptom.name, 
@@ -22,10 +27,6 @@ const SymptomSelector = ({ symptoms, onSubmit }) => {
     setSelectedSymptoms(selectedSymptoms?.filter((symptom) => symptom.value !== symptomValue));
   };
 
-  const handleSubmit = () => {
-    const symptomList = selectedSymptoms?.map((symptom) => symptom.value); // Send symptom IDs
-    onSubmit({ symptomList, additionalInfo });
-  };
 
   // Filter out already selected symptoms from the dropdown
   const filteredOptions = symptomOptions.filter(
@@ -33,17 +34,16 @@ const SymptomSelector = ({ symptoms, onSubmit }) => {
   );
 
   return (
-    <div className="mt-14 max-w-[90%]">
-      <h2 className="text-lg mb-4 text-blue-600 font-medium">Select Symptoms</h2>
+    <div className="mt-8 max-w-[90%]">
+      <h2 className="mb-4 text-secondary font-medium">Select Symptoms <span className='text-sm text-gray-600'>(optional)</span></h2>
 
-      {/* Symptom Selector */}
       <Select
         options={filteredOptions}
         onChange={(selectedOption) => {
           handleAddSymptom(selectedOption);
         }}
         placeholder="Search and select symptoms..."
-        className="mb-4 focus:outline-none"
+        className="mb-4 focus:outline-none placeholder:text-sm"
         isClearable
         value={null}
         styles={{
@@ -60,12 +60,12 @@ const SymptomSelector = ({ symptoms, onSubmit }) => {
 
       {/* Selected Symptoms Display */}
       <div className="mt-8">
-        <h3 className="text-gray-600 font-medium mb-2">Selected Symptoms:</h3>
+        <h3 className=" mb-2">Selected Symptoms:</h3>
         <div className="flex flex-wrap gap-2">
           {selectedSymptoms?.map((symptom) => (
             <span
               key={symptom.value}
-              className="bg-blue-100 text-blue-700 px-3 py-1 text-sm rounded-full flex items-center gap-2"
+              className="bg-[#6c4de612] text-secondary px-3 py-1 text-sm rounded-full flex items-center gap-2"
             >
               {symptom.label}
               <button
@@ -81,8 +81,8 @@ const SymptomSelector = ({ symptoms, onSubmit }) => {
 
       {/* Additional Information */}
       <div className="mt-8">
-        <label htmlFor="additionalInfo" className="block text-gray-600 font-medium mb-2">
-          Additional Information (Optional):
+        <label htmlFor="additionalInfo" className="block  mb-2">
+          Additional Information <span className='text-sm text-gray-600'>(optional)</span>
         </label>
         <textarea
           id="additionalInfo"
@@ -93,15 +93,14 @@ const SymptomSelector = ({ symptoms, onSubmit }) => {
         ></textarea>
       </div>
 
-      {/* Submit Button */}
-      <div className="mt-5">
+      {/* <div className="mt-5">
         <button
           onClick={handleSubmit}
-          className="px-4 py-2 rounded-md bg-blue-600 text-white  transition duration-200"
+          className="px-9 py-2 rounded-md bg-secondary text-white  transition duration-200"
         >
           Submit Symptoms
         </button>
-      </div>
+      </div> */}
     </div>
   );
 };
