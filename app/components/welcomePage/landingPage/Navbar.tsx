@@ -36,12 +36,12 @@ const Navbar = () => {
 
         <div className='flex items-center gap-10'>
           <Link href="/sign-in">
-            <button className="hidden lg:block bg-[#6B4DE6] text-white text-[14px] py-3 px-10 rounded-[20px]">
+            <button className="hidden lg:block bg-[#6B4DE6] text-white text-[14px] py-2.5 px-10 rounded-[8px]">
               Login
             </button>
           </Link>
           <Link href="/sign-up">
-            <button className="hidden lg:block border border-[#6B4DE6] text-[#6B4DE6] shadow-lg text-[14px] py-3 px-8 rounded-[20px]">
+            <button className="hidden lg:block border border-[#6B4DE6] text-[#6B4DE6] shadow-lg text-[14px] py-2.5 px-8 rounded-[8px]">
               Sign Up
             </button>
           </Link>
