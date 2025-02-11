@@ -7,6 +7,7 @@ import api from '@/app/utils/axiosInstance';
 import { useRole } from '@/app/context/RoleContext';
 import UpdateAppointment from './UpdateAppointment';
 import { CiNoWaitingSign } from "react-icons/ci";
+import axios from 'axios';
 
 const AppointmentDetails = () => {
   const { id } = useParams(); 
@@ -53,8 +54,11 @@ const AppointmentDetails = () => {
     fetchSymptoms();
   }, [id]);
 
-  const handleCancel = () => {
-    alert('Appointment has been cancelled');
+  const handleCancel = async () => {
+
+    const response = await axios.delete(`http://localhost:5000/api/appointment/${id}`)
+    console.log(response.data)
+
   };
 
   const handleUpdate = () => {
