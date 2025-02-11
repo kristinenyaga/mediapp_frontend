@@ -4,6 +4,7 @@ import HeroSection from './HeroSection'
 import Faq from './Faq'
 import AboutUs from './About'
 import ProgressiveStack from './Works'
+import Footer from './Footer'
 
 const LandingPage = () => {
   return (
@@ -13,6 +14,8 @@ const LandingPage = () => {
       <AboutUs />
       <ProgressiveStack />
       <Faq />
+      <Footer />
+      
     </div>
   )
 }
