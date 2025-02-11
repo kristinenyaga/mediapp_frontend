@@ -1,14 +1,32 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Notify } from "notiflix";
 import axios from "axios";
 import { useFormik } from "formik";
 import * as Yup from 'yup' 
+import dayjs, { Dayjs } from 'dayjs';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
+import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 const SignUp = () => {
   const router = useRouter()
+  const [value, setValue] = React.useState('female');
+  const [dob, setDob] = React.useState<Dayjs | null>(dayjs('2007-01-01'));
 
+  const max = dayjs().subtract(18, 'year');
+  const min = dayjs().subtract(75, 'year');
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setValue((event.target as HTMLInputElement).value);
+  };
   const formik = useFormik({
     initialValues: {
       username: '',
@@ -63,10 +81,9 @@ const SignUp = () => {
       }
     }
   })
-
   return (
     <>
-      <div className="flex flex-row justify-between space-y-32 gap-y-0.5">
+      <div className="flex flex-row justify-between space-y-32 gap-y-0.5 p-5 ">
         <div></div>
         <div>
           <div className="mb-6 flex flex-col gap-2">
@@ -74,7 +91,7 @@ const SignUp = () => {
             <p className="text-sm text-gray-500 font-normal mb-5">
               Get started with us !
             </p>
-            <form onSubmit={formik.handleSubmit}>
+            <form onSubmit={formik.handleSubmit} className="">
               <label htmlFor="username" className="text-sm font-normal">
                 Username*
               </label>
@@ -126,6 +143,60 @@ const SignUp = () => {
                 <p className="text-red-500 text-xs mt-2">{formik.errors.password}</p>
               )}
               <br />
+              <FormControl>
+                <FormLabel sx={{
+                  color: '#6B4DE6',
+                  '&.Mui-checked': {
+                    color: '#6B4DE6',
+                  },
+                }} id="demo-radio-buttons-group-label" className="font-normal w-80 text-black text-base">Gender*</FormLabel>
+                <RadioGroup
+                  row
+                  aria-labelledby="demo-radio-buttons-group-label"
+                  defaultValue="female"
+                  name="radio-buttons-group"
+                  onChange={handleChange}
+
+                >
+                  <FormControlLabel value="female" control={<Radio sx={{
+                    color: '#6B4DE6',
+                    '&.Mui-checked': {
+                      color: '#6B4DE6',
+                    },
+                  }} />} label="Female" />
+                  <FormControlLabel value="male" control={<Radio sx={{
+                    color: '#6B4DE6',
+                    '&.Mui-checked': {
+                      color: '#6B4DE6',
+                    },
+                  }} />} label="Male" />
+                  <FormControlLabel value="other" control={<Radio sx={{
+                    color: '#6B4DE6',
+                    '&.Mui-checked': {
+                      color: '#6B4DE6',
+                    },
+                  }} />} label="Other" />
+                </RadioGroup>
+              </FormControl>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DemoContainer
+                  components={[
+                    'DatePicker',
+                  ]}
+                >
+                  <DemoItem label="Date Of Birth*" >
+                    <DatePicker
+                      defaultValue={max}
+                      maxDate={max}
+                      minDate={min}
+                      views={['year', 'month', 'day']}
+                      value={dob}
+                      onChange={(newValue) => setDob(newValue)}
+                    />
+                  </DemoItem>
+                </DemoContainer>
+              </LocalizationProvider>
+
               <button
                 className="w-full bg-gradient-to-r from-[#6B4DE6] to-[#927de7] text-white h-12 rounded-md mt-8 font-semibold transition-all hover:scale-105"
                 type="submit"
