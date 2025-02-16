@@ -51,7 +51,6 @@ const Home = () => {
   return (
     <AdminLayout>
       <div className="w-[90%]">
-        {/* Top Stats */}
         <p className=' mt-2 text-xl font-medium'>Welcome, Back!</p>
         <p className='mb-7 text-gray-500 text-sm'>Overview of the system stats</p>
         <div className="grid grid-cols-3 gap-6 mb-8">

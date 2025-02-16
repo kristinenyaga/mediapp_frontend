@@ -49,9 +49,9 @@ const SideBar: React.FC<SideBarProps> = ({ showSideBar, setShowSideBar }) => {
               Overview
             </Link>
           </li>
-          <li className={`menu-item ${pathname === '/patient/book-appointment' ? 'active' : ''}`}>
+          <li className={`menu-item ${pathname === '/admin/users' ? 'active' : ''}`}>
             <Image src={appointmentbook} width={22} height={22} className="menu-icon" alt="Book Appointment" />
-            <Link href="/patient/book-appointment" className="menu-text">
+            <Link href="/admin/users" className="menu-text">
               User Management
             </Link>
           </li>
