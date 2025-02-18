@@ -9,7 +9,6 @@ const DoctorFilters = ({ onFilterChange }: { onFilterChange: (filters: any) => v
     roomNumber: "",
   });
 
-  // Call onFilterChange when filters change
   useEffect(() => {
     onFilterChange(filters);
   }, [filters, onFilterChange]);

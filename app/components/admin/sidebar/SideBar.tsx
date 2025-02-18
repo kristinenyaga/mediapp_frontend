@@ -55,16 +55,16 @@ const SideBar: React.FC<SideBarProps> = ({ showSideBar, setShowSideBar }) => {
               User Management
             </Link>
           </li>
-          <li className={`menu-item ${pathname === '/patient/appointments' ? 'active' : ''}`}>
+          <li className={`menu-item ${pathname === '/admin/appointments' ? 'active' : ''}`}>
             <Image src={calendar} width={22} height={22} className="menu-icon" alt="Appointments" />
-            <Link href="/patient/appointments" className="menu-text">
+            <Link href="/admin/appointments" className="menu-text">
               Appointments Management 
             </Link>
           </li>
-          <li className={`menu-item ${pathname === '/patient/notifications' ? 'active' : ''}`}>
+          <li className={`menu-item ${pathname === '/admin/diagnoses' ? 'active' : ''}`}>
             <Image src={notifications} width={22} height={22} className="menu-icon" alt="Notifications" />
-            <Link href="/patient/notifications" className="menu-text">
-              Reports & Analytics
+            <Link href="/admin/diagnoses" className="menu-text">
+              Diagnoses & Analytics
             </Link>
           </li>
           <li className={`menu-item ${pathname === '/patient/notifications' ? 'active' : ''}`}>

@@ -66,7 +66,7 @@ const Users = () => {
   return (
     <AdminLayout>
       <div className='w-[90%]'>
-        <p className=' mt-2 text-3xl font-medium'>Users</p>
+        <p className=' mt-2 text-2xl font-medium'>System Users</p>
         <p className='mb-7 text-gray-500 text-sm'>Overview of all system users</p>
         <Box sx={{ width: '100%' }}>
           <Tabs

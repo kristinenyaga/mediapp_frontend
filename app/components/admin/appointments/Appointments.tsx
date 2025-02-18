@@ -14,11 +14,11 @@ const Appointments = () => {
   });
   
   useEffect(() => {
-    const fetchPatients = async () => {
+    const fetchAppointments = async () => {
       const response = await axios.get('http://localhost:5000/api/appointment')
       setAppointments(response.data)
     }
-    fetchPatients()
+    fetchAppointments()
   }, [])
 
   const columns = [

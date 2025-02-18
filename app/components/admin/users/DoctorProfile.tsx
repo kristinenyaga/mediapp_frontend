@@ -1,11 +1,10 @@
 "use client"
 import React, { useEffect, useState } from "react";
-import { Card, CardContent, Typography, Grid, Switch, Table, TableHead, TableBody, TableRow, TableCell, Paper, TableContainer, Select, MenuItem, CircularProgress } from "@mui/material";
+import { Card, CardContent, Typography, Grid, Select, MenuItem, CircularProgress } from "@mui/material";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 import AdminLayout from "../AdminLayout";
 import axios from "axios";
 import { useParams } from "next/navigation";
-import { STATUS_CODES } from "node:http";
 import AppointmentsFilters from "./AppointmentFilters";
 import TableData from "./TableData";
 const DoctorProfile = () => {
@@ -205,8 +204,8 @@ const DoctorProfile = () => {
         {/* Doctor Profile Section */}
         <Grid container spacing={3}>
 
-          <Typography sx={{paddingLeft:3,paddingTop:2,marginTop:3}} variant="h5" fontWeight={500}>
-            DR. {doctor.username}
+          <Typography sx={{paddingLeft:3,paddingTop:2,marginTop:3,fontSize:'24px'}} variant="h5" fontWeight={500}>
+            {doctor.username}
           </Typography>
         
           {/* Appointment Statistics */}

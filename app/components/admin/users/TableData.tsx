@@ -8,7 +8,6 @@ import {
   TableContainer,
   Paper,
   Switch,
-  Button,
 } from "@mui/material";
 import { MdKeyboardDoubleArrowLeft, MdKeyboardDoubleArrowRight } from "react-icons/md";
 import { useRouter } from "next/navigation";
@@ -125,7 +124,13 @@ const TableData = ({ search, filters,data,columns,userType,name }) => {
                       </>
                     ) : col.key === "patient" && typeof row.patient === "object" ? (
                       row.patient.username || row.patient.name
-                    ) :
+                      ) : col.key === "date" ? (
+                        new Intl.DateTimeFormat("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        }).format(new Date(row.date))
+                      ) :
                       (
                         Array.isArray(row[col.key]) ? row[col.key].length : row[col.key]
                     )}
