@@ -1,89 +1,68 @@
 'use client';
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import './sidebar.css';
-import { appointmentbook, calendar, home, logo, logout, notifications, patient, profile } from '@/public/constants/images';
+import { FaHome, FaCalendarAlt, FaBell, FaUser, FaSignOutAlt, FaClipboardList } from 'react-icons/fa';
+import { IoMdClose } from 'react-icons/io';
+import { MdEventAvailable } from 'react-icons/md';
+import Image from 'next/image';
+import { logo } from '@/public/constants/images';
 
 interface SideBarProps {
   showSideBar: boolean;
   setShowSideBar: (show: boolean) => void;
 }
 
+const menuItems = [
+  { name: 'Home', path: '/patient/home', icon: <FaHome size={20} /> },
+  { name: 'Book Appointment', path: '/patient/book-appointment', icon: <FaClipboardList size={20} /> },
+  { name: 'Appointments', path: '/patient/appointments', icon: <FaCalendarAlt size={20} /> },
+  { name: 'Notifications', path: '/patient/notifications', icon: <FaBell size={20} /> },
+  { name: 'Profile', path: '/patient/profile', icon: <FaUser size={20} /> },
+];
+
 const SideBar: React.FC<SideBarProps> = ({ showSideBar, setShowSideBar }) => {
   const pathname = usePathname();
 
   return (
     <div
-      className={`sidebar_container ${showSideBar ? 'show' : ''
-        } border-r border-gray-300 h-full fixed top-0 left-0 bg-white xl:relative transition-transform xl:translate-x-0 ${showSideBar ? 'translate-x-0' : '-translate-x-full'
-        }`}
+      className={`sidebar_container ${showSideBar ? 'show' : ''} fixed top-0 left-0 w-64 h-full bg-white shadow xl:relative transition-transform xl:translate-x-0 ${showSideBar ? 'translate-x-0' : '-translate-x-full'}`}
     >
-      <div className="flex flex-col">
-        {/* Close Icon */}
-        <Image
-          src={patient}
-          width={20}
-          height={20}
-          alt="Close Sidebar"
-          className="xl:hidden absolute right-5 top-5 cursor-pointer"
+      <div className="flex flex-col h-full p-5">
+        <IoMdClose
+          size={24}
+          className="xl:hidden absolute right-5 top-5 cursor-pointer text-gray-600 hover:text-gray-900"
           onClick={() => setShowSideBar(false)}
         />
 
-        {/* Logo Section */}
-        <div className="flex justify-center items-center my-8">
+        <div className="flex justify-center items-center mb-8 border-b py-2">
           <Image
             src={logo}
-            width={180}
+            width={160}
             height={20}
             alt="Close Sidebar"
           />
         </div>
-
-        {/* Menu Section */}
-        <ul className="menu">
-          <li className={`menu-item ${pathname === '/patient/home' ? 'active' : ''}`}>
-            <Image src={home} width={22} height={22} className="menu-icon" alt="Home" />
-            <Link href="/patient/home" className="menu-text">
-              Home
-            </Link>
-          </li>
-          <li className={`menu-item ${pathname === '/patient/book-appointment' ? 'active' : ''}`}>
-            <Image src={appointmentbook} width={22} height={22} className="menu-icon" alt="Book Appointment" />
-            <Link href="/patient/book-appointment" className="menu-text">
-              Book Appointment
-            </Link>
-          </li>
-          <li className={`menu-item ${pathname === '/patient/appointments' ? 'active' : ''}`}>
-            <Image src={calendar} width={22} height={22} className="menu-icon" alt="Appointments" />
-            <Link href="/patient/appointments" className="menu-text">
-              Appointments
-            </Link>
-          </li>
-          <li className={`menu-item ${pathname === '/patient/notifications' ? 'active' : ''}`}>
-            <Image src={notifications} width={22} height={22} className="menu-icon" alt="Notifications" />
-            <Link href="/patient/notifications" className="menu-text">
-              Notifications
-            </Link>
-          </li>
-
-          {/* Footer Section */}
-          <div className="absolute bottom-20 w-full p-0 border-t border-gray-300">
-            <li className={`menu-item mt-5 ${pathname === '/patient/profile' ? 'active' : ''}`}>
-              <Image src={profile} width={22} height={22} className="menu-icon" alt="Profile" />
-              <Link href="/patient/profile" className="menu-text">
-                Profile
+        <ul className="menu space-y-3 flex-1">
+          {menuItems.map((item) => (
+            <li
+              key={item.path}
+              className={`flex text-sm hover:bg-blue-0 items-center p-3 rounded-lg transition-all cursor-pointer ${pathname === item.path ? 'bg-blue-700 text-white' : 'hover:bg-gray-100 border-b text-gray-600'}`}
+            >
+              <span className="mr-3">{item.icon}</span>
+              <Link href={item.path} className="menu-text">
+                {item.name}
               </Link>
             </li>
-            <li className={`menu-item`}>
-              <Image src={logout} width={22} height={22} className="menu-icon" alt="Logout" />
-              <p className="menu-text">
-                Log Out
-              </p>
-            </li>
-          </div>
+          ))}
         </ul>
+
+        <div className="border-t pb-14 border-gray-300 pt-4">
+          <li className="flex items-center p-3 rounded-lg hover:bg-gray-100 text-gray-600 cursor-pointer">
+            <FaSignOutAlt size={20} className="mr-3" />
+            <p className="menu-text font-medium">Log Out</p>
+          </li>
+        </div>
       </div>
     </div>
   );

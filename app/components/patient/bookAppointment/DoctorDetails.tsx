@@ -18,7 +18,7 @@ const DoctorDetails = () => {
   const [symptoms, setSymptoms] = useState([])
   const [selectedSymptoms, setSelectedSymptoms] = useState([]);
   const [additionalInfo, setAdditionalInfo] = useState("");
-  
+  const [doctor,setDoctor] = useState(null)
   const { id } = useParams()
   const doctorId = id
   const router = useRouter()
@@ -97,6 +97,14 @@ const DoctorDetails = () => {
     fetchTimeslots();
   }, [selectedDate, doctorId]);
 
+  useEffect(() => {
+    const fetchDoctor = async () => {
+      const response = await axios.get(`http://localhost:5000/api/doctor/${doctorId}`)
+      setDoctor(response.data)
+    }
+    fetchDoctor()
+  },[doctorId])
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -142,8 +150,8 @@ const DoctorDetails = () => {
         <div className='w-[20%] hidden h-[25vh] bg-gray-200 rounded-lg flex justify-center items-center'>
           KN
         </div>
-        <div className='w-[93%] h-[25vh] rounded-lg border border-gray-300 p-5'>
-          <p className='text-[22px] font-medium text-gray-700'>Dr. Kristine Nyaga</p>
+        <div className='w-[93%] lg:h-[25vh] rounded-lg border border-gray-300 p-5'>
+          <p className='text-[22px] font-medium text-gray-700'>{doctor?.username}</p>
           <p className=' text-secondary text-[18px]'>General Practioner</p>
 
           <div className='flex items-center gap-1 text-xs mt-2 border text-gray-500 border-gray-300 w-[170px] pl-4 p-1 rounded-full'>
@@ -151,7 +159,7 @@ const DoctorDetails = () => {
             <p>years of experience</p>
           </div>
           <p className='text-xs text-black mt-6 font-semibold'>About</p>
-          <p className='text-[14px] max-w-[80%] mt-2'>Dr. Jane Doe is a highly experienced cardiologist with over 15 years of
+          <p className='text-[14px] lg:max-w-[80%] mt-2'>Dr. Jane Doe is a highly experienced cardiologist with over 15 years of
             experience in diagnosing and treating heart-related conditions. She is
             passionate about providing personalized care to her patients.</p>
         </div>

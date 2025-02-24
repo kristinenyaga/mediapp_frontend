@@ -47,7 +47,6 @@ const Profile = () => {
   const handleClose = () => setOpen(false);
 
   const handleSubmit = async (updatedValues) => {
-    console.log(`Updated ${currentSection}:`, updatedValues);
     let payload = {}
     switch (currentSection) {
       case "Personal Information":
@@ -78,11 +77,9 @@ const Profile = () => {
 
     }
     try {
-      const response = await api.patch(`/api/patient/${profileDetails?.id}`, payload);
-      setProfileDetails((prev) => ({
-        ...prev,
-        ...response.data
-      }))
+      await api.patch(`/api/patient/${profileDetails?.id}`, payload);
+      const response = await api.get('/api/patient/profile');
+      setProfileDetails(response.data);
       setOpen(false)
       Notify.success('updated succesfully')
     }
@@ -97,124 +94,113 @@ const Profile = () => {
       setProfileDetails(response.data);
     }
     fetchProfileDetails()
-  },[profileDetails])
+  },[])
   if (!profileDetails) return <LoadingScreen />;
   const emergencyContact = profileDetails?.emergencycontact
   return (
     <PatientLayout>
-      <div className="">
+      <div className="w-[90%]">
         {/* Header Section */}
         <div className="flex justify-between items-center mb-4">
           <div>
-            <h2 className="text-[22px] font-semibold text-blue-600">Profile Information</h2>
-            <p className="text-sm text-gray-500">View and update your profile information</p>
+            <h2 className="text-2xl font-semibold text-blue-600">Profile Information</h2>
+            <p className="text-sm text-gray-500 mb-6">View and update your profile details</p>
           </div>
         </div>
 
         {/* Personal Information Section */}
-        <section className="mb-4 mt-10">
-          <div className="flex items-center gap-5">
-            <h3 className="text-base font-medium text-black mb-5">Personal Information</h3>
-            <button className="mb-5 text-gray-600 hover:text-blue-300 hover:border-blue-200 cursor-pointer text-sm border border-gray-300 p-2 py-1 rounded-lg" onClick={() =>
-              handleOpen(
-                "Personal Information",
-                [
-                  { name: "fullName", label: "Full Name", required: true },
-                  { name: "email", label: "Email", type: "email", required: true },
-                  { name: "phone", label: "Phone", required: true },
-                ],
-                {
-                  fullName: profileDetails?.username || '',
-                  email: profileDetails?.email || '',
-                  phone: profileDetails?.phone || '',
-                }
-              )
-            }>update</button>
+        <section className="border border-gray-2 p-5 rounded-lg mb-6">
+          <div className="flex gap-5 items-center mb-4">
+            <h3 className="text-lg font-medium text-gray-800">Personal Information</h3>
+            <button
+              className="text-sm px-3 py-2 bg-blue-100 text-blue-600 rounded-lg"
+              onClick={() =>
+                handleOpen(
+                  "Personal Information",
+                  [
+                    { name: "fullName", label: "Full Name", required: true },
+                    { name: "email", label: "Email", type: "email", required: true },
+                    { name: "phone", label: "Phone", required: true },
+                  ],
+                  {
+                    fullName: profileDetails?.username || "",
+                    email: profileDetails?.email || "",
+                    phone: profileDetails?.phone || "",
+                  }
+                )
+              }
+            >
+              Update
+            </button>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="w-32 h-28 bg-gray-300 rounded-full flex justify-center items-center text-black text-xl font-medium uppercase">{profileDetails?.username.split('')[0]}</div>
-            <div className="grid grid-cols-2 gap-4 text-sm w-full">
-              <div>
-                <label className="block text-gray-800">Full Name</label>
-                <div className=" border border-gray-300 p-2 rounded mt-2 text-gray-500">{profileDetails?.username}</div>
-              </div>
-              <div>
-                <label className="block text-gray-800">Email</label>
-                <div className=" border border-gray-300 p-2 rounded mt-2 text-gray-500">{ profileDetails?.email}</div>
-              </div>
-              <div>
-                <label className="block text-gray-800">Phone</label>
-                <div className="border border-gray-300 p-2 rounded mt-2 text-gray-500">
-                  {profileDetails?.phone ? profileDetails.phone : 'Nan'}
-                </div>
-              </div>
-            </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <InfoField label="Full Name" value={profileDetails?.username} />
+            <InfoField label="Email" value={profileDetails?.email} />
+            <InfoField label="Phone" value={profileDetails?.phone || "N/A"} />
           </div>
         </section>
 
         {/* Health Information Section */}
-        <section className="mb-4 mt-10">
-          <div className="flex items-center gap-5">
-            <h3 className="text-base font-medium text-black mb-5">Health Information</h3>
-            <button className="mb-5 text-gray-600 hover:text-blue-300 hover:border-blue-200 cursor-pointer text-sm border border-gray-300 p-2 py-1 rounded-lg" onClick={() =>
-              handleOpen(
-                "Health Information",
-                [
-                  { name: "allergies", label: "Allergies" },
-                  { name: "medications", label: "Ongoing Medications" },
-                ],
-                {
-                  allergies: profileDetails?.medicalinformation?.allergies || '',
-                  medications: profileDetails?.medicalinformation?.medications || '',
-                }
-              )
-            }>update</button>
+        <section className="border border-gray-200 p-5 rounded-lg mb-6">
+          <div className="flex gap-5 items-center mb-4">
+            <h3 className="text-lg font-medium text-gray-800">Health Information</h3>
+            <button
+              className="text-sm px-3 py-2 bg-blue-100 text-blue-600 rounded-lg"
+              onClick={() =>
+                handleOpen(
+                  "Health Information",
+                  [
+                    { name: "allergies", label: "Allergies" },
+                    { name: "medications", label: "Ongoing Medications" },
+                  ],
+                  {
+                    allergies: profileDetails?.medicalinformation?.allergies || "No allergies provided",
+                    medications: profileDetails?.medicalinformation?.medications || "No ongoing medications",
+                  }
+                )
+              }
+            >
+              Update
+            </button>
           </div>
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <label className="block text-gray-800">Allergies</label>
-              <div className=" border border-gray-300 p-2 rounded mt-2 text-gray-500">{profileDetails?.medicalinformation?.allergies ?? 'No allergies provided'}</div>
-            </div>
-            <div>
-              <label className="block text-gray-800">Ongoing Medications</label>
-              <div className=" border border-gray-300 p-2 rounded mt-2 text-gray-500">{profileDetails?.medicalinformation?.medications ?? 'No ongoing medications'}</div>
-            </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <InfoField label="Allergies" value={profileDetails?.medicalinformation?.allergies || "No allergies provided"} />
+            <InfoField label="Ongoing Medications" value={profileDetails?.medicalinformation?.medications || "No ongoing medications"} />
           </div>
         </section>
 
         {/* Emergency Contact Section */}
-        <section className="mb-4 mt-10">
-          <div className="flex items-center gap-5">
-            <h3 className="text-base font-medium text-red-300 mb-5">Emergency Contact</h3>
-            <button className="mb-5 text-gray-600 hover:text-blue-300 hover:border-blue-200 cursor-pointer text-sm border border-gray-300 p-2 py-1 rounded-lg"
-              onClick={() => handleOpen(
-                'Emergency Contact',
-                [
-                  { name: "name", label: "Full Name", required: true },
-                  { name: "relationship", label: "Relationship", required: true },
-                  { name: "phone", label: "Phone", required: true },
-                ],
-                {
-                  name: emergencyContact?.name || '',
-                  relationship: emergencyContact?.relationship || '',
-                  phone: emergencyContact?.phone || '',
-                }
-              )}
-            >update</button>
+        <section className="border border-gray-2 p-5 rounded-lg">
+          <div className="flex gap-5 items-center mb-4">
+            <h3 className="text-lg font-medium text-gray-800">Emergency Contact</h3>
+            <button
+              className="text-sm px-3 py-2 bg-blue-100 text-blue-600 rounded-lg"
+              onClick={() =>
+                handleOpen(
+                  "Emergency Contact",
+                  [
+                    { name: "name", label: "Full Name", required: true },
+                    { name: "relationship", label: "Relationship", required: true },
+                    { name: "phone", label: "Phone", required: true },
+                  ],
+                  {
+                    name: profileDetails?.emergencycontact?.name || "",
+                    relationship: profileDetails?.emergencycontact?.relationship || "",
+                    phone: profileDetails?.emergencycontact?.phone || "",
+                  }
+                )
+              }
+            >
+              Update
+            </button>
           </div>
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <label className="block text-gray-800">Name</label>
-              <div className=" border border-gray-300 p-2 rounded mt-2 text-gray-500">{emergencyContact?.name}</div>
-            </div>
-            <div>
-              <label className="block text-gray-800">Relationship</label>
-              <div className=" border border-gray-300 p-2 rounded mt-2 text-gray-500">{emergencyContact?.relationship}</div>
-            </div>
-            <div>
-              <label className="block text-gray-800">Phone</label>
-              <div className=" border border-gray-300 p-2 rounded mt-2 text-gray-500">{emergencyContact?.phone}</div>
-            </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <InfoField label="Name" value={profileDetails?.emergencycontact?.name || "Not provided"} />
+            <InfoField label="Relationship" value={profileDetails?.emergencycontact?.relationship || "Not provided"} />
+            <InfoField label="Phone" value={profileDetails?.emergencycontact?.phone || "Not provided"} />
           </div>
         </section>
 
@@ -231,5 +217,11 @@ const Profile = () => {
     </PatientLayout>
   );
 };
+const InfoField = ({ label, value }) => (
+  <div>
+    <label className="block text-gray-600 text-sm">{label}</label>
+    <div className="border border-gray-300 p-2 rounded mt-1 text-gray-600">{value}</div>
+  </div>
+);
 
 export default Profile;

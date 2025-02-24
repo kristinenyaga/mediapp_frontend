@@ -31,8 +31,8 @@ const Notifications = () => {
 
   return (
     <PatientLayout>
-      <h1 className="text-2xl font-medium text-secondary">Notifications</h1>
-      <p className="text-gray-500 mb-5">
+      <h1 className="text-2xl font-medium text-blue-700">Notifications</h1>
+      <p className="text-gray-500 text-sm">
         These are all notifications about your appointments
       </p>
       <div className="grid grid-cols-1 mt-10 md:grid-cols-2 lg:grid-cols-3 gap-5 w-[90%]">
@@ -45,14 +45,17 @@ const Notifications = () => {
             <div
               className={`text-base font-medium ${notification.type === "urgent"
                   ? "text-red-600"
-                  : "text-secondary"
+                  : "text-blue-700"
                 }`}
             >
               {notification.type}
             </div>
-            <p className=" text-sm">{notification.message}</p>
-            <p className="text-xs text-yellow-600 mt-2 font-medium">
-              <span className="text-gray-700">sent</span> {new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", year: "numeric" }).format(new Date(notification.createdAt))}
+            <p className=" text-sm text-gray-700">{notification.message}</p>
+            <p className="text-xs text-brand-600 mt-2 font-medium">
+              <span className="text-gray-500"></span> {new Intl.DateTimeFormat("en-US", {
+                month: "short", day: "numeric", year: "numeric",
+              }).format(new Date(notification.createdAt))}
+
             </p>
           </div>
         ))}

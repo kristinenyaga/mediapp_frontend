@@ -22,6 +22,9 @@ const Navbar = () => {
             <Link href="/">
               <li className="text-[14px] cursor-pointer">Home</li>
             </Link>
+            <Link href="/#doctors">
+              <li className="text-[14px] cursor-pointer">Doctors</li>
+            </Link>
             <Link href="/#about">
               <li className="text-[14px] cursor-pointer">About</li>
             </Link>

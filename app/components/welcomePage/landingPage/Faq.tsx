@@ -37,24 +37,24 @@ const Faq = () => {
   ];
 
   return (
-    <div className='py-10  h-[100vh] mt-[20%]' id='faq'>
+    <div className='py-10 mt-[18%]' id='faq'>
       <div className='max-w-[1280px] mx-auto px-4'>
         {/* Section Header */}
         <div className='text-center'>
           <p className='inline-block bg-[#6c4de629] text-[#6B4DE6] px-4 py-2 rounded-full text-sm font-medium'>
             FAQs
           </p>
-          <h2 className='text-[40px] font_dm_serif font-medium mt-8 flex justify-center items-center gap-2'>
+          <h2 className='text-[30px] font-semibold text-[#16213E] mt-2 flex items-center justify-center gap-2'>
             Frequently Asked Questions
             <AiOutlineQuestionCircle className='text-[#E49B31] w-7 h-7' />
           </h2>
-          <p className='text-gray-600 mt-3 text-sm'>
+          <p className='text-gray-600 mt-2 text-center'>
             Find answers to common questions about our platform.
           </p>
         </div>
 
         {/* FAQ List */}
-        <div className='flex gap-20 justify-between items-center mt-10'>
+        <div className='flex gap-20 justify-between items-center'>
           <div className='mt-8 space-y-8 w-[60%]'>
             {faqsData.map((faq, index) => (
               <div
@@ -65,7 +65,7 @@ const Faq = () => {
                   className='flex justify-between items-center cursor-pointer'
                   onClick={() => toggleFAQ(index)}
                 >
-                  <h3 className='text-lg font-medium text-gray-700'>
+                  <h3 className='text-lg font-medium text-[#16213E]'>
                     {faq.question}
                   </h3>
                   <span className='text-gray-600'>

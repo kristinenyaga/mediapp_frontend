@@ -18,7 +18,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 const SignUp = () => {
   const router = useRouter()
-  const [value, setValue] = React.useState('female');
+  const [value, setValue] = React.useState('');
   const [dob, setDob] = React.useState<Dayjs | null>(dayjs('2007-01-01'));
 
   const max = dayjs().subtract(18, 'year');

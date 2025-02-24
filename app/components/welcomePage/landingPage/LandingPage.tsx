@@ -5,12 +5,14 @@ import Faq from './Faq'
 import AboutUs from './About'
 import ProgressiveStack from './Works'
 import Footer from './Footer'
+import Doctors from './Doctors'
 
 const LandingPage = () => {
   return (
     <div className=''>
       <Navbar />
       <HeroSection />
+      <Doctors />
       <AboutUs />
       <ProgressiveStack />
       <Faq />

@@ -77,10 +77,6 @@ const TableData = ({ search, filters,data,columns,userType,name }) => {
   const totalPages = Math.ceil(searchedData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const displayedData = searchedData.slice(startIndex, startIndex + itemsPerPage);
-  console.log(columns)
-
-  console.log('displayed data',searchedData)
-
 
   return (
     <TableContainer component={Paper} sx={{

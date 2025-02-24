@@ -121,9 +121,6 @@ const BookAppointment = () => {
     e.preventDefault();
 
     const bookAppointment = async () => {
-      console.log('triggered')
-      console.log('symptoms', selectedSymptoms)
-      console.log('add info',additionalInfo)
       const response = await api.post('/api/appointment/book', {
         date: selectedDate,
         selectedTime,
@@ -162,28 +159,28 @@ const BookAppointment = () => {
   return (
     <PatientLayout>
       <div className="bg-white">
-        <div className="flex justify-between items-center border-b pb-6 mb-4">
-          <div>
-            <p className="text-2xl font-medium text-secondary mt-3">Book Appointment</p>
-            <p className="text-sm text-gray-500">Please fill out the details below to book your next appointment</p>
-          </div>
+        <div className="border-b pb-4 mb-6">
+          <h2 className="text-2xl font-medium text-blue-700">Book Appointment</h2>
+          <p className="text-gray-500 text-sm">Fill in the details below to schedule an appointment.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="bg-white rounded-lg mb-9">
-            <label className="block text-gray-900 text-[16px]">Would you like to select a doctor?</label>
+            <label className="block text-gray-600">Would you like to select a doctor?</label>
             <div className="flex items-center mt-2 space-x-4">
               <button
                 type="button"
                 onClick={() => setIsDoctorRequired(true)}
-                className={`py-2 px-4 rounded-lg ${isDoctorRequired ? 'bg-secondary text-white' : 'bg-gray-200 text-gray-700'}`}
+                className={`px-4 py-2 rounded-lg ${isDoctorRequired ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-800"
+                  }`}
               >
                 Yes
               </button>
               <button
                 type="button"
                 onClick={() => setIsDoctorRequired(false)}
-                className={`py-2 px-4 rounded-lg ${!isDoctorRequired ? 'bg-secondary text-white' : 'bg-gray-200 text-gray-700'}`}
+                className={`px-5 py-2 rounded-lg ${!isDoctorRequired ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-800"
+                  }`}
               >
                 No
               </button>
@@ -192,9 +189,9 @@ const BookAppointment = () => {
 
           {
             isDoctorRequired ? (
-              <div className="bg-white shadow-sm rounded-lg py-4">
-                <label className="block text-black text-xl mb-5">Available Doctors</label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="bg-white rounded-lg py-4">
+                <label className="block text-gray-800 text-xl mb-5">Available Doctors</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-[90%]">
                   {doctors.map((doctor) => (
                     <DoctorCard
                       key={doctor.id}

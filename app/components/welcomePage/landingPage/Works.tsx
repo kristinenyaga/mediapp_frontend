@@ -21,8 +21,8 @@ const ProgressiveStack = () => {
   const steps = isPatient ? patientSteps : doctorSteps;
 
   return (
-    <div className=" flex flex-col items-center" id="works">
-      <h2 className="text-[44px] font-medium font_dm_serif text-center ">
+    <div className=" flex flex-col items-center mt-10" id="works">
+      <h2 className="text-[30px] font-semibold text-[#16213E] mt-2 leading-[50px]">
         How It Works
       </h2>
       <p className="text-gray-600 mt-2 text-center">
@@ -54,8 +54,8 @@ const ProgressiveStack = () => {
             <div className="flex items-center gap-4">
               <div className="text-[#6B4DE6] text-3xl">{step.icon}</div>
               <div>
-                <p className="font-semibold">{step.title}</p>
-                <p className="text-sm text-gray-500">{step.description}</p>
+                <p className="font-semibold text-[#16213E] text-lg">{step.title}</p>
+                <p className="text-sm text-gray-600">{step.description}</p>
               </div>
             </div>
             {index < steps.length - 1 && (

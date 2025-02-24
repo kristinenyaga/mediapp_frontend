@@ -19,7 +19,13 @@ const style = {
 };
 const UpdateAppointment = ({ open, handleClose, date, role, doctor, symptoms, patientSymptoms, appointmentId, symptomId, refreshData }) => {
 
-  const [selectedDate, setSelectedDate] = useState(new Date(date).toISOString().split('T')[0])
+  const getValidDate = (date) => {
+    const parsedDate = date ? new Date(date) : null;
+    return parsedDate 
+  };
+
+  const [selectedDate, setSelectedDate] = useState(getValidDate(date));
+
   const [selectedTime, setSelectedTime] = useState('')
   const [selectedDoctor,setSelectedDoctor] = useState(doctor)
   const [availableTimeslots, setAvailableTimeslots] = useState({
