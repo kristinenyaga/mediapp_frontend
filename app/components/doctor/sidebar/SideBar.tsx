@@ -3,7 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { FaHome, FaCalendarAlt, FaBell, FaUser, FaSignOutAlt, FaClipboardList } from 'react-icons/fa';
+import { FaHome, FaUser, FaClipboardList, FaCalendarCheck, FaChartBar, FaBell, FaSignOutAlt, FaUserFriends, FaUsers } from "react-icons/fa";
 import { IoMdClose } from 'react-icons/io';
 import './sidebar.css';
 import { logo } from '@/public/constants/images';
@@ -15,9 +15,9 @@ interface SideBarProps {
 }
 const menuItems = [
   { name: 'Overview', path: '/doctor/overview', icon: <FaHome size={20} /> },
-  { name: 'Patients', path: '/doctor/patients', icon: <FaCalendarAlt size={20} /> },
-  { name: 'Appointments', path: '/doctor/appointments', icon: <FaBell size={20} /> },
-  { name: 'Reports', path: '/doctor/reports', icon: <FaCalendarAlt size={20} /> },
+  { name: 'Patients', path: '/doctor/patients', icon: <FaUsers size={20} /> },
+  { name: 'Appointments', path: '/doctor/appointments', icon: <FaCalendarCheck size={20} /> },
+  { name: 'Reports', path: '/doctor/reports', icon: <FaChartBar size={20} /> },
   { name: 'Notifications', path: '/doctor/notifications', icon: <FaBell size={20} /> },
   { name: 'Profile', path: '/doctor/profile', icon: <FaUser size={20} /> },
 ];
