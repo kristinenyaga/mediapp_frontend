@@ -1,283 +1,142 @@
-'use client'
-import React, { useState,useEffect } from 'react'
+"use client"
+import React, { useEffect, useState } from 'react'
 import DoctorLayout from '../doctorLayout'
-import axios from 'axios'
-import UnfoldMoreOutlinedIcon from "@mui/icons-material/UnfoldMoreOutlined";
-import KeyboardArrowUpOutlinedIcon from "@mui/icons-material/KeyboardArrowUpOutlined";
-import KeyboardArrowDownOutlinedIcon from "@mui/icons-material/KeyboardArrowDownOutlined";
-import { createTheme as createMaterialTheme } from "@mui/material/styles";
-import { ThemeProvider as MaterialThemeProvider } from "@mui/material/styles";
-import { MdKeyboardDoubleArrowRight, MdKeyboardDoubleArrowLeft, MdOutlineArrowRightAlt } from "react-icons/md";
-import {
-  Table,
-  Header,
-  HeaderRow,
-  Body,
-  Row,
-  HeaderCell,
-  Cell,
-} from '@table-library/react-table-library/table';
-import {
-  useSort,
-  HeaderCellSort,
-  SortIconPositions,
-  SortToggleType,
-} from "@table-library/react-table-library/sort";
-import { useTheme } from '@table-library/react-table-library/theme';
-import { getTheme } from '@table-library/react-table-library/baseline';
-import { usePagination } from '@table-library/react-table-library/pagination';
-import DiagnosisModal from './diagnosisModal';
-import LoadingScreen from '../../loader/Loader';
+import LoadingScreen from '../../loader/Loader'
+import api from '@/app/utils/axiosInstance'
+import TableData from './TableData'
+import { format } from 'date-fns'
+import { DateRange } from "react-date-range";
+import "react-date-range/dist/styles.css";
+import "react-date-range/dist/theme/default.css";
 
-const key = 'Composed Table';
 const Appointments = () => {
-  const [search, setSearch] = useState('');
-  const [data, setData] = useState({ nodes:[] });
-  const [statusFilter, setStatusFilter] = useState('')
-  const [open, setOpen] = useState(false);
   const [loading, setIsLoading] = useState(false)
-  
-  const handleOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => setOpen(false);
-  
-  const pagination = usePagination(data, {
-    state: {
-      page: 0,
-      size: 5,
-    },
-    onChange: onPaginationChange,
-  });
-  function onPaginationChange(action: any, state: any) {
-    console.log(action, state);
-  }
-
-  const handleSearch = (event: { target: { value: React.SetStateAction<string>; }; }) => {
-    setSearch(event.target.value);
-  };
-  const sort = useSort(
-    data,
+  const [appointments,setAppointments] = useState([])
+  const [showDatePicker, setShowDatePicker] = useState(false)
+  const [dateRange, setDateRange] = useState([
     {
-      onChange: onSortChange,
-    },
-    {
-      sortIcon: {
-        margin: "0px",
-        iconDefault: <UnfoldMoreOutlinedIcon fontSize="medium" />,
-        iconUp: <KeyboardArrowUpOutlinedIcon fontSize="medium" />,
-        iconDown: <KeyboardArrowDownOutlinedIcon fontSize="medium" />,
-      },
-      sortFns: {
-        PATIENT_NAME: (array) => array.sort((a, b) => a.name.localeCompare(b.name)),
-        APPOINTMENT_DATE: (array) => array.sort((a, b) => new Date(a.date) - new Date(b.date)),
-        APPOINTMENT_TIME: (array) => array.sort((a, b) => {
-          const [hourA, minuteA] = a.time.split(":").map(Number)
-          const [hourB, minuteB] = b.time.split(":").map(Number)
-          return hourA * 60 + minuteA - (hourB * 60 + minuteB)
-
-        }),
-      },
+      startDate: new Date(),
+      endDate: new Date(),
+      key: 'selection',
     }
-  );
-  function onSortChange(action, state) {
-    console.log(action, state);
-  }
-  const handleUpdate = (value, id, property) => {
-    setData((state) => ({
-      ...state,
-      nodes: state.nodes.map((node) => {
-        if (node.id === id) {
-          return { ...node, [property]: value };
-        } else {
-          return node;
-        }
-      }),
-    }));
-  };
-
-  useEffect(() => {
-    const filteredNodes = search || statusFilter ? nodes.filter(item => { 
-      return (
-        (!search || item.name.toLowerCase().includes(search.toLowerCase())) &&
-        (!statusFilter || item.status === statusFilter)
-      )
-    }):data.nodes
-    setData({ nodes: filteredNodes })
-    pagination.fns.onSetPage(0);
-  },[search,statusFilter])
-  const theme = useTheme({
-    HeaderRow: `
-        .th {
-          border-bottom: 1px solid #F9F9F9;
-        }
-      `,
-    BaseCell: `
-        &:not(:last-of-type) {
-          border: 1px solid #F9F9F9;
-
-        }
-        border: 1px solid #F9F9F9;
-        padding: 8px 16px;
-        text-align: center;
-        color:#4F5653;
-
-      `,
-    Cell: `
-            &:last-of-type {
-          color:#0077B6;
-          cursor:pointer;
-        }
-    `,
-
-    HeaderCell: `
-    color:#000201;
-    font-weight:600;
-    `
-
+  ]);
+  const [filters, setFilters] = useState({
+    search: '',
+    status: '',
+    startDate: '',
+    endDate: '',
+    sex:''
   });
 
+
+  function getUniquePatients(appointments) {
+    const uniquePatients = new Map();
+
+    appointments.forEach(appointment => {
+      uniquePatients.set(appointment.patient.id, appointment.patient);
+    });
+
+    const uniquePatientsArray = [...uniquePatients.values()];
+    return uniquePatientsArray
+
+  }
   useEffect(() => {
     setIsLoading(true)
-    const fetchAppointments = async ()=>{
-      try{
-        const response = await axios.get('http://localhost:5000/api/appointment/doctor-appointments',{
-          headers:{Authorization: `Bearer ${sessionStorage.getItem('access_token')}`}
-        })
-        setData({ nodes: response?.data })
+    const fetchAppointments = async () => {
+      try {
+        const response = await api.get('http://localhost:5000/api/appointment/doctor-appointments')
+        setAppointments(response.data)
         setIsLoading(false)
-      }catch(error){
+      } catch (error) {
         console.log(error)
       }
     }
     fetchAppointments()
   }, [])
-  if(loading) return <LoadingScreen />
+
+  const columns = [
+    { key: 'date', label: 'Date' },
+    { key: 'startTime', label: 'Start Time' },
+    { key: 'endTime', label: 'End Time' },
+    { key: 'status', label: 'Status' },
+    { key: 'patient', label: 'Patient' },
+    { key: 'sex', label: 'Sex' },
+
+  ]
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters((prevFilters) => ({ ...prevFilters, [name]: value }));
+  };
+
+  const handleDateRange = (ranges) => {
+    setDateRange([ranges.selection])
+    setFilters(prev => ({
+      ...prev,
+      startDate: format(ranges.selection.startDate,'yyyy-MM-dd'),
+      endDate: format(ranges.selection.endDate, 'yyyy-MM-dd'),
+    }))
+  }
+  if (loading) return <LoadingScreen />
   return (
     <DoctorLayout>
-      <div className='flex flex-col gap-5'>
-        <div className='flex items-center justify-between w-[98%]'>
-          <div className='mt-3 mb-8'>
-            <p className='text-[24px] font-medium text-blue-600'>Today&apos;s Appointments</p>
-            <p className='text-sm text-gray-500 pl-1'>an overview of todays appointment details</p>
+      <div className='w-[90%]'>
+        <div className="border-b pb-4 mb-6 flex flex-col gap-3">
+          <div>
+            <h2 className="text-2xl font-medium text-blue-700">Appointments</h2>
+            <p className="text-gray-700 text-sm">Here are all your appointments</p>
           </div>
-          <p className='text-blue-500 font-medium text-base flex items-center gap-1 cursor-pointer hover:text-[18px]'>view all appointments <MdOutlineArrowRightAlt className=' text-3xl'/> </p>
+          <div className='flex items-center gap-5 text-gray-700'>
+            <p>Appointments for</p>
+            <p className='border p-3 border-gray-200 rounded-md text-blue-700'>            {filters.startDate && filters.endDate
+              ? `${filters.startDate} - ${filters.endDate}`
+              : new Date().toISOString().split('T')[0]}</p>
+          </div>
         </div>
-        <div className='flex items-center mb-5'>
-          <input id="search" placeholder='search by patient name' type="text" className='p-2 rounded-md border border-gray-400 placeholder:text-gray-600 placeholder:text-sm focus:outline-blue-600 focus:outline-[0.1px]' onChange={handleSearch} />
-          <div className="">
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="p-[10px] rounded-md text-sm focus:outline-none"
-            >
-              <option value="">Status filter</option>
-              <option value="pending">Pending</option>
-              <option value="completed">Completed</option>
-              <option value="cancelled">Cancelled</option>
-
-            </select>
-          </div>
-
-        </div>
-        <Table data={data} theme={theme} sort={sort} pagination={pagination}>
-          {(tableList) => (
-            <>
-              <Header>
-                <HeaderRow>
-                  <HeaderCellSort sortKey='APPOINTMENT_DATE'>Appointment Date</HeaderCellSort>
-                  <HeaderCellSort sortKey='APPOINTMENT_TIME'>Appointment Time</HeaderCellSort>
-                  <HeaderCellSort sortKey='PATIENT_NAME'>Patient Name</HeaderCellSort>
-                  <HeaderCell>Room Number</HeaderCell>
-                  <HeaderCell>Status</HeaderCell>
-                  <HeaderCell>completed</HeaderCell>
-                  <HeaderCell>Predicted Diagnosis</HeaderCell>
-                </HeaderRow>
-              </Header>
-
-              <Body>
-                {tableList.map((item) => (
-                  <Row key={item.id} item={item}>
-                    <Cell>
-                      {new Date(item.date).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                        })}
-                      </Cell>
-                    <Cell>{`${item.startTime} - ${item.endTime}`}</Cell>
-                    <Cell>{item?.patient?.username}</Cell>
-                    <Cell>{item?.doctor?.room_number}</Cell>
-                    <Cell className={`
-                    ${item.status === 'pending' ? 'bg-[#faedde5f] text-[#d97706]' : ''}
-                    ${item.status === 'completed' ? 'text-brand-500 bg-brand-100' : ''}
-                    ${item.status === 'cancelled' ? 'text-red-300 bg-red-50' : ''}
-                  
-                      `}>{item.status}</Cell>
-                    <Cell>
-                      <input
-                        type="checkbox"
-                        checked={item.status !== 'pending' && item.status !== 'cancelled'}
-                        onChange={(event) =>
-                          handleUpdate(event.target.checked ? 'completed':'pending' , item.id, "status")
-                        }
-                      />
-                    </Cell>
-                    <Cell onClick={()=>handleOpen()}>view</Cell>
-                  </Row>
-                ))}
-              </Body>
-            </>
-          )}
-        </Table>
-        <div className="flex flex-col items-left mt-4">
-          <div className="mb-4 text-sm text-gray-700">
-            Total Pages: {pagination.state.getTotalPages(data.nodes)}
-          </div>
-
-          <div className="flex items-right space-x-4 text-sm">
-            <button
-              className={`px-3 py-1.5 rounded-md ${pagination.state.page === 0
-                ?"border text-gray-500 border-gray-200 cursor-not-allowed" :
-                "border text-gray-700 border-gray-300"
-                }`}
-              onClick={() => pagination.fns.onSetPage(pagination.state.page - 1)}
-              disabled={pagination.state.page === 0}
-            >
-              <MdKeyboardDoubleArrowLeft className='text-lg' />
-            </button>
-
-            {pagination.state.getPages(data.nodes).map((_, index) => (
+        <div className="mb-4 flex gap-4">
+          <button
+            onClick={() => setShowDatePicker(!showDatePicker)}
+            className="border text-sm p-2 rounded-md bg-blue-600 text-white"
+          >
+            select date range
+          </button>
+          {showDatePicker && (
+            <div className="absolute z-10 bg-white shadow-lg rounded-md p-4 top-12">
+              <DateRange
+                ranges={dateRange}
+                onChange={handleDateRange}
+                moveRangeOnFirstSelection={false}
+                rangeColors={["#3b82f6"]}
+              />
               <button
-                key={index}
-                type="button"
-                className={`px-4 py-1 rounded-sm ${pagination.state.page === index ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"
-                  }`}
-                onClick={() => pagination.fns.onSetPage(index)}
+                className="mt-2 w-full text-center text-blue-600"
+                onClick={() => setShowDatePicker(false)}
               >
-                {index + 1}
+                Close
               </button>
-            ))}
-
-            <button
-              className={`px-3 py-1 rounded-md ${pagination.state.page === pagination.state.getTotalPages(data.nodes) - 1
-                ? "border text-gray-500 border-gray-200 cursor-not-allowed"
-                : "border text-gray-700 border-gray-300"
-                }`}
-              onClick={() => pagination.fns.onSetPage(pagination.state.page + 1)}
-              disabled={pagination.state.page === pagination.state.getTotalPages(data.nodes) - 1}
-            >
-              <MdKeyboardDoubleArrowRight className='text-lg' />
-            </button>
-          </div>
+            </div>
+          )}
+          <input
+            type="text"
+            name="search"
+            value={filters.search}
+            onChange={handleFilterChange}
+            placeholder="Search by patient name"
+            className="border p-2 rounded-md placeholder:text-sm placeholder:text-gray-700 outline-none focus:border-gray-300"
+          />
+          <select name="status" value={filters.status} onChange={handleFilterChange} className="border bg-white text-sm text-gray-700 p-2 rounded-md outline-none focus:border-gray-300">
+            <option value="">All Statuses</option>
+            <option value="pending">Pending</option>
+            <option value="completed">Completed</option>
+            <option value="canceled">Canceled</option>
+          </select>
+          <select name="sex" value={filters.sex} onChange={handleFilterChange} className="border bg-white text-sm text-gray-700 p-2 rounded-md outline-none focus:border-gray-300">
+            <option value="">All Genders</option>
+            <option value="female">Female</option>
+            <option value="male">Male</option>
+          </select>
         </div>
-        <DiagnosisModal
-          handleClose={handleClose}
-          open={open}
-        />
+        <TableData columns={columns} data={appointments} filters={filters} />
       </div>
-
     </DoctorLayout>
   )
 }
