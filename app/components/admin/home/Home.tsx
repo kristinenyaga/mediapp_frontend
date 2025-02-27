@@ -42,21 +42,6 @@ const Home = () => {
     { title: "Pending Appointments", value:pendingAppointments.length, bgColor: "#EAAA0812", textColor: "#EAAA08" }
   ];
 
-  const appointmentTrends = [
-    { month: "Jan", appointments: 500 },
-    { month: "Feb", appointments: 450 },
-    { month: "Mar", appointments: 600 },
-    { month: "Apr", appointments: 700 },
-    { month: "May", appointments: 800 },
-  ];
-
-  const appointmentByDoctor = [
-    { name: "Dr. Smith", count: 320 },
-    { name: "Dr. Jane", count: 290 },
-    { name: "Dr. John", count: 270 },
-    { name: "Dr. Emily", count: 250 },
-  ];
-
   const patientDemographics = [
     { name: "18-25 years", value: 400 },
     { name: "26-35 years", value: 600 },

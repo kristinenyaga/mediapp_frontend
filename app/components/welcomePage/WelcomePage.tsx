@@ -29,26 +29,29 @@ const WelcomePage = () => {
         {/* Role Selection Section */}
         <p className=" text-base mb-6">Choose your role</p>
         <div className="flex gap-10">
-          {/* Patient Card */}
           <div
             className="bg-[#ffffff] shadow-md hover:shadow-lg py-8 px-16 cursor-pointer transition-all duration-300 transform hover:scale-105 flex flex-col items-center rounded-lg border border-gray-200"
             onClick={() => handleRoleSelection("patient")}
           >
             <Image src={patient} alt="Patient Icon" width={60} height={60} />
-            <p className=" text-lg mt-3">Patient</p>
+            <p className="text-xl mt-3 text-gray-700">Patient</p>
           </div>
 
-          {/* Doctor Card */}
           <div
             className="bg-white shadow-md hover:shadow-lg py-8 px-14 cursor-pointer transition-all duration-300 transform hover:scale-105 flex flex-col items-center rounded-lg border border-gray-200"
             onClick={() => handleRoleSelection("doctor")}
           >
             <Image src={doctor} alt="Doctor Icon" width={60} height={60} />
-            <p className=" text-lg  mt-3">Doctor</p>
+            <p className="text-xl mt-3 text-gray-700">Doctor</p>
+          </div>
+          <div
+            className="bg-white shadow-md hover:shadow-lg py-8 px-14 cursor-pointer transition-all duration-300 transform hover:scale-105 flex flex-col items-center rounded-lg border border-gray-200"
+            onClick={() => handleRoleSelection("admin")}
+          >
+            <Image src={doctor} alt="Doctor Icon" width={60} height={60} />
+            <p className="text-xl mt-3 text-gray-700">Admin</p>
           </div>
         </div>
-
-        <p className=" text-sm mt-10">Providing seamless healthcare experiences</p>
       </div>
     </div>
 

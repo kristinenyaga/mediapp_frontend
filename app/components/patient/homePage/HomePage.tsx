@@ -56,7 +56,7 @@ console.log(appointments)
         <header className="flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-medium text-blue-700">
-              Welcome Back, Kristine <span className="animate-bounce">👋</span>
+              Welcome Back, Kristine
             </h1>
             <p className="text-gray-500 text-sm">
               Here&apos;s a quick overview of your medical history.
