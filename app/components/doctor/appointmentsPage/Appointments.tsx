@@ -8,7 +8,7 @@ import { format } from 'date-fns'
 import { DateRange } from "react-date-range";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
-
+import { RiCloseFill } from 'react-icons/ri'
 const Appointments = () => {
   const [loading, setIsLoading] = useState(false)
   const [appointments,setAppointments] = useState([])
@@ -28,18 +28,6 @@ const Appointments = () => {
     sex:''
   });
 
-
-  function getUniquePatients(appointments) {
-    const uniquePatients = new Map();
-
-    appointments.forEach(appointment => {
-      uniquePatients.set(appointment.patient.id, appointment.patient);
-    });
-
-    const uniquePatientsArray = [...uniquePatients.values()];
-    return uniquePatientsArray
-
-  }
   useEffect(() => {
     setIsLoading(true)
     const fetchAppointments = async () => {
@@ -76,6 +64,21 @@ const Appointments = () => {
       endDate: format(ranges.selection.endDate, 'yyyy-MM-dd'),
     }))
   }
+
+  const handleClearButton = () => {
+    setDateRange([
+      {
+        startDate: new Date(),
+        endDate: new Date(),
+        key: 'selection',
+      }
+    ])
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      startDate: '',
+      endDate: '',
+    }));
+  }
   if (loading) return <LoadingScreen />
   return (
     <DoctorLayout>
@@ -87,7 +90,8 @@ const Appointments = () => {
           </div>
           <div className='flex items-center gap-5 text-gray-700'>
             <p>Appointments for</p>
-            <p className='border p-3 border-gray-200 rounded-md text-blue-700'>            {filters.startDate && filters.endDate
+            <p className='border p-3 border-gray-200 rounded-md text-blue-700'>
+              {filters.startDate && filters.endDate
               ? `${filters.startDate} - ${filters.endDate}`
               : new Date().toISOString().split('T')[0]}</p>
           </div>
@@ -100,19 +104,28 @@ const Appointments = () => {
             select date range
           </button>
           {showDatePicker && (
-            <div className="absolute z-10 bg-white shadow-lg rounded-md p-4 top-12">
+            <div className="absolute z-10 bg-white shadow-lg rounded-md p-4 top-16">
               <DateRange
                 ranges={dateRange}
                 onChange={handleDateRange}
                 moveRangeOnFirstSelection={false}
                 rangeColors={["#3b82f6"]}
               />
-              <button
-                className="mt-2 w-full text-center text-blue-600"
-                onClick={() => setShowDatePicker(false)}
-              >
-                Close
-              </button>
+              <div className='flex justify-between'>
+                <button
+                  className="mt-2 flex items-center w-full text-center text-red-600"
+                  onClick={() => setShowDatePicker(false)}
+                >
+                  Close <RiCloseFill className='text-lg' />
+                </button>
+                <button
+                  className="mt-2 flex items-center w-full text-center text-blue-700"
+                  onClick={() => handleClearButton()}
+                >
+                  Clear
+                </button>
+              </div>
+
             </div>
           )}
           <input

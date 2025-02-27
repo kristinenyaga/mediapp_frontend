@@ -7,15 +7,18 @@ import {
   TableCell,
   TableContainer,
   Paper,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { MdKeyboardDoubleArrowLeft, MdKeyboardDoubleArrowRight } from "react-icons/md";
 import { useRouter } from "next/navigation";
 import { BsDownload } from "react-icons/bs";
 import { isWithinInterval, parseISO } from "date-fns";
-
+import { handleDownloadPDF } from './handleDownload'
 
 const TableData = ({ data,columns,filters }) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [status,setStatus] = useState({})
   const router = useRouter()
 
   const filteredAppointments = useMemo(() => {
@@ -24,8 +27,8 @@ const TableData = ({ data,columns,filters }) => {
       const { search, sex, startDate, endDate, status } = filters
       
       const appointmentDate = parseISO(appointment.date)
-      const filterStartDate = startDate ? parseISO(startDate) : null
-      const filterEndDate = startDate ? parseISO(endDate) : null
+      const filterStartDate = startDate ? parseISO(startDate) : new Date().toDateString()
+      const filterEndDate = startDate ? parseISO(endDate) : new Date().toDateString()
 
       const searchMatch =
         search.trim() === "" ||
@@ -45,10 +48,23 @@ const TableData = ({ data,columns,filters }) => {
       return statusMatch && dateMatch && searchMatch && sexMatch
     })
   }, [filters, data])
-  
-  console.log(filters)
 
-  // Pagination logic
+  const todayAppointments = data.filter(appointment => new Date(appointment.date).toDateString() === new Date().toDateString()
+  )
+
+  const handleStatusChange = async (appointmentId, newStatus) => {
+    try {
+      setStatus(prev => ({
+        ...prev,
+        [appointmentId]: newStatus
+      }))
+      console.log(appointmentId,newStatus)
+    } catch (error) {
+      console.error("Failed to update status", error);
+    }
+  };
+
+
   const itemsPerPage = 5;
   const totalPages = Math.ceil(filteredAppointments.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -62,7 +78,7 @@ const TableData = ({ data,columns,filters }) => {
       borderRadius: "8px",
       overflowX: "auto"
     }}>
-      <button className="flex gap-2 items-center p-3 pl-3 bg-[#6c4de60a] rounded-md m-3 text-blue-700">download <BsDownload className=" font-medium text-lg text-blue-700" /></button>
+      <button onClick={() => handleDownloadPDF(filteredAppointments, filters)} className="flex gap-2 items-center p-3 pl-3 bg-[#6c4de60a] rounded-md m-3 text-blue-700">download <BsDownload className=" font-medium text-lg text-blue-700" /></button>
       <Table>
         <TableHead>
           <TableRow>
@@ -92,21 +108,28 @@ const TableData = ({ data,columns,filters }) => {
                           day: "numeric",
                           year: "numeric",
                         }).format(new Date(row.date))
-                      ) :
+                        ) : col.key === "status" ? (
+                            <Select
+                              value={status[row.id]||row.status}
+                              onChange={(e) => handleStatusChange(row.id, e.target.value)}
+                              size="small"
+                              sx={{ minWidth: 120, fontSize: "14px" }}
+                            >
+                              <MenuItem value="pending">Pending</MenuItem>
+                              <MenuItem value="completed">Completed</MenuItem>
+                              <MenuItem value="cancelled">Cancelled</MenuItem>
+                            </Select>
+                      ):
                       (
                         Array.isArray(row[col.key]) ? row[col.key].length : row[col.key]
                     )}
                   </TableCell>
                 ))}
-
                   <TableCell sx={{ padding: "12px 16px" }}>
-                  {/* <button className="px-3 py-1 mx-1 border rounded-md bg-gray-200 hover:bg-gray-300">Edit</button> */}
                   <button className="px-3 py-1 mx-1 border rounded-md bg-gray-200 hover:bg-gray-300"
-                    onClick={() => router.push(userType === 'doctor' ? `/admin/users/doctors/${row.id}` : `/admin/users/patients/${row.id}`)}>View</button>
+                    onClick={() => router.push(`/doctor/appointments/${row.id}`)}>View</button>
                 </TableCell>
-
               </TableRow>
-
             ))
           ) : (
             <TableRow>
