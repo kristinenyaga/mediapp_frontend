@@ -37,7 +37,16 @@ const SignIn = () => {
     onSubmit: async (initialValues) => {
       try {
         setLoading(true)
-        const url = role === 'patient' ? "http://localhost:5000/api/patient/login" :"http://localhost:5000/api/doctor/login"
+        let url = ''
+        if (role === 'patient') {
+          url ='http://localhost:5000/api/patient/login'
+        }
+        else if (role === 'doctor') {
+          url ='http://localhost:5000/api/doctor/login'
+        }
+        else {
+          url ='http://localhost:5000/api/admin/login'
+        }
         const response = await axios.post(url, {
           email: initialValues.email,
           password: initialValues.password,
