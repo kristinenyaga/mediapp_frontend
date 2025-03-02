@@ -1,19 +1,26 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useRole } from "@/app/context/RoleContext";
 import { useRouter } from "next/navigation";
 import { doctor, patient, stethoscope } from "@/public/constants/images";
 import Image from "next/image";
+import LoadingScreen from "../loader/Loader";
 
 const WelcomePage = () => {
   const { setRole } = useRole();
   const router = useRouter();
+  const [loading, setLoading] = useState(false)
+  
 
   const handleRoleSelection = (role: string) => {
+    setLoading(true)
     setRole(role);
     router.push("/sign-in");
+    setLoading(false)
   };
+
+  if(loading) return <LoadingScreen />
 
   return (
     <div>
