@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { FaHome, FaCalendarAlt, FaBell, FaUser, FaSignOutAlt, FaClipboardList } from 'react-icons/fa';
 import { IoMdClose } from 'react-icons/io';
 import { MdEventAvailable } from 'react-icons/md';
@@ -23,7 +23,14 @@ const menuItems = [
 
 const SideBar: React.FC<SideBarProps> = ({ showSideBar, setShowSideBar }) => {
   const pathname = usePathname();
-
+  const router = useRouter()
+  
+  const handleLogout = () => {
+    sessionStorage.removeItem('access_token');
+    sessionStorage.removeItem('refreshtoken')
+    localStorage.removeItem('role')
+    router.push('/welcomepage')
+  }
   return (
     <div
       className={`sidebar_container ${showSideBar ? 'show' : ''} fixed top-0 left-0 w-64 h-full bg-white shadow xl:relative transition-transform xl:translate-x-0 ${showSideBar ? 'translate-x-0' : '-translate-x-full'}`}
@@ -45,20 +52,23 @@ const SideBar: React.FC<SideBarProps> = ({ showSideBar, setShowSideBar }) => {
         </div>
         <ul className="menu space-y-3 flex-1">
           {menuItems.map((item) => (
-            <li
-              key={item.path}
-              className={`flex text-sm hover:bg-blue-0 items-center p-3 rounded-lg transition-all cursor-pointer ${pathname === item.path ? 'bg-blue-700 text-white' : 'hover:bg-gray-100 border-b text-gray-600'}`}
-            >
-              <span className="mr-3">{item.icon}</span>
-              <Link href={item.path} className="menu-text">
-                {item.name}
-              </Link>
-            </li>
+            <Link key={item.path} href={item.path} className="block">
+              <li
+                className={`flex text-sm hover:bg-blue-0 items-center p-3 rounded-lg transition-all cursor-pointer ${pathname === item.path
+                  ? "bg-blue-700 text-white"
+                  : "hover:bg-gray-100 border-b text-gray-600"
+                  }`}
+              >
+                <span className="mr-3">{item.icon}</span>
+                <span className="menu-text">{item.name}</span>
+              </li>
+            </Link>
           ))}
         </ul>
 
+
         <div className="border-t pb-14 border-gray-300 pt-4">
-          <li className="flex items-center p-3 rounded-lg hover:bg-gray-100 text-gray-600 cursor-pointer">
+          <li onClick={() => handleLogout()} className="flex items-center p-3 rounded-lg hover:bg-gray-100 text-gray-600 cursor-pointer">
             <FaSignOutAlt size={20} className="mr-3" />
             <p className="menu-text font-medium">Log Out</p>
           </li>

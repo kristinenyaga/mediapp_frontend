@@ -3,7 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { FaHome, FaUser, FaClipboardList, FaCalendarCheck, FaChartBar, FaBell, FaSignOutAlt, FaUserFriends, FaUsers } from "react-icons/fa";
+import { FaHome, FaUser,FaCalendarCheck, FaChartBar, FaBell, FaSignOutAlt, FaUsers } from "react-icons/fa";
 import { IoMdClose } from 'react-icons/io';
 import './sidebar.css';
 import { logo } from '@/public/constants/images';
@@ -30,6 +30,7 @@ const SideBar: React.FC<SideBarProps> = ({ showSideBar, setShowSideBar }) => {
   const handleLogout = () => {
     sessionStorage.removeItem('access_token');
     sessionStorage.removeItem('refreshtoken')
+    localStorage.removeItem('role')
     router.push('/welcomepage')
   }
   return (
