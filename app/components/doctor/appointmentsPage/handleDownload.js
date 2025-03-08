@@ -67,7 +67,7 @@ export const handleDownloadPDF = (data, filters) => {
   doc.text(reportTitle, 14, 50);
 
   // Table Headers
-  const tableColumn = ["Date", "Doctor", "Patient", "Start Time","End Time", "Status", "Gender"];
+  const tableColumn = ["Date", "Doctor", "Patient", "Appointment Time", "Status", "Gender"];
   const tableRows = data.map((row) => [
     new Intl.DateTimeFormat("en-US", {
       month: "short",
@@ -76,8 +76,7 @@ export const handleDownloadPDF = (data, filters) => {
     }).format(new Date(row.date)),
     row.doctor?.username || "-",
     row.patient?.username || "-",
-    row.startTime || "-",
-    row.endTime || "-",
+    `${row.startTime} - ${row.endTime}` || "-",
     row.status || "-",
     row.patient?.gender || "-",
   ]);

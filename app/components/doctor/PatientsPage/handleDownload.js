@@ -7,21 +7,21 @@ export const formatDate = (date) => {
     day: "numeric",
     year: "numeric",
   }).format(new Date(date));
-};
+}
 
 export const handleDownloadPDF = (data, filters) => {
   const doc = new jsPDF();
 
   const logoUrl = "/images/logo.png";
-  doc.addImage(logoUrl, "PNG", 10, 10, 30, 10);
+  doc.addImage(logoUrl, "PNG", 10,10,30,10);
 
   doc.setFontSize(14);
   doc.setFont("helvetica", "bold");
-  doc.text("APPOINTMENT REPORT", 80, 20);
+  doc.text("PATIENT REPORT", 85, 20);
+
   doc.setFontSize(10);
   doc.setFont("helvetica", "normal");
-  doc.text(`All Appointments for Kristine Nyaga`, 80, 27);
-
+  doc.text("Intelligent Medical Diagnostic System", 80, 27);
   doc.text(
     "Generated on: " +
       new Intl.DateTimeFormat("en-US", {
@@ -32,51 +32,52 @@ export const handleDownloadPDF = (data, filters) => {
     85,
     34
   );
-  let reportTitle = "All Appointments";
 
-  const { statusFilter, searchDoctor, sortOrder } = filters;
+  let reportTitle = "All Patients ";
+  let fileName = "Patients";
 
-  if (statusFilter) {
-    reportTitle = `Appointments - ${
-      statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1)
-    }`;
+  if (filters.search) {
+    reportTitle += ` whose name contains ${filters.search}`
+    fileName += `_name_contains_ ${filters.search}`;
+    }
+  if (filters.hasAppointments) {
+    reportTitle += ` with appointments`;
+    fileName += `_with_appointments`;
   }
-
-  if (searchDoctor) {
-    reportTitle += ` with Dr. ${searchDoctor}`;
+  if (filters.startDate && filters.endDate) {
+    reportTitle += ` registered from ${formatDate(filters.startDate)} to ${formatDate(
+      filters.endDate
+    )}`;
+    fileName += `_registered_from ${formatDate(
+      filters.startDate
+    )} to ${formatDate(filters.endDate)}`;
   }
-
-  if (sortOrder === "newest") {
-    reportTitle += " (Newest First)";
-  } else if (sortOrder === "oldest") {
-    reportTitle += " (Oldest First)";
+  if (filters.gender) {
+    reportTitle += ` All ${filters.gender} patients`
+    fileName += `All_${filters.gender}_patients`
   }
 
   doc.setFontSize(10);
   doc.setFont("helvetica");
   doc.text(reportTitle, 14, 50);
 
-  if (data.length === 0) {
-    doc.text("No data available", 14, 35);
-    doc.save(`${reportTitle.replace(/\s+/g, "_")}.pdf`);
-    return;
-  }
-
-  const tableColumn = ["Date", "Appointment time", "Appointment Duration", "Status", "Queue Number", "Doctor"]
-  
+  // Table Headers
+  const tableColumn = ["Name", "Email", "Phone", "Dob","Sex", "Appointments", "Registered"];
   const tableRows = data.map((row) => [
+    row.username || "-",
+    row.email || "-",
+    row.phone || "-",
+    row.dob || "-",
+    row.gender || "-",
+    row.appointments.length || "-",
     new Intl.DateTimeFormat("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",
-    }).format(new Date(row.date)),
-    `${row.startTime} - ${row.endTime}` || "-",
-    row.appointmentDuration || "-",
-    row.status || "-",
-    row.queueNumber || "-",
-    row.doctor.username || "-",
+    }).format(new Date(row.createdAt)),
   ]);
 
+  // Table
   doc.autoTable({
     startY: 60,
     head: [tableColumn],
@@ -105,5 +106,5 @@ export const handleDownloadPDF = (data, filters) => {
     doc.internal.pageSize.height - 10
   );
 
-  doc.save(`${reportTitle.replace(/\s+/g, "_")}.pdf`);
+  doc.save(`${fileName.replace(/\s+/g, "_")}.pdf`);
 };

@@ -9,7 +9,6 @@ const AppointmentDetails = () => {
   useEffect(() => {
     const fetchAppointment = async () => {
       const response = await axios.get(`http://localhost:5000/api/appointment/${id}`)
-      console.log(response.data)
     }
     fetchAppointment()
   },[])

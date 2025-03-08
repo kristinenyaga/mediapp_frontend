@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import { BsDownload } from "react-icons/bs";
 import { isWithinInterval, parseISO } from "date-fns";
 import { handleDownloadPDF } from './handleDownload'
+import api from "@/app/utils/axiosInstance";
 
 const TableData = ({ data,columns,filters }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -58,13 +59,16 @@ const TableData = ({ data,columns,filters }) => {
         ...prev,
         [appointmentId]: newStatus
       }))
-      console.log(appointmentId,newStatus)
+
+      const response = await api.post(`/api/appointment/${appointmentId}/status`, {
+        status:newStatus
+      })
+      console.log(response.data)
     } catch (error) {
       console.error("Failed to update status", error);
     }
   };
-
-
+  console.log(status)
   const itemsPerPage = 5;
   const totalPages = Math.ceil(filteredAppointments.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -113,13 +117,26 @@ const TableData = ({ data,columns,filters }) => {
                               value={status[row.id]||row.status}
                               onChange={(e) => handleStatusChange(row.id, e.target.value)}
                               size="small"
-                              sx={{ minWidth: 120, fontSize: "14px" }}
+                              sx={{
+                                minWidth: 120,
+                                fontSize: "14px",
+                                fontWeight: 600,
+                                color:
+                                  (status[row.id] || row.status) === "pending"
+                                    ? "#FFA000"
+                                    : (status[row.id] || row.status) === "completed"
+                                      ? "#388E3C"
+                                      : (status[row.id] || row.status) === "cancelled"
+                                        ? "#D32F2F"
+                                        : "inherit",
+                              }}
+
                             >
-                              <MenuItem value="pending">Pending</MenuItem>
-                              <MenuItem value="completed">Completed</MenuItem>
-                              <MenuItem value="cancelled">Cancelled</MenuItem>
+                              <MenuItem value="pending" sx={{ color: "#FFA000", fontWeight: 600 }}>Pending</MenuItem>
+                              <MenuItem value="completed" sx={{ color: "#388E3C", fontWeight: 600 }}>Completed</MenuItem>
+                              <MenuItem value="cancelled" sx={{ color: "#D32F2F", fontWeight: 600 }}>Cancelled</MenuItem>
                             </Select>
-                      ):
+                      ):col.key === 'startTime' ? (`${row.startTime} - ${row.endTime}`):
                       (
                         Array.isArray(row[col.key]) ? row[col.key].length : row[col.key]
                     )}

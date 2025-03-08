@@ -47,7 +47,9 @@ const Patients = () => {
     { key: "phone", label: "Phone" },
     { key: "dob", label: "Dob" },
     { key: "gender", label: "Sex" },
-    { key: "appointments", label: "Appointments" }
+    { key: "appointments", label: "Appointments" },
+    { key: "createdAt", label: "Registered" }
+
   ];
 
   if(loading) return <LoadingScreen/>

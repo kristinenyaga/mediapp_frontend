@@ -1,23 +1,23 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import DoctorLayout from "../doctorLayout";
 import { CiNoWaitingSign } from "react-icons/ci";
 import { Radio, RadioGroup, FormControlLabel, FormControl } from "@mui/material";
-
+import axios from "axios";
+import { useParams } from "next/navigation";
 const Appointment = () => {
+  const { id } = useParams()
+  
   const [appointment, setAppointment] = useState({
-    patient: {
-      name: "John Doe",
-      age: 35,
-      gender: "Male",
-      symptoms: ["Fever", "Cough", "Headache"],
-    },
-    modelPrediction: "Flu",
-    doctorDecision: "Pending",
-    status: "In Review",
-    doctorDiagnosis: "",
-    completed: false,
   });
+
+  useEffect(() => {
+    const fetchAppointment = async () => {
+      const response = await axios.get(`http://localhost:5000/api/appointment/${id}`)
+      setAppointment(response.data)
+    }
+    fetchAppointment()
+  },[id])
 
   const [value, setValue] = useState("");
 
@@ -37,20 +37,28 @@ const Appointment = () => {
     <DoctorLayout>
       <div className="w-[90%]">
         {/* Title */}
-        <h2 className="text-2xl font-medium text-blue-700 mb-6">Appointment Details</h2>
+        <div className="flex items-center gap-2">
+          <h2 className="text-2xl font-medium text-blue-700">Appointment Details</h2>
+          <p className={`px-5 py-3 rounded-md
+          ${appointment.status === 'completed' ? 'bg-brand-100 text-brand-500' :
+            appointment.status === 'cancelled' ? 'bg-red-100 text-red-300' :
+              'text-amber-600 bg-amber-100'
+          }
+            `}>{appointment.status}</p>
+        </div>
 
         {/* Patient Details */}
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 gap-6 mt-6">
           <div className="border rounded-lg p-4 border-gray-200">
             <h3 className="text-lg font-medium text-gray-700 mb-3">Patient Information</h3>
             <p className="text-gray-600 text-sm">
-              <span className="font-medium">Name:</span> {appointment.patient.name}
+              <span className="font-medium">Name:</span> {appointment?.patient?.username}
             </p>
             <p className="text-gray-600 mt-2 text-sm">
-              <span className="font-medium">Age:</span> {appointment.patient.age} years
+              <span className="font-medium">Age:</span> {appointment?.patient?.age} years
             </p>
             <p className="text-gray-600 mt-2 text-sm">
-              <span className="font-medium">Gender:</span> {appointment.patient.gender}
+              <span className="font-medium">Gender:</span> {appointment?.patient?.gender}
             </p>
           </div>
 
@@ -58,7 +66,7 @@ const Appointment = () => {
           <div className="border rounded-lg p-4 border-gray-200">
             <h3 className="text-lg font-medium text-gray-700 mb-3">Model Prediction</h3>
             <p className="text-blue-700 bg-blue-50 rounded-md text-xl w-fit px-4 py-2 font-semibold">
-              {appointment.modelPrediction}
+              {appointment?.modelPrediction}
             </p>
           </div>
         </div>
@@ -110,17 +118,19 @@ const Appointment = () => {
             />
           </div>
         )}
-
-        {/* Mark as Completed */}
-        <div className="mt-6 flex items-center gap-3">
-          <input
-            type="checkbox"
-            className="w-5 h-5 accent-brand-500 text-white"
-            checked={appointment.completed}
-            onChange={toggleCompleted}
-          />
-          <label className="text-gray-800">Mark appointment as completed</label>
-        </div>
+        {
+          appointment.status !== 'completed' && (
+            <div className="mt-6 flex items-center gap-3">
+              <input
+                type="checkbox"
+                className="w-5 h-5 accent-brand-500 text-white"
+                checked={appointment.completed}
+                onChange={toggleCompleted}
+              />
+              <label className="text-gray-800">Mark appointment as completed</label>
+            </div>
+          ) 
+        }
       </div>
     </DoctorLayout>
   );

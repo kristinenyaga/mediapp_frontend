@@ -122,7 +122,18 @@ const OverviewPage = () => {
   const noShowData = getNoShowData();
 
   const filteredData = getFilteredData()
-  
+
+  function getUniquePatients(appointments) {
+    const uniquePatients = new Map();
+
+    appointments.forEach(appointment => {
+      uniquePatients.set(appointment.patient.id, appointment.patient);
+    });
+
+    const uniquePatientsArray = [...uniquePatients.values()];
+    return uniquePatientsArray
+
+  }
   useEffect(() => {
     setIsLoading(true)
     const fetchAppointments = async () => {
@@ -148,6 +159,11 @@ const OverviewPage = () => {
     date.setHours(hours, minutes, 0);
     return date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
   };
+
+  const completedAppointments = appointments?.filter(appointment => appointment.status === 'completed')
+  const pendingAppointments = appointments?.filter(appointment => appointment.status === 'pending')
+  const cancelledAppointments = appointments?.filter(appointment => appointment.status === 'cancelled')
+  const doctorPatients = getUniquePatients(appointments)
   if(loading) return <LoadingScreen />
   return (
     <DoctorLayout>
@@ -161,7 +177,7 @@ const OverviewPage = () => {
               </div>
               <p className='text-blue-700 text-sm font-medium'>Upcoming <br /> Apppointments</p>
             </div>
-            <p className='text-gray-700 text-2xl pr-2'>50</p>
+            <p className='text-gray-700 text-2xl pr-2'>{ pendingAppointments.length}</p>
           </div>
           <div className='flex justify-between h-24 px-5 items-center border border-gray-300 w-[400px] rounded-md'>
             <div className='flex gap-5 items-center px-2'>
@@ -170,7 +186,7 @@ const OverviewPage = () => {
               </div>
               <p className=' text-brand-500 text-sm font-medium'>Comleted <br /> Apppointments</p>
             </div>
-            <p className='text-gray-700 text-2xl pr-2'>50</p>
+            <p className='text-gray-700 text-2xl pr-2'>{ completedAppointments.length}</p>
           </div>
           <div className='flex justify-between h-24 px-5 items-center border border-gray-300 w-[400px] rounded-md'>
             <div className='flex gap-5 items-center px-2'>
@@ -179,7 +195,7 @@ const OverviewPage = () => {
               </div>
               <p className=' text-red-400 text-sm font-medium'>Cancelled <br /> Apppointments</p>
             </div>
-            <p className='text-gray-700 text-2xl pr-2'>50</p>
+            <p className='text-gray-700 text-2xl pr-2'>{ cancelledAppointments.length}</p>
           </div>
           <div className='flex justify-between h-24 px-5 items-center border border-gray-300 w-[400px] rounded-md'>
             <div className='flex gap-5 items-center px-2'>
@@ -188,7 +204,7 @@ const OverviewPage = () => {
               </div>
               <p className=' text-blue-300 text-sm font-medium'>Total <br /> Patients</p>
             </div>
-            <p className='text-gray-700 text-2xl pr-2'>50</p>
+            <p className='text-gray-700 text-2xl pr-2'>{doctorPatients.length}</p>
           </div>
         </div>
         <div className='grid grid-cols-2 w-[90%]'>

@@ -37,9 +37,12 @@ const Otp = () => {
           Notify.success("OTP Verified successfully!");
           if (role === 'doctor') {
             router.push('/doctor/overview')
-          } else {
+          }
+          else if (role === 'patient') {
             router.push("/patient/book-appointment");
-
+          }
+          else {
+            router.push("/admin/home")
           }
         } else {
           Notify.failure(response.data.message || "Login failed");

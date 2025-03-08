@@ -109,8 +109,8 @@ const Appointment = () => {
               onClick={() => handleAppointmentClick(appointment.id)}
             >
               <div>
-                <h2 className="text-[17px] font-medium text-gray-900">Appointment {index + 1}</h2>
-                <p className="text-[15px] text-gray-900 ">Dr. {appointment.doctor.username}</p>
+                <h2 className="text-[17px] font-medium text-gray-700">Appointment {index + 1}</h2>
+                <p className="text-[15px] text-gray-600 ">Dr. {appointment.doctor.username}</p>
                 <p className="text-[14px] text-blue-700 font-medium mt-3">
                   {new Intl.DateTimeFormat("en-US", {
                     month: "long",
@@ -124,12 +124,12 @@ const Appointment = () => {
               </div>
 
               <p
-                className={`text-sm border p-2 rounded-md bg-yellow-50 ${appointment.status === "pending"
-                    ? "text-yellow-600"
-                    : appointment.status === "confirmed"
-                      ? "text-green-600"
-                      : "text-red-600"
-                  }`}
+                className={`px-3 text-sm py-1 rounded-md
+          ${appointment.status === 'completed' ? ' text-brand-500' :
+                    appointment.status === 'cancelled' ? ' text-red-300' :
+                      'text-amber-600 '
+                  }
+            `}
               >
                 {appointment.status}
               </p>

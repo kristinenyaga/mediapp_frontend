@@ -44,8 +44,7 @@ const Appointments = () => {
 
   const columns = [
     { key: 'date', label: 'Date' },
-    { key: 'startTime', label: 'Start Time' },
-    { key: 'endTime', label: 'End Time' },
+    { key: 'startTime', label: 'Appointment Time' },
     { key: 'status', label: 'Status' },
     { key: 'patient', label: 'Patient' },
     { key: 'sex', label: 'Sex' },

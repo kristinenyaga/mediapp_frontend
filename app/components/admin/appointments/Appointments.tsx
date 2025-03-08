@@ -23,8 +23,7 @@ const Appointments = () => {
 
   const columns = [
     { key: 'date', label: 'Date' },
-    { key: 'startTime', label: 'Start Time' },
-    { key: 'endTime', label: 'End Time' },
+    { key: 'startTime', label: 'Appointment Time' },
     { key: 'status', label: 'Status' },
     { key: 'patient', label: 'Patient' },
     { key: 'doctor', label: 'Doctor' }
@@ -37,7 +36,7 @@ const Appointments = () => {
         <p className=' mt-2 text-2xl font-medium'>Appointments</p>
         <p className='mb-7 text-gray-500 text-sm'>Overview of all appointments booked</p>
         <AppointmentFilters filters={filters} setFilters={setFilters} />
-        <TableData filters={filters} data={appointments} columns={columns} />
+        <TableData filters={filters} setAppointments={setAppointments} appointments={appointments} columns={columns} />
       </div>
     </AdminLayout>
   )

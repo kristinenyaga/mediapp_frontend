@@ -8,21 +8,118 @@ import {
   TableContainer,
   Paper,
   Switch,
+  Typography,
 } from "@mui/material";
 import { MdKeyboardDoubleArrowLeft, MdKeyboardDoubleArrowRight } from "react-icons/md";
 import { useRouter } from "next/navigation";
-import { BsDownload } from "react-icons/bs";
+import { BsDownload, BsThreeDotsVertical } from "react-icons/bs";
 import { handleDownloadPDF } from "./handledownload";
-
-const TableData = ({ filters,data,columns }) => {
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import api from "@/app/utils/axiosInstance";
+import AvailableDoctors from "./AvailableDoctors";
+const TableData = ({ filters, appointments, setAppointments,columns }) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const router = useRouter()
+  const [openMenu, setOpenMenu] = useState(null);
+  const router = useRouter();
+  const [open, setOpen] = React.useState(false);
+  const [appointmentToReassign, setAppointmentToReassign] = useState(false)
+  const [availableDoctors, setAvailableDoctors] = useState([])
+  const [selectedDoctor, setSelectedDoctor] = useState({})
+  const [openReassignModal, setOpenReassignModal] = useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleOpenMenu = (id) => {
+    setOpenMenu(openMenu === id ? null : id);
+  };
+
+  const handleView = (id) => {
+    router.push(`/admin/appointments/${id}`);
+  };
+
+  const handleReassign = async (appointment) => {
+    setAppointmentToReassign(appointment)
+    try {
+      if (appointmentToReassign) {
+        const response = await api.post('/api/appointment/get-available-doctors', {
+          startTime: appointmentToReassign.startTime,
+          endTime: appointmentToReassign.endTime,
+          date: appointmentToReassign.date,
+        })
+        setAvailableDoctors(response.data)
+      }
+
+      setOpenReassignModal(true)
+    } catch (error) {
+      console.log(error)
+    }
+  };
+  const handleConfirmCancel = (id) => {
+    handleCancel(id);
+    handleClose();
+  };
+  const handleCancel =async (id) => {
+    try {
+      console.log('cancel', id)
+      const response = await api.post(`/api/appointment/${id}/cancel`, {
+        doctorId: selectedDoctor
+      })
+      setAppointments((prevAppointments) => prevAppointments.map((appointment) => appointment.id === id ? { ...appointment, status: response.data?.status } : appointment
+
+      ))
+    } catch (error) {
+      console.error("Error canceling appointment:", error);
+      alert("Failed to cancel appointment.");
+    }
+  };
+
+  const uploadReassign = async () => {
+    setOpenReassignModal(false)
+
+    try {
+      const response = await api.post(`/api/appointment/${appointmentToReassign.id}/reassign`, {
+        doctorId: selectedDoctor
+      })
+      setAppointments((prevAppointments) => prevAppointments.map((appointment) => appointment.id === appointmentToReassign.id ? { ...appointment, doctor: response.data?.doctor.username } : appointment
+        
+      ))
+
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  const cancelAppointment = async () => {
+    setOpenReassignModal(false)
+
+    try {
+      const response = await api.post(`/api/appointment/${appointmentToReassign.id}/cancel`, {
+        doctorId: selectedDoctor
+      })
+      setAppointments((prevAppointments) => prevAppointments.map((appointment) => appointment.id === appointmentToReassign.id ? { ...appointment, status: response.data?.status } : appointment
+
+      ))
+
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   // filtering logic
   const filteredData = useMemo(() => {
-    return data.filter((appointment) => {
+    return appointments.filter((appointment) => {
       const { dateFrom, dateTo, status, username } = filters
-      
+
       if (status !== 'all' && appointment.status !== status) {
         return false
       }
@@ -43,8 +140,8 @@ const TableData = ({ filters,data,columns }) => {
       }
       return true
     })
-  }, [data, filters])
-  
+  }, [appointments, filters])
+
   // Pagination logic
   const itemsPerPage = 5;
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -59,12 +156,12 @@ const TableData = ({ filters,data,columns }) => {
       borderRadius: "8px",
       overflowX: "auto"
     }}>
-      <button className="flex gap-2 items-center p-3 pl-3 bg-[#6c4de60a] rounded-md m-3 text-secondary" onClick={()=>handleDownloadPDF(filteredData,filters)}>download <BsDownload className="font-medium text-lg text-secondary" /></button>
+      <button className="flex gap-2 items-center p-3 pl-3 bg-[#6c4de60a] rounded-md m-3 text-secondary" onClick={() => handleDownloadPDF(filteredData, filters)}>download <BsDownload className="font-medium text-lg text-secondary" /></button>
       <Table>
         <TableHead>
           <TableRow>
-            {columns.map((col,index) => (
-              <TableCell sx={{ fontWeight: 600, color: "#333", padding: "12px 16px"}} key={index} >{ col.label}</TableCell>
+            {columns.map((col, index) => (
+              <TableCell sx={{ fontWeight: 600, color: "#333", padding: "12px 16px" }} key={index} >{col.label}</TableCell>
             ))}
             <TableCell>Actions</TableCell>
           </TableRow>
@@ -72,7 +169,7 @@ const TableData = ({ filters,data,columns }) => {
 
         <TableBody>
           {displayedData.length > 0 ? (
-            displayedData.map((row,index) => (
+            displayedData.map((row, index) => (
               <TableRow sx={{
                 bgcolor: index % 2 === 0 ? "#FFFFFF" : "#FAFAFA",
                 "&:hover": { bgcolor: "#F1F1F1" }
@@ -83,23 +180,78 @@ const TableData = ({ filters,data,columns }) => {
                       row.patient.username || row.patient.name
                     ) : col.key === "doctor" && typeof row.doctor === "object" ? (
                       row.doctor.username || row.patient.name
-                      ) : col.key === "date" ? (
+                    ) : col.key === "date" ? (
                       new Intl.DateTimeFormat("en-US", {
                         month: "short",
                         day: "numeric",
                         year: "numeric",
                       }).format(new Date(row.date))
-                    ):
+                    ) :col.key === 'startTime' ?(`${row.startTime} - ${row.endTime}`):
                       (
                         Array.isArray(row[col.key]) ? row[col.key].length : row[col.key]
-                    )}
+                      )}
                   </TableCell>
                 ))}
 
-                <TableCell sx={{ padding: "12px 16px" }}>
-                  {/* <button className="px-3 py-1 mx-1 border rounded-md bg-gray-200 hover:bg-gray-300">Edit</button> */}
-                  <button className="px-3 py-1 mx-1 border rounded-md bg-gray-200 hover:bg-gray-300"
-                    onClick={() => router.push(`/admin/appointments/${row.id}`)}>View</button>
+                <TableCell sx={{ padding: "12px 16px", position: 'relative' }}>
+                  <button
+                    className="p-2 bg-gray-200 rounded-full hover:bg-gray-300"
+                    onClick={() => handleOpenMenu(row.id)}
+                  >
+                    <BsThreeDotsVertical />
+                  </button>
+                  {openMenu === row.id && (
+                    <div className="absolute flex flex-col gap-2 -left-2 mt-2 w-40 bg-white border rounded-lg shadow-lg z-10">
+                      {/* <button
+                        className="block border-b w-full text-left px-4 py-2 hover:bg-gray-100"
+                        onClick={() => handleView(row.id)}
+                      >
+                        View
+                      </button> */}
+                      <button
+                        className="block border-b w-full text-left px-4 py-2 hover:bg-gray-100"
+                        onClick={() => handleReassign(row)}
+                      >
+                        Reassign
+                      </button>
+                      <AvailableDoctors uploadReassign={uploadReassign} openReassignModal={openReassignModal} setOpenReassignModal={setOpenReassignModal} availableDoctors={availableDoctors} selectedDoctor={selectedDoctor} setSelectedDoctor={setSelectedDoctor} />
+                      <button
+                        className="block border-b w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100"
+                        onClick={() => {
+                          handleConfirmCancel(row.id)
+                        }}
+                      >
+                        Cancel
+                      </button>
+                      {
+                        open && (
+                          <Dialog
+                            open={open}
+                            onClose={handleClose}
+                            aria-labelledby="alert-dialog-title"
+                            aria-describedby="alert-dialog-description"
+                          >
+                            <DialogTitle sx={{ color: '#FF8503' }} id="alert-dialog-title">
+                              {"Warning!"}
+                            </DialogTitle>
+                            <DialogContent>
+                              <DialogContentText id="alert-dialog-description">
+                                Are you sure you want to cancel this appointment?
+                              </DialogContentText>
+                            </DialogContent>
+                            <DialogActions>
+                              <Button onClick={() => handleConfirmCancel(row.id)}>Yes</Button>
+                              <Button onClick={() => {
+                                handleClose()
+                              }} autoFocus>
+                                No
+                              </Button>
+                            </DialogActions>
+                          </Dialog>
+                        )
+                      }
+                    </div>
+                  )}
                 </TableCell>
               </TableRow>
 
