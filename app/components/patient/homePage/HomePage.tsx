@@ -73,7 +73,7 @@ console.log(appointments)
 
         <section className="mt-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-blue-50 p-5 rounded-lg shadow-sm">
+            {/* <div className="bg-blue-50 p-5 rounded-lg shadow-sm">
               <h2 className="text-blue-700 font-medium mb-3">Queue Information</h2>
               <div className="space-y-2 text-gray-700 text-[15px]">
                 <div className="flex justify-between">
@@ -89,7 +89,7 @@ console.log(appointments)
                   <span className="text-blue-700 font-semibold">4</span>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             <div className="bg-brand-100 p-5 rounded-lg shadow-sm">
               <p className="text-gray-800">Next Appointment</p>
@@ -112,20 +112,20 @@ console.log(appointments)
               )}
             </div>
 
-            <div className="bg-yellow-50 p-5 rounded-lg shadow-sm">
+            <div className={`${lastAppointment?.status === 'cancelled' ? 'bg-red-100' : lastAppointment?.status === 'completed' ? 'bg-brand-100' : 'bg-yellow-50'} p-5 rounded-lg shadow-sm`}>
               <div className="flex justify-between items-center">
                 <p className="text-gray-800">Last Appointment</p>
-                <p className="text-sm flex gap-2 items-center text-yellow-700">{lastAppointment?.status} <FaCheck /></p>
+                <p className={`text-sm flex gap-2 items-center ${lastAppointment?.status === 'cancelled' ? 'text-red-300' : lastAppointment?.status === 'completed' ? 'text-brand-500' :'text-yellow-700'} `}>{lastAppointment?.status} </p>
               </div>
               {
                 lastAppointment ? (
                   <>
-                    <p className="text-yellow-700 text-xl font-semibold mt-2">{new Intl.DateTimeFormat("en-US", {
+                    <p className=" text-xl font-semibold mt-2">{new Intl.DateTimeFormat("en-US", {
                       month: 'short',
                       day: 'numeric',
                       year: 'numeric'
                     }).format(lastAppointment?.date)}</p>
-                    <p className="text-gray-600 text-xs mt-1">{lastAppointment?.doctor?.username}</p>
+                    <p className="text-gray-600 text-xs mt-2">DR. {lastAppointment?.doctor?.username}</p>
                   </>
                 ) : (
                     <p className="text-gray-600 text-sm mt-2">No previous appointments</p>
