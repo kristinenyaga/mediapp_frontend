@@ -9,6 +9,7 @@ import axios, { AxiosError } from "axios";
 import { useAuth } from "@/app/context/authContext";
 import { useRole } from "@/app/context/RoleContext";
 import LoadingScreen from "../loader/Loader";
+
 const Otp = () => {
   const inputRefs = useRef([]);
   const router = useRouter();
@@ -73,8 +74,22 @@ const Otp = () => {
   }
 
   const handleResendOTP = async () => {
+    if (!user?.email) {
+      Notify.failure("User email not found. Please log in again.");
+      return;
+    }
+
     try {
-      const response = await axios.post("http://localhost:5000/api/patient/resendotp", {
+
+      let endpoint = ""
+      if (role === 'patient') {
+        endpoint = "http://localhost:5000/api/patient/resendotp"
+      } else if (role === 'doctor') {
+        endpoint = "http://localhost:5000/api/doctor/resendotp"
+      } else {
+        endpoint = "http://localhost:5000/api/admin/resendotp"
+      }
+      const response = await axios.post(endpoint, {
         email: user.email,
       }, {
         withCredentials: true,
@@ -90,7 +105,10 @@ const Otp = () => {
       Notify.failure("Failed to resend OTP. Please try again.");
     }
   };
-
+  useEffect(() => {
+    console.log("Auth Context Updated:", user);
+  }, [user]);
+  
   if(isLoading) return <LoadingScreen />
   return (
     <div className="flex flex-col items-center space-y-32 mt-36 gap-y-8">
