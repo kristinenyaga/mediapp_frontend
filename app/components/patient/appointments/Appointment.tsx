@@ -125,9 +125,9 @@ const Appointment = () => {
 
               <p
                 className={`px-3 text-sm py-1 rounded-md
-          ${appointment.status === 'completed' ? ' text-brand-500' :
-                    appointment.status === 'cancelled' ? ' text-red-300' :
-                      'text-amber-600 '
+          ${appointment.status === 'completed' ? ' text-brand-500 bg-brand-100' :
+                    appointment.status === 'cancelled' ? ' text-red-500 bg-red-50' :
+                      'text-amber-600 bg-amber-50'
                   }
             `}
               >
