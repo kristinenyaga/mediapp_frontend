@@ -86,7 +86,7 @@ const TableData = ({ search, filters,data,columns,userType,name }) => {
       borderRadius: "8px",
       overflowX: "auto"
     }}>
-      <button className="flex gap-2 items-center p-3 pl-3 bg-[#6c4de60a] rounded-md m-3 text-secondary" onClick={() => handleDownloadPDF(searchedData, filters, userType, name)} >download <BsDownload className=" font-medium text-lg text-secondary" /></button>
+      <button className="flex gap-2 items-center p-3 pl-3 bg-blue-50 rounded-md m-3 text-blue-600" onClick={() => handleDownloadPDF(searchedData, filters, userType, name)} >download <BsDownload className=" font-medium text-lg text-blue-600" /></button>
       <Table>
         <TableHead>
           <TableRow>

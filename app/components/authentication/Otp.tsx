@@ -105,9 +105,6 @@ const Otp = () => {
       Notify.failure("Failed to resend OTP. Please try again.");
     }
   };
-  useEffect(() => {
-    console.log("Auth Context Updated:", user);
-  }, [user]);
   
   if(isLoading) return <LoadingScreen />
   return (

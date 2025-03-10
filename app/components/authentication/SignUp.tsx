@@ -18,20 +18,23 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 const SignUp = () => {
   const router = useRouter()
-  const [value, setValue] = React.useState('');
+  const [gender, setGender] = React.useState('');
   const [dob, setDob] = React.useState<Dayjs | null>(dayjs('2007-01-01'));
 
   const max = dayjs().subtract(18, 'year');
   const min = dayjs().subtract(75, 'year');
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setValue((event.target as HTMLInputElement).value);
+    setGender((event.target as HTMLInputElement).value);
   };
   const formik = useFormik({
     initialValues: {
       username: '',
       email: '',
-      password:''
+      password: '',
+      dob: max.format("2007-01-01"),
+      gender:'female'
+      
     },
     validationSchema: Yup.object({
       username: Yup.string()
@@ -49,11 +52,14 @@ const SignUp = () => {
     }),
     onSubmit: async (initialValues) => {
       try {
+        console.log(initialValues)
         const response = await axios.post(
-          "http://localhost:5000/api/patient/signup" , {
+          "" , {
             username: initialValues.username,
             email: initialValues.email,
-            password:initialValues.password
+            password: initialValues.password,
+            dob: initialValues.dob,
+            gender:initialValues.gender
           }
         )
 
@@ -83,7 +89,7 @@ const SignUp = () => {
   })
   return (
     <>
-      <div className="flex flex-row justify-between space-y-32 gap-y-0.5 p-5 ">
+      <div className="flex flex-row justify-between space-y-24 gap-y-0.5 p-5 ">
         <div></div>
         <div>
           <div className="mb-6 flex flex-col gap-2">
@@ -143,19 +149,38 @@ const SignUp = () => {
                 <p className="text-red-500 text-xs mt-2">{formik.errors.password}</p>
               )}
               <br />
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DemoContainer
+                  components={[
+                    'DatePicker',
+                  ]}
+                >
+                  <DemoItem label="Date Of Birth*" >
+                    <DatePicker
+                      defaultValue={max}
+                      maxDate={max}
+                      minDate={min}
+                      views={['year', 'month', 'day']}
+                      value={dayjs(formik.values.dob)}
+                      onChange={(date) => formik.setFieldValue("dob", date?.format("YYYY-MM-DD"))}
+                    />
+                  </DemoItem>
+                </DemoContainer>
+              </LocalizationProvider>
               <FormControl>
                 <FormLabel sx={{
                   color: '#6B4DE6',
                   '&.Mui-checked': {
                     color: '#6B4DE6',
                   },
-                }} id="demo-radio-buttons-group-label" className="font-normal w-80 text-black text-base">Gender*</FormLabel>
+                }} id="demo-radio-buttons-group-label" className="font-normal mt-7 w-80 text-black text-base">Gender*</FormLabel>
                 <RadioGroup
                   row
                   aria-labelledby="demo-radio-buttons-group-label"
                   defaultValue="female"
                   name="radio-buttons-group"
-                  onChange={handleChange}
+                  value={formik.values.gender}
+                  onChange={(event) => formik.setFieldValue("gender", event.target.value)}
 
                 >
                   <FormControlLabel value="female" control={<Radio sx={{
@@ -178,24 +203,6 @@ const SignUp = () => {
                   }} />} label="Other" />
                 </RadioGroup>
               </FormControl>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DemoContainer
-                  components={[
-                    'DatePicker',
-                  ]}
-                >
-                  <DemoItem label="Date Of Birth*" >
-                    <DatePicker
-                      defaultValue={max}
-                      maxDate={max}
-                      minDate={min}
-                      views={['year', 'month', 'day']}
-                      value={dob}
-                      onChange={(newValue) => setDob(newValue)}
-                    />
-                  </DemoItem>
-                </DemoContainer>
-              </LocalizationProvider>
 
               <button
                 className="w-full bg-gradient-to-r from-[#6B4DE6] to-[#927de7] text-white h-12 rounded-md mt-8 font-semibold transition-all hover:scale-105"

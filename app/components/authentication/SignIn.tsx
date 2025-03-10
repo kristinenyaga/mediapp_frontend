@@ -54,12 +54,20 @@ const SignIn = () => {
 
         if (response.status === 200) {
           setLoading(false)
-          router.push('/otp')
           Notify.success("Credentials verified!");
 
-          const { accessToken,refreshToken } = response.data;
-          sessionStorage.setItem('access_token', accessToken); 
-          sessionStorage.setItem('refreshtoken', refreshToken)
+          const { doctor, accessToken, refreshToken } = response.data
+          console.log(doctor)
+          sessionStorage.setItem('access_token', accessToken);
+          sessionStorage.setItem('refreshtoken', refreshToken);
+
+          if (doctor.isFirstLogin === 'true') {
+            router.push('/reset-password')
+          }
+          else {
+            router.push('/otp')
+          }
+
         } else {
           setLoading(false)
           Notify.failure(response.data.message || "Login failed");

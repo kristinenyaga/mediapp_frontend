@@ -22,9 +22,10 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import api from "@/app/utils/axiosInstance";
 import AvailableDoctors from "./AvailableDoctors";
+import { Notify } from "notiflix";
 const TableData = ({ filters, appointments, setAppointments,columns }) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [openMenu, setOpenMenu] = useState(null);
+  const [openMenu, setOpenMenu] = useState(false);
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
   const [appointmentToReassign, setAppointmentToReassign] = useState(false)
@@ -59,17 +60,17 @@ const TableData = ({ filters, appointments, setAppointments,columns }) => {
         })
         setAvailableDoctors(response.data)
       }
-
       setOpenReassignModal(true)
     } catch (error) {
       console.log(error)
     }
   };
   const handleConfirmCancel = (id) => {
-    handleCancel(id);
-    handleClose();
+    // handleCancel(id);
+    setOpen(true)
   };
-  const handleCancel =async (id) => {
+  const handleCancel = async (id) => {
+    setOpen(false)
     try {
       console.log('cancel', id)
       const response = await api.post(`/api/appointment/${id}/cancel`, {
@@ -78,14 +79,17 @@ const TableData = ({ filters, appointments, setAppointments,columns }) => {
       setAppointments((prevAppointments) => prevAppointments.map((appointment) => appointment.id === id ? { ...appointment, status: response.data?.status } : appointment
 
       ))
+      setOpenMenu(false)
+      Notify.success("Appointment cancelled ")
     } catch (error) {
       console.error("Error canceling appointment:", error);
-      alert("Failed to cancel appointment.");
+      Notify.failure("Failed to cancel appointment.");
     }
   };
 
   const uploadReassign = async () => {
     setOpenReassignModal(false)
+    setOpenMenu(false)
 
     try {
       const response = await api.post(`/api/appointment/${appointmentToReassign.id}/reassign`, {
@@ -94,22 +98,7 @@ const TableData = ({ filters, appointments, setAppointments,columns }) => {
       setAppointments((prevAppointments) => prevAppointments.map((appointment) => appointment.id === appointmentToReassign.id ? { ...appointment, doctor: response.data?.doctor.username } : appointment
         
       ))
-
-    } catch (error) {
-      console.log(error)
-    }
-  }
-  const cancelAppointment = async () => {
-    setOpenReassignModal(false)
-
-    try {
-      const response = await api.post(`/api/appointment/${appointmentToReassign.id}/cancel`, {
-        doctorId: selectedDoctor
-      })
-      setAppointments((prevAppointments) => prevAppointments.map((appointment) => appointment.id === appointmentToReassign.id ? { ...appointment, status: response.data?.status } : appointment
-
-      ))
-
+      Notify.success(`Appointment reassigned to ${response.data?.doctor.username}`)
     } catch (error) {
       console.log(error)
     }
@@ -214,7 +203,7 @@ const TableData = ({ filters, appointments, setAppointments,columns }) => {
                       >
                         Reassign
                       </button>
-                      <AvailableDoctors uploadReassign={uploadReassign} openReassignModal={openReassignModal} setOpenReassignModal={setOpenReassignModal} availableDoctors={availableDoctors} selectedDoctor={selectedDoctor} setSelectedDoctor={setSelectedDoctor} />
+                      <AvailableDoctors uploadReassign={uploadReassign} setOpenMenu={setOpenMenu} openReassignModal={openReassignModal} setOpenReassignModal={setOpenReassignModal} availableDoctors={availableDoctors} selectedDoctor={selectedDoctor} setSelectedDoctor={setSelectedDoctor} />
                       <button
                         className="block border-b w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100"
                         onClick={() => {
@@ -240,9 +229,10 @@ const TableData = ({ filters, appointments, setAppointments,columns }) => {
                               </DialogContentText>
                             </DialogContent>
                             <DialogActions>
-                              <Button onClick={() => handleConfirmCancel(row.id)}>Yes</Button>
+                              <Button onClick={() => handleCancel(row.id)}>Yes</Button>
                               <Button onClick={() => {
-                                handleClose()
+                                setOpen(false)
+                                setOpenMenu(false)
                               }} autoFocus>
                                 No
                               </Button>

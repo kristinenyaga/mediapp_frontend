@@ -11,7 +11,7 @@ import LoadingScreen from '../../loader/Loader'
 const OverviewPage = () => {
   const [appointments,setAppointments] = useState([])
   const [upcomingAppointments, setUpcomingAppointments] = useState([])
-  const [filter, setFilter] = useState('thisMonth');
+  const [filter, setFilter] = useState('otherMonths');
   const [loading, setIsLoading] = useState(false)
   const mostCommonDiagnoses = [
     { name: "Flu", count: 300 },
