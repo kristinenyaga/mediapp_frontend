@@ -35,7 +35,7 @@ const SideBar: React.FC<SideBarProps> = ({ showSideBar, setShowSideBar }) => {
 
   return (
     <div
-      className={`sidebar_container ${showSideBar ? 'show' : ''} fixed top-0 left-0 w-64 h-full bg-white shadow xl:relative transition-transform xl:translate-x-0 ${showSideBar ? 'translate-x-0' : '-translate-x-full'}`}
+      className={`sidebar_container ${showSideBar ? 'show' : ''} fixed top-0 left-0 w-[16rem] h-full bg-white shadow xl:relative transition-transform xl:translate-x-0 ${showSideBar ? 'translate-x-0' : '-translate-x-full'}`}
     >
       <div className="flex flex-col h-full p-5">
         <IoMdClose
@@ -58,11 +58,17 @@ const SideBar: React.FC<SideBarProps> = ({ showSideBar, setShowSideBar }) => {
               <li
                 className={`flex text-sm hover:bg-blue-0 items-center p-3 rounded-lg transition-all cursor-pointer ${pathname === item.path
                   ? "bg-blue-700 text-white"
-                  : "hover:bg-gray-100 border-b text-gray-600"
+                  : "hover:bg-gray-100 border-b "
                   }`}
               >
-                <span className="mr-3">{item.icon}</span>
-                <span className="menu-text">{item.name}</span>
+                <span className={`mr-3 text-gray-700 ${pathname === item.path
+                  ? "text-white"
+                  : "hover:bg-gray-100 border-b "
+                  }`}>{item.icon}</span>
+                <span className={`text-gray-700 ${pathname === item.path
+                  ? "text-white"
+                  : "hover:bg-gray-100 border-b "
+                  }`}>{item.name}</span>
               </li>
             </Link>
           ))}
