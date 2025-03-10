@@ -58,17 +58,11 @@ const SideBar: React.FC<SideBarProps> = ({ showSideBar, setShowSideBar }) => {
               <li
                 className={`flex text-sm hover:bg-blue-0 items-center p-3 rounded-lg transition-all cursor-pointer ${pathname === item.path
                   ? "bg-blue-700 text-white"
-                  : "hover:bg-gray-100 border-b "
+                  : "hover:bg-gray-100 border-b text-gray-600 "
                   }`}
               >
-                <span className={`mr-3 text-gray-700 ${pathname === item.path
-                  ? "text-white"
-                  : "hover:bg-gray-100 border-b "
-                  }`}>{item.icon}</span>
-                <span className={`text-gray-700 ${pathname === item.path
-                  ? "text-white"
-                  : "hover:bg-gray-100 border-b "
-                  }`}>{item.name}</span>
+                <span className="mr-3">{item.icon}</span>
+                <span className=''>{item.name}</span>
               </li>
             </Link>
           ))}
