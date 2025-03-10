@@ -1,7 +1,7 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography } from '@mui/material'
 import React from 'react'
 
-const AvailableDoctors = ({ openReassignModal, setOpenReassignModal, availableDoctors, selectedDoctor, setSelectedDoctor, uploadReassign }) => {
+const AvailableDoctors = ({ openReassignModal, setOpenMenu, setOpenReassignModal, availableDoctors, selectedDoctor, setSelectedDoctor, uploadReassign }) => {
   if(availableDoctors !>0) return <p>loading...</p>
   return (
     <>
@@ -27,7 +27,10 @@ const AvailableDoctors = ({ openReassignModal, setOpenReassignModal, availableDo
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenReassignModal(false)}>Cancel</Button>
+          <Button onClick={() => {
+            setOpenReassignModal(false)
+            setOpenMenu(false)
+          }}>Cancel</Button>
           <Button onClick={uploadReassign}>
             Confirm
           </Button>
