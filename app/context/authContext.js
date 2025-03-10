@@ -12,11 +12,14 @@ export const AuthProvider = ({ children }) => {
   const fetchUserDetails = async () => {
   try {
     if (!role) return;
-
-    const endpoint =
-      role === "doctor"
-        ? "http://localhost:5000/api/doctor/profile"
-        : "http://localhost:5000/api/patient/profile";
+    let endpoint = ""
+    if (role === 'doctor') {
+      endpoint = "http://localhost:5000/api/doctor/profile"
+    } else if (role === 'patient') {
+      endpoint = "http://localhost:5000/api/patient/profile";
+    } else {
+      endpoint = "http://localhost:5000/api/admin/profile";
+    }
 
     const response = await axios.get(endpoint, {
       headers: { Authorization: `Bearer ${sessionStorage.getItem("access_token")}` },
@@ -33,8 +36,8 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const token = sessionStorage.getItem('access_token');
-    if (token) fetchUserDetails();
-  }, []);
+      if (token && role) fetchUserDetails();
+  }, [role]);
 
   return (
     <AuthContext.Provider value={{ user, setUser }}>
