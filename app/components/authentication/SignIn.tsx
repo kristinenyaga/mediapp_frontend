@@ -57,11 +57,11 @@ const SignIn = () => {
           Notify.success("Credentials verified!");
 
           const { doctor, accessToken, refreshToken } = response.data
-          console.log(doctor)
+
           sessionStorage.setItem('access_token', accessToken);
           sessionStorage.setItem('refreshtoken', refreshToken);
 
-          if (doctor.isFirstLogin === 'true') {
+          if (doctor?.isFirstLogin === 'true') {
             router.push('/reset-password')
           }
           else {

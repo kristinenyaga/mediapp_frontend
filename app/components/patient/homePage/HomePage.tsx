@@ -7,6 +7,7 @@ import { BsArrowUpRight } from "react-icons/bs";
 import api from "@/app/utils/axiosInstance";
 import { useRole } from "@/app/context/RoleContext";
 import { useRouter } from "next/navigation";
+import FeedbackModal from "./FeedbackModal";
 const HomePage = () => {
   const [appointments, setAppointments] = useState([])
   const [nextAppointment, setNextAppointment] = useState(null);
@@ -14,7 +15,8 @@ const HomePage = () => {
   const [previousVisits, setPreviousVisits] = useState([]);
   const { role } = useRole()
   const router = useRouter()
-  
+  const [isFeedbackOpen, setFeedbackOpen] = useState(false);
+
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
@@ -34,21 +36,27 @@ const HomePage = () => {
         const today = new Date()
         const upcomingAppointment = fetchedAppointments.filter((appointment) => appointment.date >= today)
         const pastAppointment = fetchedAppointments.filter(appointment => appointment.date <= today)
-
-        console.log(upcomingAppointment)
         
         setLastAppointment(pastAppointment[pastAppointment.length - 1] || null)
         setNextAppointment(upcomingAppointment[0] || null)
         setPreviousVisits(pastAppointment.reverse().slice(0, 5))
         
         setAppointments(fetchedAppointments)
+
       } catch (error) {
         console.error('Error fetching appointments:', error);
       }
     };
     fetchAppointments();
   }, []);
-console.log(appointments)
+
+  useEffect(() => {
+    if (lastAppointment && lastAppointment.status === "completed" && lastAppointment.feedbackStatus === "prompted") {
+      setFeedbackOpen(true);
+    }
+  }, [lastAppointment]);
+
+  const appointmentId = lastAppointment?.id
   return (
     <PatientLayout>
       <div className="w-[95%] min-h-screen">
@@ -70,26 +78,15 @@ console.log(appointments)
         </header>
         <div>
         </div>
-
+        {lastAppointment && (
+          <FeedbackModal
+            open={isFeedbackOpen}
+            handleClose={() => setFeedbackOpen(false)}
+            lastAppointment={lastAppointment}
+          />
+        )}
         <section className="mt-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* <div className="bg-blue-50 p-5 rounded-lg shadow-sm">
-              <h2 className="text-blue-700 font-medium mb-3">Queue Information</h2>
-              <div className="space-y-2 text-gray-700 text-[15px]">
-                <div className="flex justify-between">
-                  <p>Queue Number</p>
-                  <span className="text-blue-700 font-semibold">#10</span>
-                </div>
-                <div className="flex justify-between">
-                  <p>Current Position</p>
-                  <span className="text-blue-700 font-semibold">5</span>
-                </div>
-                <div className="flex justify-between">
-                  <p>People Ahead</p>
-                  <span className="text-blue-700 font-semibold">4</span>
-                </div>
-              </div>
-            </div> */}
 
             <div className="bg-brand-100 p-5 rounded-lg shadow-sm">
               <p className="text-gray-800">Next Appointment</p>
