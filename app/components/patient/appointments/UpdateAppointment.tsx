@@ -17,28 +17,46 @@ const style = {
   boxShadow: 24,
   p: 4,
 };
-const UpdateAppointment = ({ open, handleClose, date, role, doctor, symptoms, patientSymptoms, appointmentId, symptomId, refreshData }) => {
+
+const formatDate = (date) => {
+  if (!date || isNaN(new Date(date).getTime())) return '';
+  return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(date));
+};
+
+const UpdateAppointment = ({ open,appointment, handleClose, date, role, doctor, symptoms, patientSymptoms, appointmentId, symptomId, refreshData }) => {
 
   const getValidDate = (date) => {
-    const parsedDate = date ? new Date(date) : null;
-    return parsedDate 
+    if (!date) return null;
+    const parsedDate = new Date(date);
+    return isNaN(parsedDate.getTime()) ? null : parsedDate;
   };
 
-  const [selectedDate, setSelectedDate] = useState(getValidDate(date));
-
+  const [selectedDate, setSelectedDate] = useState(getValidDate(date)?.toISOString().split('T')[0] || '');
   const [selectedTime, setSelectedTime] = useState('')
   const [selectedDoctor,setSelectedDoctor] = useState(doctor)
   const [availableTimeslots, setAvailableTimeslots] = useState({
       morning: [],
       afternoon:[]
   });
-  const updatedPatientSymptoms = patientSymptoms?.map((symptom: { name: any; id: any; }) => ({
-    label: symptom.name,
-    value:symptom.id
-  }))
-  const [selectedSymptoms, setSelectedSymptoms] = useState(updatedPatientSymptoms || []);
   const [additionalInfo, setAdditionalInfo] = useState("");
   const router = useRouter()
+  const [selectedSymptoms, setSelectedSymptoms] = useState([]);
+
+  useEffect(() => {
+    if (date) {
+      setSelectedDate(getValidDate(date)?.toISOString().split('T')[0]);
+    }
+  }, [date]);
+
+  useEffect(() => {
+    if (patientSymptoms?.length > 0) {
+      setSelectedSymptoms(patientSymptoms.map(symptom => ({
+        label: symptom.name,
+        value: symptom.id
+      })));
+    }
+  }, [patientSymptoms]); 
+
   
   const getDateOptions = () => {
     const dates = []
@@ -52,10 +70,7 @@ const UpdateAppointment = ({ open, handleClose, date, role, doctor, symptoms, pa
   }
   const dates = getDateOptions()
 
-  const formatDate = (date: number | Date | undefined) => {
-    const options = { month: 'short', day: 'numeric', year: 'numeric' }
-    return new Intl.DateTimeFormat('en-US', options).format(date);
-  }
+
 
   useEffect(() => {
     const fetchTimeslots = async () => {
@@ -101,23 +116,59 @@ const UpdateAppointment = ({ open, handleClose, date, role, doctor, symptoms, pa
 
   }, [selectedDate]);
 
-  const handleSubmit = (e: { preventDefault: () => void; }) => {
+  useEffect(() => {
+    if (appointment?.timeSlot) {
+      const availableSlots =
+        appointment.timeSlot === "morning" ? availableTimeslots.morning : availableTimeslots.afternoon;
+
+      // Format appointment time to match available slot format
+      const formatTime = (time) => time.slice(0, 5);
+      const formattedTime = `${formatTime(appointment.startTime)}-${formatTime(appointment.endTime)}`;
+
+      // Check if the formatted time exists in the available slots
+      const slotExists = availableSlots.some(slot => `${slot.startTime}-${slot.endTime}` === formattedTime);
+
+      if (!slotExists) {
+        // If the selected appointment's slot is not in available slots, add it manually
+        setSelectedTime(formattedTime);
+      }
+    }
+  }, [appointment, availableTimeslots]);
+
+
+  const handleSubmit = (e: { preventDefault: () => void }) => {
     e.preventDefault();
 
     const updateAppointment = async () => {
+      const hasDateChanged = selectedDate !== appointment?.date;
+      const hasTimeChanged = selectedTime !== `${appointment?.startTime}-${appointment?.endTime}`;
 
-      const response = await api.patch(`/api/appointment/${appointmentId}`, {
-        date: selectedDate,
-        selectedTime,
-      }, {
-        _role: role
-      })
-      if (response.status === 200 && selectedSymptoms) {
-        submitSymptoms()
+      if (hasDateChanged || hasTimeChanged) {
+        try {
+          const response = await api.patch(`/api/appointment/${appointmentId}`, {
+            date: hasDateChanged ? selectedDate : undefined,
+            selectedTime: hasTimeChanged ? selectedTime : undefined,
+          }, {
+            _role: role
+          });
+
+          if (response.status === 200) {
+            Notify.success("Appointment updated successfully");
+          }
+        } catch (error) {
+          console.error("Error updating appointment:", error);
+        }
       }
-    }
-    updateAppointment()
+
+      // Always update symptoms if they are provided
+      if (selectedSymptoms) {
+        submitSymptoms();
+      }
+    };
+
+    updateAppointment();
   };
+
 
   const submitSymptoms = async () => {
     const symptomList = selectedSymptoms?.map((symptom: { value: any; }) => symptom.value);
@@ -126,7 +177,8 @@ const UpdateAppointment = ({ open, handleClose, date, role, doctor, symptoms, pa
       if (patientSymptoms) {
         response = await api.patch(`/api/patientsymptoms/${symptomId}`, {
           symptoms: symptomList,
-          additionalInfo: additionalInfo
+          additionalInfo: additionalInfo,
+          appointmentId
         }, {
           _role: role
         })
@@ -151,17 +203,18 @@ const UpdateAppointment = ({ open, handleClose, date, role, doctor, symptoms, pa
       console.log(error)
     }
   }
+
   return (
     <Modal open={open} onClose={handleClose} aria-labelledby="modal-title">
       <Box sx={style}>
-        <Typography id="modal-title" variant='h6' component='h2' >Update Appointment</Typography>
+        <Typography id="modal-title" variant='h6' component='h2'>Update Appointment</Typography>
         <p className='flex gap-2 items-center text-sm text-amber-600 mt-2'><MdWarning className='text-amber-600' /> you can not change the selected doctor</p>
 
         <form onSubmit={handleSubmit}>
           <div className="bg-white rounded-lg mt-8">
             <label className="block text-gray-900 text-base">Select Date</label>
             <select
-              value={selectedDate}
+              value={selectedDate || ''}
               onChange={(e) => setSelectedDate(e.target.value)}
               className="w-full p-3 mt-2 border rounded-lg outline-none focus:outline-none"
             >
@@ -186,6 +239,13 @@ const UpdateAppointment = ({ open, handleClose, date, role, doctor, symptoms, pa
                       className="w-full p-3 mt-2 border rounded-lg"
                     >
                       <option value="">Select a Morning Slot</option>
+                      {appointment?.timeSlot === "morning" && !availableTimeslots.morning.some(
+                        (slot) => `${slot.startTime}-${slot.endTime}` === selectedTime
+                      ) && (
+                          <option value={selectedTime} disabled>
+                            {selectedTime} (Booked)
+                          </option>
+                        )}
                       {availableTimeslots.morning.map((slot, index) => (
                         <option key={index} value={`${slot.startTime}-${slot.endTime}`}>
                           {slot.startTime} - {slot.endTime}
@@ -202,6 +262,14 @@ const UpdateAppointment = ({ open, handleClose, date, role, doctor, symptoms, pa
                       className="w-full p-3 mt-2 border rounded-lg "
                     >
                       <option value="">Select an Afternoon Slot</option>
+                      {appointment?.timeSlot === "afternoon" && !availableTimeslots.afternoon.some(
+                        (slot) => `${slot.startTime}-${slot.endTime}` === selectedTime
+                      ) && (
+                          <option value={selectedTime} disabled>
+                            {selectedTime} (Booked)
+                          </option>
+                        )}
+
                       {availableTimeslots.afternoon.map((slot, index) => (
                         <option key={index} value={`${slot.startTime}-${slot.endTime}`}>
                           {slot.startTime} - {slot.endTime}
