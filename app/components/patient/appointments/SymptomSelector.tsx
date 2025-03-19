@@ -1,15 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Select from 'react-select'; 
 
-const SymptomSelector = ({ symptoms, patientSymptoms,selectedSymptoms,setSelectedSymptoms,additionalInfo,setAdditionalInfo }) => {
-
-  // const updatedPatientSymptoms = patientSymptoms?.map((symptom) => ({
-  //   label: symptom.name,
-  //   value:symptom.id
-  // }))
-  // const [selectedSymptoms, setSelectedSymptoms] = useState(updatedPatientSymptoms);
-  // const [additionalInfo, setAdditionalInfo] = useState("");
-
+const SymptomSelector = ({ symptoms, selectedSymptoms, setSelectedSymptoms, additionalInfo, setAdditionalInfo }) => {
+  
   const symptomOptions = symptoms?.map((symptom) => ({
     label: symptom.name, 
     value: symptom.id,  
@@ -32,7 +25,6 @@ const SymptomSelector = ({ symptoms, patientSymptoms,selectedSymptoms,setSelecte
   const filteredOptions = symptomOptions.filter(
     (option) => !selectedSymptoms?.some((symptom) => symptom.value === option.value)
   );
-
   return (
     <div className="mt-8 max-w-[90%]">
       <h2 className="mb-4 text-secondary font-medium">Select Symptoms <span className='text-sm text-gray-600'>(optional)</span></h2>
@@ -93,14 +85,6 @@ const SymptomSelector = ({ symptoms, patientSymptoms,selectedSymptoms,setSelecte
         ></textarea>
       </div>
 
-      {/* <div className="mt-5">
-        <button
-          onClick={handleSubmit}
-          className="px-9 py-2 rounded-md bg-secondary text-white  transition duration-200"
-        >
-          Submit Symptoms
-        </button>
-      </div> */}
     </div>
   );
 };
