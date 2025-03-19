@@ -8,7 +8,10 @@ import { useRole } from '@/app/context/RoleContext';
 import UpdateAppointment from './UpdateAppointment';
 import { CiNoWaitingSign } from "react-icons/ci";
 import axios from 'axios';
-import { BsPencilSquare, BsTrash } from 'react-icons/bs';
+import { BsArrowClockwise, BsPencilSquare, BsTrash } from 'react-icons/bs';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
+import { Warning } from '@mui/icons-material';
+import { Notify } from 'notiflix';
 
 const AppointmentDetails = () => {
   const { id } = useParams(); 
@@ -17,6 +20,8 @@ const AppointmentDetails = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { role } = useRole()
   const [open, setOpen] = useState(false)
+  const [openCancelDialog, setOpenCancelDialog] = useState(false);
+
   const handleClose =() => {
     setOpen(false)
   }
@@ -36,7 +41,6 @@ const AppointmentDetails = () => {
   };
 
   useEffect(() => {
-    console.log('triggered')
     const fetchSymptoms = async () => {
       try {
         const response = await api.get('/api/symptoms', {
@@ -54,9 +58,29 @@ const AppointmentDetails = () => {
     fetchSymptoms();
   }, [id,role]);
 
-  const handleCancel = async () => {
-    const response = await axios.delete(`http://localhost:5000/api/appointment/${id}`)
-    console.log(response.data)
+
+
+  const handleOpenCancelDialog = () => {
+    setOpenCancelDialog(true);
+  };
+
+  const handleCloseCancelDialog = () => {
+    setOpenCancelDialog(false);
+  };
+
+  const handleConfirmCancel = async () => {
+    try {
+      const response = await api.post(`/api/appointment/${id}/cancel`);
+      if (response.status === 200) {
+        Notify.success("Appointment canceled successfully");
+        fetchAppointment(); // Refresh UI
+      }
+    } catch (error) {
+      console.error("Error canceling appointment:", error);
+      Notify.failure("Failed to cancel appointment");
+    } finally {
+      setOpenCancelDialog(false); // Close dialog
+    }
   };
 
   const handleUpdate = () => {
@@ -65,7 +89,6 @@ const AppointmentDetails = () => {
 
 
   if (isLoading && !appointment) return <LoadingScreen />;
-  console.log(appointment)
 
   const formatTime = (timestring) => {
     if (!timestring) return "N/A"; 
@@ -77,26 +100,97 @@ const AppointmentDetails = () => {
 
   const patientSymptoms = appointment?.patientSymptom?.symptoms 
   const symptomId = appointment?.patientSymptom?.id
+
+  const handleRestoreAppointment = async () => {
+    if (!appointment) return;
+
+    const now = new Date();
+    const appointmentEndTime = new Date(`${appointment.date}T${appointment.endTime}`);
+
+    if (appointmentEndTime < now) {
+      Notify.failure("Cannot restore appointment. The time has already passed.");
+      return;
+    }
+
+    try {
+      const response = await api.post(`/api/appointment/${appointment.id}/status`, {
+        status: 'pending'
+      },{
+        _role: role
+      })
+
+      if (response.status === 200) {
+        Notify.success("Appointment restored successfully");
+        fetchAppointment(); // Refresh appointment details
+      }
+    } catch (error) {
+      console.error("Error restoring appointment:", error);
+      Notify.failure("Failed to restore appointment.");
+    }
+  };
+
   return (
     <PatientLayout>
       <div className="max-w-[90%]">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-medium text-blue-700">Appointment Details</h1>
           <div className="flex gap-3">
+            {
+              appointment?.status !== 'cancelled' && (
+                <button
+                  onClick={handleUpdate}
+                  className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-100 rounded-md"
+                >
+                  <BsPencilSquare /> Update
+                </button>
+              )
+            }
+
             <button
-              onClick={handleUpdate}
-              className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-100 rounded-md"
-            >
-              <BsPencilSquare /> Update
-            </button>
-            <button
-              onClick={handleCancel}
-              className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+              onClick={handleOpenCancelDialog}
+              disabled={appointment?.status === "cancelled"}
+              className={`flex items-center gap-2 px-4 py-2 rounded-md ${appointment?.status === "cancelled"
+                  ? "bg-red-400 text-gray-200 cursor-not-allowed" // Disabled styling
+                  : "bg-red-500 text-white hover:bg-red-600" // Normal styling
+                }`}
             >
               <BsTrash /> Cancel
             </button>
+            {appointment?.status === "cancelled" && (
+              <button
+                onClick={handleRestoreAppointment}
+                disabled={new Date(`${appointment.date}T${appointment.startTime}`) < new Date()} // Disable if time passed
+                className={`flex items-center gap-2 px-4 py-2 rounded-md ${new Date(`${appointment.date}T${appointment.startTime}`) < new Date() ? "bg-gray-400 text-gray-700 cursor-not-allowed" : "bg-brand-600 text-white hover:bg-green-600"}`}
+              >
+                <BsArrowClockwise /> Restore Appointment
+              </button>
+            )}
+
+            <Dialog open={openCancelDialog} onClose={handleCloseCancelDialog}>
+              <DialogTitle className='text-[#ec942c]'><Warning/> Appointment Cancellation</DialogTitle>
+              <DialogContent>
+                <Typography>Are you sure you want to cancel this appointment?</Typography>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={handleCloseCancelDialog} color="primary">No</Button>
+                <Button onClick={handleConfirmCancel}  color="error" variant="contained">Yes, Cancel</Button>
+              </DialogActions>
+            </Dialog>
+
           </div>
+
         </div>
+        {
+          appointment?.status === 'cancelled' && (
+            <div className=" mb-11 border-l-4 border-blue-500 text-blue-700 p-4 rounded-md">
+              <p className="font-semibold">Note:</p>
+              <ul className="list-disc list-inside mt-2 text-sm">
+                <li>You can only restore an appointment if the appointment time has not passed.</li>
+                <li>If your time slot has already been booked by someone else, you will need to schedule a new appointment</li>
+              </ul>
+            </div>
+          )
+        }
 
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-b pb-4">
@@ -134,6 +228,7 @@ const AppointmentDetails = () => {
         appointmentId={id}
         symptomId={symptomId}
         refreshData={fetchAppointment}
+        appointment={appointment}
       />
     </PatientLayout>
   );
