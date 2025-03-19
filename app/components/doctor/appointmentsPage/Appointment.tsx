@@ -2,14 +2,20 @@
 import React, { useEffect, useState } from "react";
 import DoctorLayout from "../doctorLayout";
 import { CiNoWaitingSign } from "react-icons/ci";
-import { Radio, RadioGroup, FormControlLabel, FormControl } from "@mui/material";
+import { Radio, RadioGroup, FormControlLabel, FormControl, Button } from "@mui/material";
 import axios from "axios";
 import { useParams } from "next/navigation";
+import { Notify } from "notiflix";
+import api from "@/app/utils/axiosInstance";
+import { useRole } from "@/app/context/RoleContext";
 const Appointment = () => {
   const { id } = useParams()
-  
-  const [appointment, setAppointment] = useState({
-  });
+  const { role } = useRole()
+  const [appointment, setAppointment] = useState({});
+  const [diagnosisError, setDiagnosisError] = useState(false);
+  const [diagnosis, setDiagnosis] = useState()
+  const [doctorDiagnosis,setDoctorDiagnosis] = useState('')
+  const [value, setValue] = useState("");
 
   useEffect(() => {
     const fetchAppointment = async () => {
@@ -17,22 +23,62 @@ const Appointment = () => {
       setAppointment(response.data)
     }
     fetchAppointment()
+  }, [id])
+  
+  useEffect(() => {
+    const fetchDiagnosis = async () => {
+      const response = await axios.get(`http://localhost:5000/api/diagnosis/${id}`)
+      setDiagnosis(response.data)
+    }
+    fetchDiagnosis()
   },[id])
 
-  const [value, setValue] = useState("");
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setValue(event.target.value);
-  };
 
   const handleDiagnosisChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setAppointment({ ...appointment, doctorDiagnosis: event.target.value });
+    setDoctorDiagnosis(event.target.value);
   };
 
-  const toggleCompleted = () => {
-    setAppointment({ ...appointment, completed: !appointment.completed });
+  const markAppointmentCompleted = async () => {
+    try {
+      setAppointment({ ...appointment, status: "completed" });
+
+      await api.post(`/api/appointment/${id}/status`, {
+        status: "completed"
+      }, {
+        _role: role
+      })
+      Notify.success("Appointment marked as completed!");
+    } catch (error) {
+      Notify.failure(error.response?.data?.message || "Failed to update appointment status.");
+    }
   };
 
+  const handleSubmit = async () => {
+    if (value === "no" && !appointment.doctorDiagnosis?.trim()) {
+      setDiagnosisError(true);
+      return;
+    }
+    setDiagnosisError(false);
+
+    try {
+      await axios.patch(`http://localhost:5000/api/diagnosis/disapprove/${id}`, {
+        finalDiagnosis: doctorDiagnosis,
+      });
+
+      Notify.success("Diagnosis submitted successfully!");
+    } catch (error) {
+      Notify.failure(error.response.data);
+    }
+  };
+
+  const handleApproveDiagnosis = async () => {
+    try {
+      await axios.patch(`http://localhost:5000/api/diagnosis/approve/${id}`);
+      Notify.success("Diagnosis approved successfully!");
+    } catch (error) {
+      Notify.failure(error.response?.data?.message || "Something went wrong!");
+    }
+  };
   return (
     <DoctorLayout>
       <div className="w-[90%]">
@@ -66,7 +112,7 @@ const Appointment = () => {
           <div className="border rounded-lg p-4 border-gray-200">
             <h3 className="text-lg font-medium text-gray-700 mb-3">Model Prediction</h3>
             <p className="text-blue-700 bg-blue-50 rounded-md text-xl w-fit px-4 py-2 font-semibold">
-              {appointment?.modelPrediction}
+              {diagnosis ? diagnosis?.predictedDiagnosis : 'loading...'}
             </p>
           </div>
         </div>
@@ -90,47 +136,69 @@ const Appointment = () => {
         </div>
 
         {/* Doctor's Decision */}
-        <div className="mt-6 border rounded-lg p-4 border-gray-200">
-          <h3 className="text-lg font-medium text-gray-700 mb-3">Is the predicted diagnosis accurate?</h3>
-          <FormControl>
-            <RadioGroup
-              name="diagnosis-accuracy"
-              value={value}
-              onChange={handleChange}
-              className="flex flex-row gap-6"
-            >
-              <FormControlLabel value="yes" control={<Radio />} label="Yes" />
-              <FormControlLabel value="no" control={<Radio />} label="No" />
-            </RadioGroup>
-          </FormControl>
-        </div>
+        {diagnosis?.isApproved ? (
+          <div className="mt-6 border rounded-lg p-4 bg-green-100 border-green-300">
+            <h3 className="text-lg font-medium text-green-700">
+              Diagnosis has been approved ✅
+            </h3>
+            <p className="text-gray-700">The predicted diagnosis has been confirmed as accurate.</p>
+          </div>
+        ): (
+            <div className="mt-6 border rounded-lg p-4 border-gray-200">
+              <h3 className="text-lg font-medium text-gray-700 mb-3">Is the predicted diagnosis accurate?</h3>
+            <FormControl>
+              <RadioGroup
+                name="diagnosis-accuracy"
+                value={value}
+                onChange={(event) => {
+                  setValue(event.target.value);
+                  if (event.target.value === "yes") {
+                    handleApproveDiagnosis();
+                  }
+                }}
+                className="flex flex-row gap-6"
+              >
+                <FormControlLabel value="yes" control={<Radio />} label="Yes" />
+                <FormControlLabel value="no" control={<Radio />} label="No" />
+              </RadioGroup>
+            </FormControl>
+          </div>
+        )}
 
         {/* Diagnosis Input (if incorrect prediction) */}
         {value === "no" && (
-          <div className="mt-6 border rounded-lg p-4 bg-gray-50">
-            <h3 className="text-lg font-semibold text-gray-800 mb-3">Provide Correct Diagnosis</h3>
+          <div className="mt-6 border rounded-lg p-4">
+            <h3 className="text-lg font-medium text-gray-700 mb-3">Provide Correct Diagnosis</h3>
             <input
               type="text"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400"
+              className={`w-full p-3 border rounded-lg outline-none ${diagnosisError ? "border-red-500" : "border-gray-300 focus:border-gray-500"}`}
               placeholder="Enter diagnosis"
-              value={appointment.doctorDiagnosis}
+              value={doctorDiagnosis}
               onChange={handleDiagnosisChange}
             />
+            {diagnosisError && <p className="text-red-500 text-sm mt-1">Please enter a diagnosis.</p>}
+            <Button className="mt-6" onClick={handleSubmit} variant="contained" color="primary">
+              Submit
+            </Button>
+
           </div>
         )}
         {
-          appointment.status !== 'completed' && (
+          appointment.status !== "completed" && appointment.status !== "cancelled" && (
             <div className="mt-6 flex items-center gap-3">
               <input
                 type="checkbox"
-                className="w-5 h-5 accent-brand-500 text-white"
-                checked={appointment.completed}
-                onChange={toggleCompleted}
+                className="w-5 h-5 accent-brand-500"
+                checked={appointment.status === "completed"}
+                onChange={markAppointmentCompleted}
               />
-              <label className="text-gray-800">Mark appointment as completed</label>
+              <label className="text-gray-800 cursor-pointer" onClick={markAppointmentCompleted}>
+                Mark appointment as completed
+              </label>
             </div>
-          ) 
+          )
         }
+
       </div>
     </DoctorLayout>
   );
