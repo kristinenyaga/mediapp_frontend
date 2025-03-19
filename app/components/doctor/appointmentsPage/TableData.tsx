@@ -63,12 +63,12 @@ const TableData = ({ data,columns,filters }) => {
       const response = await api.post(`/api/appointment/${appointmentId}/status`, {
         status:newStatus
       })
-      console.log(response.data)
+      
     } catch (error) {
       console.error("Failed to update status", error);
     }
   };
-  console.log(status)
+  
   const itemsPerPage = 5;
   const totalPages = Math.ceil(filteredAppointments.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -132,9 +132,9 @@ const TableData = ({ data,columns,filters }) => {
                               }}
 
                             >
-                              <MenuItem value="pending" sx={{ color: "#FFA000", fontWeight: 600 }}>Pending</MenuItem>
+                              <MenuItem  value="pending" sx={{ color: "#FFA000", fontWeight: 600 }}>Pending</MenuItem>
                               <MenuItem value="completed" sx={{ color: "#388E3C", fontWeight: 600 }}>Completed</MenuItem>
-                              <MenuItem value="cancelled" sx={{ color: "#D32F2F", fontWeight: 600 }}>Cancelled</MenuItem>
+                              <MenuItem disabled value="cancelled" sx={{ color: "#D32F2F", fontWeight: 600 }}>Cancelled</MenuItem>
                             </Select>
                       ):col.key === 'startTime' ? (`${row.startTime} - ${row.endTime}`):
                       (
