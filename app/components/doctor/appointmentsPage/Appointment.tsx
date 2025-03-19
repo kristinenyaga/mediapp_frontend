@@ -54,7 +54,7 @@ const Appointment = () => {
   };
 
   const handleSubmit = async () => {
-    if (value === "no" && !appointment.doctorDiagnosis?.trim()) {
+    if (value === "no" && !doctorDiagnosis) {
       setDiagnosisError(true);
       return;
     }
@@ -111,7 +111,7 @@ const Appointment = () => {
           {/* Model Prediction */}
           <div className="border rounded-lg p-4 border-gray-200">
             <h3 className="text-lg font-medium text-gray-700 mb-3">Model Prediction</h3>
-            <p className="text-blue-700 bg-blue-50 rounded-md text-xl w-fit px-4 py-2 font-semibold">
+            <p className="text-blue-700 bg-blue-50 rounded-md text-xl w-fit px-4 py-2 font-semibold capitalize">
               {diagnosis ? diagnosis?.predictedDiagnosis : 'loading...'}
             </p>
           </div>
@@ -136,16 +136,32 @@ const Appointment = () => {
         </div>
 
         {/* Doctor's Decision */}
-        {diagnosis?.isApproved ? (
+        {appointment.status === 'cancelled' ? (
+          <div className="mt-6 border rounded-lg p-4 bg-red-50 ">
+            <h3 className="text-lg font-medium text-red-300">Appointment Cancelled ❌</h3>
+            <p className="text-gray-700 text-sm">This appointment was cancelled, so no diagnosis review needed.</p>
+          </div>
+        ):
+          diagnosis?.isApproved ? (
           <div className="mt-6 border rounded-lg p-4 bg-green-100 border-green-300">
-            <h3 className="text-lg font-medium text-green-700">
+            <h3 className="text-lg font-medium text-brand-600">
               Diagnosis has been approved ✅
             </h3>
             <p className="text-gray-700">The predicted diagnosis has been confirmed as accurate.</p>
           </div>
-        ): (
-            <div className="mt-6 border rounded-lg p-4 border-gray-200">
-              <h3 className="text-lg font-medium text-gray-700 mb-3">Is the predicted diagnosis accurate?</h3>
+        ) : diagnosis?.finalDiagnosis ? (
+          <div className="mt-6 border rounded-lg p-4 bg-blue-50">
+            <h3 className="text-lg text-gray-700 font-medium ">
+              Final diagnosis provided 🏥
+            </h3>
+            <p className="mb-5 text-sm text-gray-700">The doctor has provided their own diagnosis.</p>
+            <p className="font-semibold text-blue-700 text-xl capitalize">{diagnosis?.finalDiagnosis}</p>
+          </div>
+        ) : (
+          <div className="mt-6 border rounded-lg p-4 border-gray-200">
+            <h3 className="text-lg font-medium text-gray-700 mb-3">
+              Is the predicted diagnosis accurate?
+            </h3>
             <FormControl>
               <RadioGroup
                 name="diagnosis-accuracy"
@@ -164,6 +180,7 @@ const Appointment = () => {
             </FormControl>
           </div>
         )}
+
 
         {/* Diagnosis Input (if incorrect prediction) */}
         {value === "no" && (

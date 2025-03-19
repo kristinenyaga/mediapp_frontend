@@ -105,7 +105,7 @@ const SignIn = () => {
     <>
       <div className="flex flex-row justify-between space-y-32 gap-y-0.5">
         <div></div>
-        <div>
+        <div className="border p-5 shadow-md rounded-md">
           <div className="mb-6 flex flex-col gap-2">
             <p className="text-[32px] font-medium">Sign In</p>
             <p className="text-sm text-gray-500 font-normal mb-5">
@@ -148,8 +148,8 @@ const SignIn = () => {
               <br />
               <div className="flex justify-between my-1.5">
 
-                <div className="">
-                  <Link className="text-xs font-medium underline underline-offset-4 text-gray-700" href="/send-email">
+                <div className="" onClick={()=>router.push('/forgot-password')}>
+                  <Link  className="text-xs font-medium underline underline-offset-4 text-gray-700" href="/send-email">
                     Forgot password?
                   </Link>
                 </div>

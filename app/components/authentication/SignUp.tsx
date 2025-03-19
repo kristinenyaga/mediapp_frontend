@@ -89,9 +89,9 @@ const SignUp = () => {
   })
   return (
     <>
-      <div className="flex flex-row justify-between space-y-24 gap-y-0.5 p-5 ">
+      <div className="flex flex-row justify-between space-y-14 gap-y-0.5 p-5 ">
         <div></div>
-        <div>
+        <div className="shadow-md rounded-md border p-5">
           <div className="mb-6 flex flex-col gap-2">
             <p className="text-[32px] font-medium">Sign Up</p>
             <p className="text-sm text-gray-500 font-normal mb-5">
