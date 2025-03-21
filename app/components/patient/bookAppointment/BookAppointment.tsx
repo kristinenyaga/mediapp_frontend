@@ -7,6 +7,8 @@ import DoctorCard from './DoctorCard';
 import api from '@/app/utils/axiosInstance';
 import { useRole } from '@/app/context/RoleContext';
 import SymptomSelector from '../appointments/SymptomSelector';
+import LoadingScreen from '../../loader/Loader';
+import { BsInfoCircle } from 'react-icons/bs';
 
 const BookAppointment = () => {
   const [selectedDoctor, setSelectedDoctor] = useState('');
@@ -23,6 +25,7 @@ const BookAppointment = () => {
   const [additionalInfo, setAdditionalInfo] = useState("");
   const router = useRouter()
   const { role } = useRole()
+  const [loading,setLoading] = useState(false)
   
 
   const getDateOptions = () => {
@@ -117,25 +120,40 @@ const BookAppointment = () => {
   }, []);
 
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const bookAppointment = async () => {
+    try {
       const response = await api.post('/api/appointment/book', {
         date: selectedDate,
         selectedTime,
-        doctorId:selectedDoctor
-      },{
+        doctorId: selectedDoctor,
+      }, {
         _role: role
-      })
-      if (response.status === 201 && selectedSymptoms) {
-        submitSymptoms(response?.data?.appointment.id)
+      });
+
+      if (response.status === 201) {
+        const appointmentId = response?.data?.appointment?.id;
+
+        // Only call submitSymptoms if symptoms are selected
+        if (selectedSymptoms.length > 0) {
+          await submitSymptoms(appointmentId);
+        }
+
+        // Show success message & redirect regardless of symptoms
+        Notify.success("Appointment booked successfully");
+        router.push(`/patient/appointments/${appointmentId}`);
       }
+    } catch (error) {
+      console.error("Error booking appointment:", error);
+      Notify.failure("Failed to book appointment. Please try again.");
     }
-    bookAppointment()
   };
 
   const submitSymptoms = async (id) => {
+    if (selectedSymptoms.length === 0) {
+      return; // Prevents the API call when no symptoms are selected
+    }
     const symptomList = selectedSymptoms?.map((symptom) => symptom.value); 
       try {
         const response = await api.post('/api/patientsymptoms/submit-symptoms', {
@@ -156,36 +174,53 @@ const BookAppointment = () => {
   }
   
   const patientSymptoms: unknown = []
+
+  if(loading) return <LoadingScreen />
   return (
     <PatientLayout>
       <div className="bg-white">
         <div className="border-b pb-4 mb-6">
-          <h2 className="text-2xl font-medium text-blue-700">Book Appointment</h2>
-          <p className="text-gray-500 text-sm">Fill in the details below to schedule an appointment.</p>
+          <h2 className="text-2xl font-medium text-blue-700">Doctors</h2>
+          <p className="text-gray-500 text-sm">View the list of available doctors and select one to book an appointment with</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="bg-white rounded-lg mb-9">
-            <label className="block text-gray-600">Would you like to select a doctor?</label>
-            <div className="flex items-center mt-2 space-x-4">
+            <div className="flex items-center gap-3">
+              <BsInfoCircle className="text-blue-600 text-lg" />
+              <p className="text-gray-700 text-sm">
+                You can either <span className="font-medium text-blue-700">select a doctor</span> from the available list
+                or <span className="font-medium text-blue-700">be assigned the next available doctor</span> for your appointment.
+              </p>
+            </div>
+
+            <div className="flex items-center mt-4 space-x-4">
+              {/* Option 1: Select a Specific Doctor */}
               <button
                 type="button"
                 onClick={() => setIsDoctorRequired(true)}
-                className={`px-4 py-2 rounded-lg ${isDoctorRequired ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-800"
+                className={`px-5 py-3 rounded-lg border transition shadow-sm ${isDoctorRequired
+                    ? "border-blue-700 text-blue-700 border"
+                    : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
                   }`}
               >
-                Yes
+                Choose a Specific Doctor
               </button>
+
+              {/* Option 2: Get Next Available Doctor */}
               <button
                 type="button"
                 onClick={() => setIsDoctorRequired(false)}
-                className={`px-5 py-2 rounded-lg ${!isDoctorRequired ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-800"
+                className={`px-5 py-3 rounded-lg font-medium border transition shadow-sm ${!isDoctorRequired
+                    ? "bg-blue-700 text-white border-blue-700"
+                    : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
                   }`}
               >
-                No
+                Get Next Available Doctor
               </button>
             </div>
           </div>
+
 
           {
             isDoctorRequired ? (
@@ -203,7 +238,8 @@ const BookAppointment = () => {
               </div>
             ) : (
               <div>
-                {/* Date Selection */}
+                  {/* Date Selection */}
+                <p className='mb-5 text-lg text-blue-600 font-medium'>Book Appointment</p>
                 <div className="bg-white rounded-lg">
                   <label className="block text-gray-900 text-base">Select Date:</label>
                   <select

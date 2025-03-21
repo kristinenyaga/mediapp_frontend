@@ -236,8 +236,8 @@ const AppointmentDetails = () => {
 const InfoItem = ({ title, content, status }) => {
   let statusColor = "text-gray-600";
   if (status === "pending") statusColor = "text-yellow-600";
-  if (status === "confirmed") statusColor = "text-green-600";
-  if (status === "canceled") statusColor = "text-red-600";
+  if (status === "confirmed") statusColor = "text-brand-600";
+  if (status === "cancelled") statusColor = "text-red-300";
 
   return (
     <div>

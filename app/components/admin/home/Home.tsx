@@ -43,15 +43,15 @@ const Home = () => {
   ];
 
   const patientDemographics = [
-    { name: "18-25 years", value: 400 },
-    { name: "26-35 years", value: 600 },
-    { name: "36-50 years", value: 500 },
-    { name: "51+ years", value: 300 },
+    { name: "18-25 years", value: 4 },
+    { name: "26-35 years", value: 3 },
+    { name: "36-50 years", value: 2},
+    { name: "51+ years", value: 0 },
   ];
 
   const completedVsCanceled = [
-    { name: "Completed", value: 4800 },
-    { name: "Canceled", value: 200 },
+    { name: "Completed", value: 12 },
+    { name: "Canceled", value: 4 },
   ];
 
   const mostCommonDiagnoses = [

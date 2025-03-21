@@ -3,73 +3,86 @@
 import React, { useState } from "react";
 import { useRole } from "@/app/context/RoleContext";
 import { useRouter } from "next/navigation";
-import { doctor, logo, patient, stethoscope } from "@/public/constants/images";
+import { doctor, logo, patient, admin } from "@/public/constants/images";
 import Image from "next/image";
 import LoadingScreen from "../loader/Loader";
+import { FaUserMd, FaUserInjured, FaUserShield } from "react-icons/fa";
 
 const WelcomePage = () => {
   const { setRole } = useRole();
   const router = useRouter();
-  const [loading, setLoading] = useState(false)
-  
+  const [loading, setLoading] = useState(false);
 
   const handleRoleSelection = (role: string) => {
-    setLoading(true)
+    setLoading(true);
     setRole(role);
     router.push("/sign-in");
-    setLoading(false)
+    setLoading(false);
   };
 
-  if(loading) return <LoadingScreen />
+  if (loading) return <LoadingScreen />;
 
   return (
-    <div>
-      <div className="relative h-screen flex flex-col items-center px-6">
-        <div className="flex absolute top-3 left-10 mb-8 border-b py-2">
-          <Image
-            src={logo}
-            width={180}
-            height={20}
-            alt="Close Sidebar"
-            />
-        </div>
-        {/* <Image src={stethoscope} alt='stethoscope' className="absolute text-[#6B4DE6] text-3xl top-10 left-[20%] animate-pulse" /> */}
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-blue-50 to-blue-100 px-6">
+      {/* Logo Section */}
+      <div className="absolute top-6 left-10 flex items-center">
+        <Image src={logo} width={180} height={20} alt="MediQueue Logo" />
+      </div>
 
-        <div className="text-center mb-16 mt-[6%]">
-          <h1 className="text-[36px] font-medium text-[#16213E] tracking-wide">MediQueue</h1>
-          <p className=" text-sm text-gray-600">Your trusted medical companion</p>
-        </div>
+      {/* Welcome Content */}
+      <div className="text-center mb-12">
+        <h1 className="text-4xl font-medium tracking-wide">MediQueue Portal</h1>
+        <p className="text-gray-700 mt-2 text-base">Your Trusted Medical Companion for Seamless Healthcare Management</p>
+      </div>
 
-        {/* Role Selection Section */}
-        <p className=" text-base mb-6">Choose your role</p>
-        <p className="mb-2 text-gray-500">Login as:</p>
-        <div className="flex gap-10">
+      {/* Role Selection */}
+      <div className="w-full max-w-4xl">
+        <p className="text-lg font-medium text-gray-700 text-center mb-6">Choose Your Role</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+          {/* Patient Card */}
           <div
-            className="bg-[#ffffff] shadow-md hover:shadow-lg py-8 px-16 cursor-pointer transition-all duration-300 transform hover:scale-105 flex flex-col items-center rounded-lg border border-gray-200"
+            className="flex flex-col items-center p-6 bg-white shadow-lg hover:shadow-xl rounded-lg border border-gray-200 cursor-pointer transition-all duration-300 transform hover:scale-105"
             onClick={() => handleRoleSelection("patient")}
           >
-            <Image src={patient} alt="Patient Icon" width={60} height={60} />
-            <p className="text-xl mt-3 text-gray-700">Patient</p>
+            <FaUserInjured className="text-5xl text-blue-600 mb-3" />
+            <p className="text-xl font-medium text-gray-700">Patient</p>
+            <p className="text-sm text-gray-500 mt-1 text-center">
+              Book appointments and manage your medical history.
+            </p>
           </div>
 
+          {/* Doctor Card */}
           <div
-            className="bg-white shadow-md hover:shadow-lg py-8 px-14 cursor-pointer transition-all duration-300 transform hover:scale-105 flex flex-col items-center rounded-lg border border-gray-200"
+            className="flex flex-col items-center p-6 bg-white shadow-lg hover:shadow-xl rounded-lg border border-gray-200 cursor-pointer transition-all duration-300 transform hover:scale-105"
             onClick={() => handleRoleSelection("doctor")}
           >
-            <Image src={doctor} alt="Doctor Icon" width={60} height={60} />
-            <p className="text-xl mt-3 text-gray-700">Doctor</p>
+            <FaUserMd className="text-5xl text-green-600 mb-3" />
+            <p className="text-xl font-medium text-gray-800">Doctor</p>
+            <p className="text-sm text-gray-500 mt-1 text-center">
+              View patient appointments and provide medical care.
+            </p>
           </div>
+
+          {/* Admin Card */}
           <div
-            className="bg-white shadow-md hover:shadow-lg py-8 px-14 cursor-pointer transition-all duration-300 transform hover:scale-105 flex flex-col items-center rounded-lg border border-gray-200"
+            className="flex flex-col items-center p-6 bg-white shadow-lg hover:shadow-xl rounded-lg border border-gray-200 cursor-pointer transition-all duration-300 transform hover:scale-105"
             onClick={() => handleRoleSelection("admin")}
           >
-            <Image src={doctor} alt="Doctor Icon" width={60} height={60} />
-            <p className="text-xl mt-3 text-gray-700">Admin</p>
+            <FaUserShield className="text-5xl text-purple-600 mb-3" />
+            <p className="text-xl font-medium text-gray-800">Admin</p>
+            <p className="text-sm text-gray-500 mt-1 text-center">
+              Manage system users, doctors, and reports.
+            </p>
           </div>
         </div>
       </div>
-    </div>
 
+      {/* Footer */}
+      <div className="absolute bottom-5 text-sm text-gray-600">
+        &copy; 2025 MediQueue. All Rights Reserved.
+      </div>
+    </div>
   );
 };
 

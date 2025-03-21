@@ -17,9 +17,9 @@ const menuItems = [
   { name: 'Overview', path: '/admin/home', icon: <FaHome size={20} /> },
   { name: 'User Management', path: '/admin/users', icon: <FaUsers size={20} /> },
   { name: 'Appointments Management ', path: '/admin/appointments', icon: <FaCalendarCheck size={20} /> },
-  { name: ' Diagnoses & Analytics', path: '/admin/diagnoses', icon: <FaChartBar size={20} /> },
-  { name: 'System Settings', path: '/doctor/notifications', icon: <FaBell size={20} /> },
-  { name: 'Profile', path: '/doctor/profile', icon: <FaUser size={20} /> },
+  { name: 'Analytics', path: '/admin/analytics', icon: <FaChartBar size={20} /> },
+  // { name: 'System Settings', path: '/doctor/notifications', icon: <FaBell size={20} /> },
+  { name: 'Profile', path: '/admin/profile', icon: <FaUser size={20} /> },
 ];
 
 const SideBar: React.FC<SideBarProps> = ({ showSideBar, setShowSideBar }) => {

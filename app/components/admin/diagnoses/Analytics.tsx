@@ -1,22 +1,22 @@
 "use client";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, BarChart, Bar, Legend } from "recharts";
-import DoctorLayout from "../doctorLayout";
 import ReportHeader from "./ReportsHeader";
 import api from "@/app/utils/axiosInstance";
 import { useEffect, useState } from "react";
 import LoadingScreen from "../../loader/Loader";
 import moment from "moment";
 import { generateReport } from './generateReport'
+import AdminLayout from "../AdminLayout";
 
 const COLORS = ["#1d4ed8", "#6B4DE6", "#FFBB28", "#FF8042"];
 
-const Reports = () => {
+const Analytics = () => {
   const [feedback, setFeedback] = useState([]);
   const [diagnoses, setDiagnoses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("currentMonth");
   const [symptomData, setSymptomsData] = useState([])
-  
+
   useEffect(() => {
     const fetchFeedback = async () => {
       try {
@@ -114,7 +114,7 @@ const Reports = () => {
 
   if (loading) return <LoadingScreen />;
   return (
-    <DoctorLayout>
+    <AdminLayout>
       <div>
         <ReportHeader
           totalPredictedDiagnoses={totalPredictedDiagnoses}
@@ -213,8 +213,8 @@ const Reports = () => {
           </div>
         </div>
       </div>
-    </DoctorLayout>
+    </AdminLayout>
   );
 };
 
-export default Reports;
+export default Analytics;

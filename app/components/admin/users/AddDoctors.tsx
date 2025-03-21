@@ -49,15 +49,15 @@ const AddDoctors = () => {
     setIsLoading(true);
     try {
       
-      // const response = await axios.post("http://localhost:5000/api/admin/add-doctors", doctors, {
-      //   headers: { "Content-Type": "application/json" },
-      // });
+      const response = await axios.post("http://localhost:5000/api/admin/addDoctors", {doctors}, {
+        headers: { "Content-Type": "application/json" },
+      });
 
-      // if (response.status === 200) {
-      //   Notify.success("Doctors added successfully!");
-      //   setDoctors([]);
-      //   setCsvFile(null);
-      // }
+      if (response.status === 201) {
+        Notify.success("Doctors added successfully!");
+        setDoctors([]);
+        setCsvFile(null);
+      }
     } catch (error) {
       Notify.failure("Failed to add doctors. Please try again.");
       console.error(error);

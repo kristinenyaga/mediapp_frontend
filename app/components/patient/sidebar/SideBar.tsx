@@ -15,7 +15,7 @@ interface SideBarProps {
 
 const menuItems = [
   { name: 'Home', path: '/patient/home', icon: <FaHome size={20} /> },
-  { name: 'Book Appointment', path: '/patient/book-appointment', icon: <FaClipboardList size={20} /> },
+  { name: 'Doctors', path: '/patient/book-appointment', icon: <FaClipboardList size={20} /> },
   { name: 'Appointments', path: '/patient/appointments', icon: <FaCalendarAlt size={20} /> },
   { name: 'Notifications', path: '/patient/notifications', icon: <FaBell size={20} /> },
   { name: 'Profile', path: '/patient/profile', icon: <FaUser size={20} /> },
