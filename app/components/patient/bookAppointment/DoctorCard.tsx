@@ -32,9 +32,9 @@ const DoctorCard = ({ doctor, onSelect }) => {
       </div>
 
       {/* Book Appointment Button */}
-      <button className="flex items-center gap-2 bg-brand-500 text-white text-sm font-medium px-4 py-2 rounded-lg shadow-md hover:bg-green-700 transition">
+      <p className="flex items-center gap-2 bg-brand-500 text-white text-sm font-medium px-4 py-2 rounded-lg shadow-md hover:bg-green-700 transition">
         Book Appointment <FaArrowRight />
-      </button>
+      </p>
     </div>
   );
 };

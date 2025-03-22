@@ -23,6 +23,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import api from "@/app/utils/axiosInstance";
 import AvailableDoctors from "./AvailableDoctors";
 import { Notify } from "notiflix";
+import { isWithinInterval, parseISO } from "date-fns";
 const TableData = ({ filters, appointments, setAppointments,columns }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [openMenu, setOpenMenu] = useState(false);
@@ -107,29 +108,31 @@ const TableData = ({ filters, appointments, setAppointments,columns }) => {
   // filtering logic
   const filteredData = useMemo(() => {
     return appointments.filter((appointment) => {
-      const { dateFrom, dateTo, status, username } = filters
+      const { startDate, endDate, status, username } = filters;
 
-      if (status !== 'all' && appointment.status !== status) {
-        return false
-      }
-      if (dateFrom && new Date(appointment.date) < new Date(dateFrom)) {
-        return false
-      }
-      if (dateTo && new Date(appointment.date) > new Date(dateTo)) {
-        return false
-      }
-      if (username) {
-        const patientName = appointment.patient?.username || ''
-        const doctorName = appointment.doctor?.username || ''
+      const appointmentDate = parseISO(appointment.date);
+      const filterStartDate = startDate ? parseISO(startDate) : new Date();
+      const filterEndDate = endDate ? parseISO(endDate) : new Date();
 
-        const searchText = username.toLowerCase()
-        if (!patientName.toLowerCase().includes(searchText) && !doctorName.toLowerCase().includes(searchText)) {
-          return false
-        }
-      }
-      return true
-    })
-  }, [appointments, filters])
+      // Status Filtering
+      const statusMatch = status === 'all' || appointment.status === status;
+
+      // Date Filtering
+      const dateMatch = isWithinInterval(appointmentDate, {
+        start: filterStartDate,
+        end: filterEndDate,
+      });
+
+      // Search Filtering (by patient or doctor name)
+      const searchMatch =
+        !username ||
+        appointment.patient?.username.toLowerCase().includes(username.toLowerCase()) ||
+        appointment.doctor?.username.toLowerCase().includes(username.toLowerCase());
+
+      return statusMatch && dateMatch && searchMatch;
+    });
+  }, [appointments, filters]);
+
 
   // Pagination logic
   const itemsPerPage = 5;
@@ -137,6 +140,7 @@ const TableData = ({ filters, appointments, setAppointments,columns }) => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const displayedData = filteredData.slice(startIndex, startIndex + itemsPerPage);
 
+  console.log(displayedData)
   return (
     <TableContainer component={Paper} sx={{
       mt: 4,
@@ -175,7 +179,7 @@ const TableData = ({ filters, appointments, setAppointments,columns }) => {
                         day: "numeric",
                         year: "numeric",
                       }).format(new Date(row.date))
-                    ) :col.key === 'startTime' ?(`${row.startTime} - ${row.endTime}`):
+                    ) : col.key === 'startTime' ? (`${row.startTime} - ${row.endTime}`) :
                       (
                         Array.isArray(row[col.key]) ? row[col.key].length : row[col.key]
                       )}

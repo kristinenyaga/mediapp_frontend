@@ -73,13 +73,12 @@ const SignIn = () => {
           Notify.failure(response.data.message || "Login failed");
         }
       } catch (error:any) {
-
+        setLoading(false)
         if (error.response) {
-          console.error("Error response data:", error.response.data);
 
           if (error.response.status === 401) {
             setLoading(false)
-            Notify.failure(error.response.data.message || "Unauthorized: Invalid credentials.");
+            Notify.failure(error.response.data.message || "Unauthorized: Invalid credentials.Try again");
           } else if (error.response.status === 400) {
             setLoading(false)
             Notify.failure(error.response.data.message || "Bad request.");
@@ -107,29 +106,29 @@ const SignIn = () => {
         <div></div>
         <div className="border p-5 shadow-md rounded-md">
           <div className="mb-6 flex flex-col gap-2">
-            <p className="text-[32px] font-medium">Sign In</p>
-            <p className="text-sm text-gray-500 font-normal mb-5">
+            <p className="text-[34px] font-medium">Sign In</p>
+            <p className="text-base text-gray-500 font-normal mb-5">
               Welcome back! Please enter your details.
             </p>
             <form onSubmit={formik.handleSubmit} className="">
-              <label htmlFor="email" className="text-sm font-normal">
+              <label htmlFor="email" className="text-base font-normal">
                 Email*
               </label>
               <br />
               <input
                 name="email"
                 type="email"
-                className={`w-[400px] h-12 border rounded-md px-3 mt-2 mb-5 text-sm ${formik.touched.password && formik.errors.password ? "border-red-500 focus:outline-red-500" : "border-gray-400"} focus: outline-[#6B4DE6] placeholder:text-gray-500`}
+                className={`w-[400px] h-12 border rounded-md px-3 mt-2 mb-5 text-sm ${formik.touched.email && formik.errors.email ? "border-red-500 focus:outline-red-500" : "border-gray-400"} focus: outline-[#6B4DE6] placeholder:text-gray-500`}
                 placeholder="johndoe@gmail.com"
                 value={formik.values.email}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
               />
               {formik.touched.email && formik.errors.email && (
-                <p className="text-red-500 text-xs">{formik.errors.email}</p>
+                <p className="text-red-500 text-sm">{formik.errors.email}</p>
               )}
               <br />
-              <label htmlFor="password" className="text-sm font-normal w-80 pt-9">
+              <label htmlFor="password" className="text-base font-normal w-80 pt-9">
                 Password*
               </label>
               <br />
@@ -143,7 +142,7 @@ const SignIn = () => {
                 onBlur={formik.handleBlur}
               />
               {formik.touched.password && formik.errors.password && (
-                <p className="text-red-500 text-xs">{formik.errors.password}</p>
+                <p className="text-red-500 text-sm">{formik.errors.password}</p>
               )}
               <br />
               <div className="flex justify-between my-1.5">

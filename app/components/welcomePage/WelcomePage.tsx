@@ -23,7 +23,7 @@ const WelcomePage = () => {
   if (loading) return <LoadingScreen />;
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-blue-50 to-blue-100 px-6">
+    <div className="flex flex-col items-center justify-center min-h-screen px-6">
       {/* Logo Section */}
       <div className="absolute top-6 left-10 flex items-center">
         <Image src={logo} width={180} height={20} alt="MediQueue Logo" />

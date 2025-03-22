@@ -24,6 +24,7 @@ interface ProfileDetails {
   id:number,
   username: string;
   email: string;
+  dob:Date,
   phone: string | null;
   emergencycontact?: EmergencyContact;
   medicalinformation?: MedicalInformation;
@@ -103,8 +104,8 @@ const Profile = () => {
         {/* Header Section */}
         <div className="flex justify-between items-center mb-4">
           <div>
-            <h2 className="text-2xl font-semibold text-blue-600">Profile Information</h2>
-            <p className="text-sm text-gray-500 mb-6">View and update your profile details</p>
+            <h2 className="text-3xl font-medium text-blue-700">Profile Information</h2>
+            <p className="text-base text-gray-500 mb-6">View and update your profile details</p>
           </div>
         </div>
 
@@ -138,6 +139,8 @@ const Profile = () => {
             <InfoField label="Full Name" value={profileDetails?.username} />
             <InfoField label="Email" value={profileDetails?.email} />
             <InfoField label="Phone" value={profileDetails?.phone || "N/A"} />
+            <InfoField label="Date Of Birth" value={profileDetails?.dob || "N/A"} />
+
           </div>
         </section>
 

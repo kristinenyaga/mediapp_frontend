@@ -9,6 +9,7 @@ import Papa from "papaparse";
 import { FaUpload } from "react-icons/fa";
 import { RiUpload2Fill } from "react-icons/ri";
 import { MdFileCopy } from "react-icons/md";
+
 const AddDoctors = () => {
   const [doctors, setDoctors] = useState([]);
   const [newDoctor, setNewDoctor] = useState({ username: "", email: "", phone: "", specialization: "", experience: "", roomNumber: "" });
@@ -45,6 +46,10 @@ const AddDoctors = () => {
 
   const handleSubmit = async () => {
     console.log(doctors)
+    if (doctors.length ===0) {
+      Notify.failure('You have not uploaded any file')
+      return
+    }
 
     setIsLoading(true);
     try {
@@ -115,6 +120,7 @@ const AddDoctors = () => {
   return (
     <AdminLayout>
       <div className="w-[90%]">
+        <GoBack/>
         <h2 className="text-2xl mb-5 font-medium text-gray-800">Add Doctors</h2>
 
         <div className="mt-4">

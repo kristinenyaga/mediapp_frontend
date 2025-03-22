@@ -8,6 +8,7 @@ import api from "@/app/utils/axiosInstance";
 import { useRole } from "@/app/context/RoleContext";
 import { useRouter } from "next/navigation";
 import FeedbackModal from "./FeedbackModal";
+import { useAuth } from "@/app/context/authContext";
 const HomePage = () => {
   const [appointments, setAppointments] = useState([])
   const [nextAppointment, setNextAppointment] = useState(null);
@@ -16,6 +17,8 @@ const HomePage = () => {
   const { role } = useRole()
   const router = useRouter()
   const [isFeedbackOpen, setFeedbackOpen] = useState(false);
+  const { user } = useAuth()
+  
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -64,14 +67,14 @@ const HomePage = () => {
         <header className="flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-medium text-blue-700">
-              Welcome Back, Kristine
+              Welcome Back, {user?.username}
             </h1>
             <p className="text-gray-500 text-sm">
               Here&apos;s a quick overview of your medical history.
             </p>
           </div>
 
-          <button className="bg-gradient-to-r from-blue-600 to-blue-900 hover:scale-105 transition text-white px-6 py-3 text-sm font-medium rounded-full flex items-center gap-2 shadow-md" onClick={()=>router.push('/patient/book-appointment')}>
+          <button className="bg-gradient-to-r from-blue-500 to-blue-700 hover:scale-105 transition text-white px-6 py-3 text-sm font-medium rounded-xl flex items-center gap-2 shadow-md" onClick={()=>router.push('/patient/book-appointment')}>
             <FiCalendar size={16} />
             Book Appointment
           </button>
@@ -134,7 +137,10 @@ const HomePage = () => {
             <div className="bg-purple-50 p-5 rounded-lg shadow-sm">
               <p className="text-gray-800">Total Appointments</p>
               <p className="text-purple-700 text-xl font-bold">{appointments?.length}</p>
-              <p className="text-gray-600 text-xs mt-1">Since 2024</p>
+              <p className="text-gray-600 text-sm mt-1">
+                {appointments.length > 0 ? `Tracking since ${new Date(appointments[0].date).getFullYear()}` : "Start your healthcare journey today"}
+              </p>
+
             </div>
           </div>
         </section>

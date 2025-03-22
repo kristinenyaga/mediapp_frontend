@@ -7,6 +7,8 @@ import './sidebar.css';
 import { FaHome, FaUser, FaCalendarCheck, FaChartBar, FaBell, FaSignOutAlt, FaUsers } from "react-icons/fa";
 import { IoMdClose } from 'react-icons/io';
 import { logo } from '@/public/constants/images';
+import { useAuth } from '@/app/context/authContext';
+import { useRole } from '@/app/context/RoleContext';
 
 interface SideBarProps {
   showSideBar: boolean;
@@ -25,7 +27,9 @@ const menuItems = [
 const SideBar: React.FC<SideBarProps> = ({ showSideBar, setShowSideBar }) => {
   const pathname = usePathname();
     const router = useRouter()
-  
+    const { user } = useAuth()
+    const { role } = useRole()
+    
     const handleLogout = () => {
       sessionStorage.removeItem('access_token');
       sessionStorage.removeItem('refreshtoken')
@@ -34,49 +38,51 @@ const SideBar: React.FC<SideBarProps> = ({ showSideBar, setShowSideBar }) => {
     }
 
   return (
-    <div
-      className={`sidebar_container ${showSideBar ? 'show' : ''} fixed top-0 left-0 w-[16rem] h-full bg-white shadow xl:relative transition-transform xl:translate-x-0 ${showSideBar ? 'translate-x-0' : '-translate-x-full'}`}
-    >
-      <div className="flex flex-col h-full p-5">
-        <IoMdClose
-          size={24}
-          className="xl:hidden absolute right-5 top-5 cursor-pointer text-gray-600 hover:text-gray-900"
-          onClick={() => setShowSideBar(false)}
-        />
+    <aside className="relative left-0 top-0 h-full w-64 bg-white backdrop-blur-lg shadow border-r border-gray-300 flex flex-col">
+      {/* Logo */}
+      <div className="p-6 flex flex-col items-center border-b border-gray-200">
+        <Image src={logo} width={160} height={40} alt="Logo" />
 
-        <div className="flex justify-center items-center mb-8 border-b py-2">
-          <Image
-            src={logo}
-            width={160}
-            height={20}
-            alt="Close Sidebar"
-          />
-        </div>
-        <ul className="menu space-y-3 flex-1">
-          {menuItems.map((item) => (
-            <Link key={item.path} href={item.path} className="block">
-              <li
-                className={`flex text-sm hover:bg-blue-0 items-center p-3 rounded-lg transition-all cursor-pointer ${pathname === item.path
-                  ? "bg-blue-700 text-white"
-                  : "hover:bg-gray-100 border-b text-gray-600 "
-                  }`}
-              >
-                <span className="mr-3">{item.icon}</span>
-                <span className=''>{item.name}</span>
-              </li>
-            </Link>
-          ))}
-        </ul>
-
-
-        <div className="border-t pb-14 border-gray-300 pt-4">
-          <li onClick={() => handleLogout()} className="flex items-center p-3 rounded-lg hover:bg-gray-100 text-gray-600 cursor-pointer">
-            <FaSignOutAlt size={20} className="mr-3" />
-            <p className="menu-text font-medium">Log Out</p>
-          </li>
+        {/* User Info */}
+        <div className="mt-4 flex items-center text-center">
+          <p className="mt-2 text-gray-700 font-medium">{user?.username} ~ {role}</p>
         </div>
       </div>
-    </div>
+
+
+      {/* Menu Items */}
+      <nav className="flex-1 mt-4 px-4">
+        <ul className="space-y-2">
+          {menuItems.map((item) => (
+            <li key={item.path}>
+              <Link
+                href={item.path}
+                className={`flex items-center mt-4 border-b gap-3 p-3 rounded-lg transition-all text-gray-700 text-sm font-medium
+                  ${pathname === item.path ? 'bg-gradient-to-r from-blue-500 to-blue-700 text-white shadow-md' : 'hover:bg-blue-50'}`}
+              >
+                <span className="text-lg">{item.icon}</span>
+                <span>{item.name}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      {/* Divider */}
+      <div className="border-t border-gray-200"></div>
+
+      {/* Logout */}
+      <ul className=" border-y pb-24 pt-4 px-4">
+        <li
+          onClick={handleLogout}
+          className="flex items-center w-full p-3 rounded-lg text-gray-700 text-sm font-medium transition-all cursor-pointer hover:bg-red-100 hover:text-red-600"
+        >
+          <FaSignOutAlt size={20} className="mr-3" />
+          <span>Log Out</span>
+        </li>
+      </ul>
+
+    </aside>
   );
 };
 
