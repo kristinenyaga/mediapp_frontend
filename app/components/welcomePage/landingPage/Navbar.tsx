@@ -2,11 +2,11 @@
 
 import Link from 'next/link';
 import React, { useState } from 'react';
-import { RiArrowDropDownLine, RiMenu3Line, RiCloseLine } from 'react-icons/ri';
+import { RiCloseLine } from 'react-icons/ri';
 import { MdMenu } from "react-icons/md";
 const Navbar = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  // const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const toggleDrawer = () => setIsDrawerOpen(!isDrawerOpen);
 

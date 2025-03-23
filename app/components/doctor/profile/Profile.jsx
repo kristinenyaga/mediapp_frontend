@@ -174,15 +174,15 @@ const handleWorkingHourChange = (day, field, value) => {
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
               <label className="block text-gray-800">Full Name</label>
-              <div className="border border-gray-300 p-2 rounded mt-2 text-gray-500">{profileDetails?.username}</div>
+              <div className="border border-gray-300 p-2 rounded mt-2 text-gray-500">{profileDetails?.username || "N/A"}</div>
             </div>
             <div>
               <label className="block text-gray-800">Email</label>
-              <div className="border border-gray-300 p-2 rounded mt-2 text-gray-500">{profileDetails?.email}</div>
+              <div className="border border-gray-300 p-2 rounded mt-2 text-gray-500">{profileDetails?.email || "N/A"}</div>
             </div>
             <div>
               <label className="block text-gray-800">Phone</label>
-              <div className="border border-gray-300 p-2 rounded mt-2 text-gray-500">{profileDetails?.phone}</div>
+              <div className="border border-gray-300 p-2 rounded mt-2 text-gray-500">{profileDetails?.phone || "N/A"}</div>
             </div>
           </div>
         </section>

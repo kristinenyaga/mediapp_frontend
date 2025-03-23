@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import SideBar from "./sidebar/SideBar";
 
-const AdminLayout = (children) => {
+const AdminLayout = ({children}) => {
   const [showSideBar, setShowSideBar] = useState(false);
 
   return (

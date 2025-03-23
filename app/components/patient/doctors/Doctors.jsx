@@ -94,7 +94,7 @@ const specializationOptions = [...new Set(doctors.map(doc => doc.specialization)
         <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg w-[90%] max-w-lg">
             {/* Doctor Name & Specialization */}
-            <h2 className="text-2xl font-semibold text-gray-700">{selectedDoctor.username}</h2>
+            <h2 className="text-2xl font-semibold text-gray-700">{selectedDoctor.username || "N/A"}</h2>
             <p className="text-lg text-blue-700">{selectedDoctor.specialization || "General Practitioner"}</p>
 
             {/* Experience & Contact */}
@@ -102,7 +102,7 @@ const specializationOptions = [...new Set(doctors.map(doc => doc.specialization)
               <strong>Experience:</strong> {selectedDoctor.yearsOfExperience || "N/A"} years
             </p>
             <p className="text-sm mt-2 text-gray-600">
-              <strong>Room Number:</strong> {selectedDoctor.room_number}
+              <strong>Room Number:</strong> {selectedDoctor.room_number || "N/A"}
             </p>
 
             {/* Working Days & Hours */}

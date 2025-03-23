@@ -2,9 +2,9 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 import React from 'react'
 
 const AvailableDoctors = ({ openReassignModal, setOpenMenu, setOpenReassignModal, availableDoctors, selectedDoctor, setSelectedDoctor, uploadReassign }) => {
-  if(availableDoctors !>0) return <p>loading...</p>
+  if (!availableDoctors) return <p>Loading...</p>;
   return (
-    <>
+    <>      
       <Dialog open={openReassignModal} onClose={() => setOpenReassignModal(false)}>
         <DialogTitle>Reassign Appointment</DialogTitle>
         <DialogContent>

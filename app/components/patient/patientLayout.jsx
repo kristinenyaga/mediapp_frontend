@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import SideBar from "./sidebar/SideBar";
 
-const PatientLayout = (children) => {
+const PatientLayout = ({children}) => {
   const [showSideBar, setShowSideBar] = useState(false);
 
   return (

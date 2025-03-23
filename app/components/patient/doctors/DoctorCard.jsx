@@ -29,7 +29,9 @@ const DoctorCard = ({ doctor, onSelect }) => {
 
       {/* Doctor Info */}
       <div className="text-center mt-4">
-        <p className="text-[18px] font-medium text-gray-800">Dr. {doctor.username}</p>
+        <p className="text-[18px] font-medium text-gray-800">
+          {doctor ? `Dr. ${doctor.username}` : "N/A"}
+          </p>
         <p className="text-[14px] text-gray-600">{doctor.specialization || "General Practitioner"}</p>
         <p className="text-sm text-gray-500">{doctor.yearsOfExperience || "5"} yrs experience</p>
       </div>

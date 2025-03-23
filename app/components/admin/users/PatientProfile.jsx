@@ -33,7 +33,7 @@ const PatientProfile = () => {
     if (id) {
       fetchPatientData()
     }
-  }, [id])
+  }, [id,setPatient])
 
   if (!patient) {
     return <p>loading ...</p>
