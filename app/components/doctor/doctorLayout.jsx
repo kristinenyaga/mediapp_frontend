@@ -1,8 +1,8 @@
 "use client"
-import React, { useState, ReactNode } from "react";
+import React, { useState } from "react";
 import SideBar from "./sidebar/SideBar";
 
-const DoctorLayout = ({ children }: { children: ReactNode }) => {
+const DoctorLayout = (children) => {
   const [showSideBar, setShowSideBar] = useState(false);
 
   return (

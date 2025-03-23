@@ -9,10 +9,6 @@ import './sidebar.css';
 import { logo } from '@/public/constants/images';
 import { useRouter } from 'next/navigation';
 
-interface SideBarProps {
-  showSideBar: boolean;
-  setShowSideBar: (show: boolean) => void;
-}
 const menuItems = [
   { name: 'Overview', path: '/doctor/overview', icon: <FaHome size={20} /> },
   { name: 'Patients', path: '/doctor/patients', icon: <FaUsers size={20} /> },
@@ -23,7 +19,7 @@ const menuItems = [
 ];
 
 
-const SideBar: React.FC<SideBarProps> = ({ showSideBar, setShowSideBar }) => {
+const SideBar = ({ showSideBar, setShowSideBar }) => {
   const pathname = usePathname();
   const router = useRouter()
 

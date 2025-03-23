@@ -241,7 +241,7 @@ const handleWorkingHourChange = (day, field, value) => {
             </button>
           </div>
           <div className="grid grid-cols-2 gap-4 mt-4 text-sm">
-            {workingHours.map((hour, index) => (
+            {workingHours.map((hour) => (
               <div key={hour.dayOfWeek} className="flex items-center gap-3">
                 <span className="w-24">{hour.dayOfWeek}</span>
                 <span className="text-gray-500">{hour.startTime || "N/A"} - {hour.endTime || "N/A"}</span>

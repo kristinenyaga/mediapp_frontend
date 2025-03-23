@@ -2,9 +2,7 @@
 import React, { useEffect, useState } from 'react'
 import DoctorLayout from '../doctorLayout'
 import Header from '../Header'
-import Image from 'next/image'
-import { appointmentBlue, appointmentRed, appointmentGreen } from '@/public/constants/images'
-import { FaCalendarCheck, FaUserCheck, FaFileMedicalAlt, FaCalendarTimes, FaCalendarDay, FaUsers, FaChartBar } from 'react-icons/fa';
+import { FaCalendarCheck, FaUsers } from 'react-icons/fa';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, CartesianGrid } from "recharts";
 import api from '@/app/utils/axiosInstance'
 import LoadingScreen from '../../loader/Loader'

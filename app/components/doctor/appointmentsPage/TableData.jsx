@@ -16,6 +16,7 @@ import { BsDownload } from "react-icons/bs";
 import { isWithinInterval, parseISO } from "date-fns";
 import { handleDownloadPDF } from './handleDownload'
 import api from "@/app/utils/axiosInstance";
+import { Notify } from "notiflix";
 
 const TableData = ({ data,columns,filters }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -50,8 +51,8 @@ const TableData = ({ data,columns,filters }) => {
     })
   }, [filters, data])
 
-  const todayAppointments = data.filter(appointment => new Date(appointment.date).toDateString() === new Date().toDateString()
-  )
+  // const todayAppointments = data.filter(appointment => new Date(appointment.date).toDateString() === new Date().toDateString()
+  // )
 
   const handleStatusChange = async (appointmentId, newStatus) => {
     try {
@@ -63,6 +64,10 @@ const TableData = ({ data,columns,filters }) => {
       const response = await api.post(`/api/appointment/${appointmentId}/status`, {
         status:newStatus
       })
+
+      if (response.status === 200) {
+        Notify.success("Appointment Status Updated Successfully")
+      }
       
     } catch (error) {
       console.error("Failed to update status", error);

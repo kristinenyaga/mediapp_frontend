@@ -34,7 +34,7 @@ const Appointment = () => {
   },[id])
 
 
-  const handleDiagnosisChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDiagnosisChange = (event) => {
     setDoctorDiagnosis(event.target.value);
   };
 
