@@ -7,7 +7,6 @@ import api from '@/app/utils/axiosInstance';
 import { useRole } from '@/app/context/RoleContext';
 import UpdateAppointment from './UpdateAppointment';
 import { CiNoWaitingSign } from "react-icons/ci";
-import axios from 'axios';
 import { BsArrowClockwise, BsPencilSquare, BsTrash } from 'react-icons/bs';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
 import { Warning } from '@mui/icons-material';

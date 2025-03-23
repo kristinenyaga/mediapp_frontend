@@ -7,6 +7,9 @@ import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, 
 import { BsDownload } from "react-icons/bs";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import { MdEmail, MdMedicalServices, MdPhone } from "react-icons/md";
+import { FaUserMd, FaUserShield } from "react-icons/fa";
+import GoBack from "../../goBack/GoBack";
 interface Appointment {
   id: number;
   date: string;
@@ -57,7 +60,13 @@ const PatientProfile = () => {
   if (!patient) {
     return <p>loading ...</p>
   }
-  
+  const formatTime = (timestring) => {
+    if (!timestring) return "N/A";
+    const [hours, minutes] = timestring.split(':');
+    const date = new Date();
+    date.setHours(hours, minutes, 0);
+    return date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+  };
   const handleDownloadPDF = () => {
     const doc = new jsPDF();
     const logoUrl = "/images/logo.png";
@@ -88,14 +97,21 @@ const PatientProfile = () => {
   
   
     const tableColumn  = [
-      'date',
+      'Date',
       'Appointment Time',
+      'Doctor',
       'status'
     ]
     const tableRows = patient.appointments?.map((row) =>
       tableColumn.map((key) => {
         if (key === "Appointment Time") {
-          return `${row.startTime} - ${row.endTime}` || "-"; 
+          return `${formatTime(row.startTime)} - ${formatTime(row.endTime)}` || "-"; 
+        }
+        if (key === "Doctor") {
+          return row.doctor.username;
+        }
+        if (key === "Date") {
+          return row.date;
         }
         return row[key] || "-"; 
       })
@@ -105,7 +121,7 @@ const PatientProfile = () => {
       startY: 53,
       head: [tableColumn],
       body: tableRows,
-      styles: { fontSize: 7 },
+      styles: { fontSize: 9 },
       headStyles: { fillColor: [0, 51, 153], textColor: 255 },
       alternateRowStyles: { fillColor: [240, 240, 240] },
       margin: { top: 10 },
@@ -129,55 +145,100 @@ const PatientProfile = () => {
 
     doc.save(`${reportTitle.replace(/\s+/g, "_")}.pdf`);
   };
-  
+
   return (
     <AdminLayout>
-      <div className=" bg-white rounded-lg">
-        <div className="mb-6">
-          <h2 className="text-2xl font-medium">{patient.username}</h2>
-          <p className="text-gray-600">{patient.email}</p>
-          <p className="text-gray-600">{patient.phone}</p>
+      <div className="bg-white shadow-md rounded-xl">
+        {/* Patient Info Section */}
+        <GoBack/>
+        <div className="mb-6 border-b pb-4">
+          <h2 className="text-3xl font-medium text-blue-700">{patient.username}</h2>
+          <div className="text-gray-600 space-y-1 mt-2">
+            <p className="flex items-center gap-2"><MdEmail className="text-blue-600" /> {patient.email}</p>
+            <p className="flex items-center gap-2"><MdPhone className="text-blue-600" /> {patient.phone}</p>
+          </div>
         </div>
 
+        {/* Emergency Contact Section */}
         {patient?.emergencycontact && (
-          <div className="mb-6">
-            <h3 className="text-lg font-medium ">Emergency Contact</h3>
-            <p className="text-gray-600">{patient.emergencycontact.name} ({patient.emergencycontact.relationship})</p>
-            <p className="text-gray-600">{patient.emergencycontact.phone}</p>
+          <div className="mb-6 p-4 rounded-lg bg-blue-50 shadow-sm">
+            <h3 className="text-lg font-medium text-blue-700 flex items-center gap-2">
+              <FaUserShield /> Emergency Contact
+            </h3>
+            <p className="text-gray-700 mt-1">{patient.emergencycontact.name} ({patient.emergencycontact.relationship})</p>
+            <p className="text-gray-700">{patient.emergencycontact.phone}</p>
           </div>
         )}
-        <div className="mt-6">
-          <h3 className="text-lg font-medium ">Medical Information</h3>
-          <p className="text-gray-500">
+
+        {/* Medical Information Section */}
+        <div className="mt-6 p-4 bg-green-50 rounded-lg shadow-sm">
+          <h3 className="text-lg font-medium text-green-700 flex items-center gap-2">
+            <MdMedicalServices /> Medical Information
+          </h3>
+          <p className="text-gray-600 mt-2">
             {patient?.medicalinformation ? JSON.stringify(patient?.medicalinformation) : "No medical information available."}
           </p>
         </div>
 
-        <div>
-          <h3 className="text-lg font-medium  my-4 mt-6">Appointments</h3>
-          <div className="overflow-x-auto w-[90%]">
+        {/* Appointments Section */}
+        <div className="mt-8">
+          <h3 className="text-lg font-medium text-blue-700 mb-4 flex items-center gap-2">
+            Appointments
+          </h3>
+          <div className="overflow-x-auto">
             <TableContainer component={Paper} sx={{ mt: 1, border: "1px solid #F9F9F9", boxShadow: "none", borderRadius: "8px" }}>
-              <Button onClick={()=>handleDownloadPDF()} sx={{ px: 2, mt: 2, ml: 1.7, fontWeight: 500, display: 'flex', gap: 2, alignItems: 'center', bgcolor: 'rgb(0,150, 199, 10%)' }}>download <BsDownload className=" font-medium text-lg" /></Button>
-              <Table>
-                <TableHead>
+              <Button
+                onClick={() => handleDownloadPDF()}
+                sx={{
+                  px: 2,
+                  mt: 2,
+                  ml: 1.7,
+                  fontWeight: 500,
+                  display: 'flex',
+                  gap: 2,
+                  alignItems: 'center',
+                  fontSize:'16px',
+                  bgcolor: 'rgb(0,150, 199, 10%)',
+                }}
+              >
+                Download <BsDownload className="font-medium text-lg" />
+              </Button>
+
+              <Table sx={{marginTop:'20px'}}>
+                <TableHead sx={{ bgcolor: "#F9F9F9" }}>
                   <TableRow>
-                    <TableCell sx={{fontWeight:'semibold'}}>Date</TableCell>
-                    <TableCell sx={{fontWeight:'semibold'}}>Appointment Time</TableCell>
-                    <TableCell sx={{fontWeight:'semibold'}}>Status</TableCell>
+                    <TableCell sx={{ fontWeight: "medium", color: "#000",fontSize:'16px' }}>Date</TableCell>
+                    <TableCell sx={{ fontWeight: "medium", color: "#000", fontSize: '16px' }}>Appointment Time</TableCell>
+                    <TableCell sx={{ fontWeight: "medium", color: "#000", fontSize: '16px' }}>Doctor</TableCell>
+                    <TableCell sx={{ fontWeight: "medium", color: "#000",fontSize:'16px' }}>Status</TableCell>
                   </TableRow>
                 </TableHead>
+
                 <TableBody>
                   {patient.appointments?.length > 0 ? (
                     patient.appointments.map((appointment) => (
-                      <TableRow key={appointment.id}>
-                        <TableCell>{appointment.date}</TableCell>
-                        <TableCell>{`${appointment.startTime} - ${appointment.endTime}`}</TableCell>
-                        <TableCell>{appointment.status}</TableCell>
+                      <TableRow key={appointment.id} sx={{ "&:hover": { bgcolor: "#F9FAFB" } }}>
+                        <TableCell sx={{ fontWeight: "medium", color: "#363D3A", fontSize: '15px' }}>{appointment.date}</TableCell>
+
+                        <TableCell sx={{ fontWeight: "medium", color: "#363D3A", fontSize: '15px' }}>{`${formatTime(appointment?.startTime)} - ${formatTime(appointment?.endTime)}`}</TableCell>
+                        <TableCell sx={{ fontWeight: "medium", color: "#363D3A", fontSize: '15px' }}>Dr. {appointment.doctor.username}</TableCell>
+                        <TableCell>
+                          <span
+                            className={`px-3 py-2 rounded-lg text-white text-sm font-medium ${appointment.status === "completed"
+                                ? "bg-brand-600"
+                                : appointment.status === "pending"
+                                  ? "bg-yellow-500"
+                                  : "bg-red-500"
+                              }`}
+                          >
+                            {appointment.status}
+                          </span>
+                        </TableCell>
                       </TableRow>
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={3} className="text-center">
+                      <TableCell colSpan={3} className="text-center text-gray-500">
                         No Appointments
                       </TableCell>
                     </TableRow>
@@ -187,7 +248,6 @@ const PatientProfile = () => {
             </TableContainer>
           </div>
         </div>
-
       </div>
     </AdminLayout>
   );

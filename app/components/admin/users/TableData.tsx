@@ -35,9 +35,13 @@ const TableData = ({ search, filters,data,columns,userType,name }) => {
 
     if (userType === "doctor") {
       if (filters.specialization && row.specialization !== filters.specialization) return false;
-      if (filters.experience && row.yearsOfExperience < filters.experience) return false;
-      if (filters.roomNumber && row.room_number !== Number(filters.room_number)) return false;
+
+      // Convert both to numbers before comparison
+      if (filters.yearsOfExperience && Number(row.yearsOfExperience) < Number(filters.yearsOfExperience)) return false;
+
+      if (filters.room_number && Number(row.room_number) !== Number(filters.room_number)) return false;
     }
+
     else if (userType === "appointment") {
       if (filters.dateFrom && new Date(row.date) < new Date(filters.dateFrom)) return false;
       if (filters.dateTo && new Date(row.date) > new Date(filters.dateTo)) return false;
@@ -52,11 +56,11 @@ const TableData = ({ search, filters,data,columns,userType,name }) => {
 
       return true; 
     }
-    // if (userType === "patient") {
-    //   if (filters.gender && row.gender !== filters.gender) return false;
-    //   if (filters.ageRange && (row.age < filters.ageRange[0] || row.age > filters.ageRange[1])) return false;
-    //   if (filters.lastVisit && row.lastVisit !== filters.lastVisit) return false;
-    // }
+    if (userType === "patient") {
+      if (filters.gender && row.gender.toLowerCase() !== filters.gender.toLowerCase()) return false;
+      if (filters.ageRange && (row.age < filters.ageRange[0] || row.age > filters.ageRange[1])) return false;
+      if (filters.lastVisit && row.lastVisit !== filters.lastVisit) return false;
+    }
 
     return true;
   });
@@ -81,21 +85,27 @@ const TableData = ({ search, filters,data,columns,userType,name }) => {
   return (
     <TableContainer component={Paper} sx={{
       mt: 4,
-      border: "1px solid #E0E0E0",
+      border: "1px solid #DFE1E0",
       boxShadow: "none",
       borderRadius: "8px",
       overflowX: "auto"
     }}>
       <button className="flex gap-2 items-center p-3 pl-3 bg-blue-50 rounded-md m-3 text-blue-600" onClick={() => handleDownloadPDF(searchedData, filters, userType, name)} >download <BsDownload className=" font-medium text-lg text-blue-600" /></button>
       <Table>
-        <TableHead>
+        <TableHead sx={{ bgcolor: "#F8F9FA" }}>
           <TableRow>
             {columns.map((col,index) => (
-              <TableCell sx={{ fontWeight: 600, color: "#333", padding: "12px 16px"}} key={index} >{ col.label}</TableCell>
+              <TableCell sx={{
+                fontWeight: "medium",
+                color: "#000",
+                padding: "14px 18px",
+                fontSize: "16px",
+                borderBottom: "2px solid #E0E0E0",
+              }} key={index} >{col.label}</TableCell>
             ))}
             {
               (userType === 'patient' || userType === 'doctor') && (
-                <TableCell>Actions</TableCell>)
+                <TableCell sx={{ fontWeight: 500, color: "#000", padding: "12px 16px", fontSize: '18px' }}>Actions</TableCell>)
             }
           </TableRow>
         </TableHead>
@@ -104,11 +114,13 @@ const TableData = ({ search, filters,data,columns,userType,name }) => {
           {displayedData.length > 0 ? (
             displayedData.map((row,index) => (
               <TableRow sx={{
-                bgcolor: index % 2 === 0 ? "#FFFFFF" : "#FAFAFA",
-                "&:hover": { bgcolor: "#F1F1F1" }
+                padding: "14px 18px",
+                color: "#495057",
+                fontSize: "15px",
+                borderBottom: "1px solid #E0E0E0",
               }} key={row.id}>
                 {columns.map((col) => (
-                  <TableCell sx={{ padding: "12px 16px", color: "#444", fontSize: "14px" }} key={col.key}>
+                  <TableCell sx={{ padding: "12px 16px", color: "#363D3A", fontSize: "16px" }} key={col.key}>
                     {col.key === "status" && (userType === 'patient' || userType === 'doctor') ? (
                       <>
                         <Switch
@@ -136,7 +148,7 @@ const TableData = ({ search, filters,data,columns,userType,name }) => {
                   (userType === 'patient' || userType === 'doctor') && (
                     <TableCell sx={{ padding: "12px 16px" }}>
                   {/* <button className="px-3 py-1 mx-1 border rounded-md bg-gray-200 hover:bg-gray-300">Edit</button> */}
-                  <button className="px-3 py-1 mx-1 border rounded-md bg-gray-200 hover:bg-gray-300"
+                  <button className="px-3 py-1 mx-1 border border-blue-600 text-blue-600 rounded-md "
                     onClick={() => router.push(userType === 'doctor' ? `/admin/users/doctors/${row.id}` : `/admin/users/patients/${row.id}`)}>View</button>
                 </TableCell>)
                 }

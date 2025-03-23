@@ -58,7 +58,7 @@ const specializationOptions = [...new Set(doctors.map(doc => doc.specialization)
           value={specializationFilter}
           onChange={(e) => setSpecializationFilter(e.target.value)}
         >
-          <option value="">All Specialties</option>
+          <option value="">All Specializations</option>
           {specializationOptions.map((spec, index) => (
             <option key={index} value={spec}>
               {spec}

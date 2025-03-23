@@ -78,7 +78,7 @@ export const handleDownloadPDF = (data, filters, userType) => {
 
   // 🏥 **PATIENT REPORT LOGIC**
   else if (userType === "patient") {
-    reportTitle = "All Patients";
+    reportTitle = "List Of All Patients";
     if (filters.status && filters.gender) {
       reportTitle = `${filters.status} ${filters.gender} Patients`;
     } else if (filters.status) {

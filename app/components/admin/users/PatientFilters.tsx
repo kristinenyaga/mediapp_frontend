@@ -17,18 +17,11 @@ const PatientFilters = ({ onFilterChange }) => {
   return (
     <div className="bg-white rounded-lg flex flex-wrap gap-6 items-center mt-5">
       {/* Status Filter */}
-      <div className="flex flex-col">
-        <label className="text-sm mb-2 text-gray-600">Status</label>
-        <select className="border bg-white border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" onChange={(e) => handleChange("status", e.target.value)}>
-          <option value="Active">Active</option>
-          <option value="Inactive">Inactive</option>
-        </select>
 
-      </div>
 
       {/* Gender Filter */}
       <div className="flex flex-col">
-        <label className="text-sm mb-2 text-gray-600">Sex</label>
+        <label className="text-base mb-2 text-gray-700">Gender</label>
         <select onChange={(e) => handleChange("gender", e.target.value)} className="border bg-white border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
           <option value="">All</option>
           <option value="Male">Male</option>
