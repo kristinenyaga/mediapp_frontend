@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect, useState } from 'react'
 import AdminLayout from '../AdminLayout'
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, CartesianGrid } from "recharts";
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from "recharts";
 import axios from 'axios';
 const Home = () => {
   const [patients, setPatients] = useState([])

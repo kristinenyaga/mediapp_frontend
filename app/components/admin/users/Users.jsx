@@ -22,11 +22,11 @@ const Users = () => {
     experience: '',
     roomNumber:''
   })
-  const handleFilterChange = (newFilters: any) => {
+  const handleFilterChange = (newFilters) => {
     setFilters(newFilters);
   };
 
-  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+  const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 

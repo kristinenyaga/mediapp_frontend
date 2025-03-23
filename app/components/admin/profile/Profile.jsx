@@ -1,10 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import AdminLayout from "../AdminLayout";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
 import { MdOutlineModeEdit, MdCheckCircle, MdCancel } from "react-icons/md";
-import { AiOutlineCloudUpload } from "react-icons/ai";
-import Image from "next/image";
+
 import api from "@/app/utils/axiosInstance";
 import LoadingScreen from "../../loader/Loader";
 
@@ -17,7 +15,7 @@ const Profile = () => {
     profilePicture: "/default-avatar.png",
   });
 
-  const [activityLogs, setActivityLogs] = useState([]);
+  // const [activityLogs, setActivityLogs] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [updatedData, setUpdatedData] = useState(adminData);
@@ -25,10 +23,12 @@ const Profile = () => {
   // Fetch Profile Info
   useEffect(() => {
     const fetchProfile = async () => {
+      setLoading(true)
       try {
         const response = await api.get("/api/admin/profile");
         setAdminData(response.data);
         setUpdatedData(response.data);
+        setLoading(false)
       } catch (error) {
         console.error("Error fetching profile:", error);
       }

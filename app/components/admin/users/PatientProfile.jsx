@@ -8,31 +8,9 @@ import { BsDownload } from "react-icons/bs";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { MdEmail, MdMedicalServices, MdPhone } from "react-icons/md";
-import { FaUserMd, FaUserShield } from "react-icons/fa";
+import { FaUserShield } from "react-icons/fa";
 import GoBack from "../../goBack/GoBack";
-interface Appointment {
-  id: number;
-  date: string;
-  startTime: string;
-  endTime: string;
-  status: string;
-}
 
-interface EmergencyContact {
-  name: string;
-  relationship: string;
-  phone: string;
-}
-
-interface Patient {
-  id: number;
-  username: string;
-  email: string;
-  phone: string;
-  appointments: Appointment[];
-  emergencycontact: EmergencyContact | null;
-  medicalinformation: any;
-}
 
 export const formatDate = (date) => {
   return new Intl.DateTimeFormat("en-US", {

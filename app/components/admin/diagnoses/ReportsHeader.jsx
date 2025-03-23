@@ -1,4 +1,4 @@
-import { FaStethoscope, FaBrain, FaUndoAlt, FaCommentDots, FaStar } from "react-icons/fa";
+import { FaBrain, FaUndoAlt, FaCommentDots, FaStar } from "react-icons/fa";
 
 const ReportHeader = ({ averageRating, totalPredictedDiagnoses, doctorOverriddenDiagnoses, totalFeedbackGiven }) => {
   return (

@@ -1,5 +1,5 @@
 "use client";
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, BarChart, Bar, Legend } from "recharts";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, LineChart, Line, XAxis, YAxis, BarChart, Bar, Legend } from "recharts";
 import ReportHeader from "./ReportsHeader";
 import api from "@/app/utils/axiosInstance";
 import { useEffect, useState } from "react";

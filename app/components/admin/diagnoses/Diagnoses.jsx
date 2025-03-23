@@ -3,7 +3,7 @@ import React from 'react'
 import AdminLayout from '../AdminLayout'
 import { Box, Card, CardContent, Grid, Grid2, Typography } from '@mui/material'
 import { FaChartBar, FaClipboardList, FaStethoscope, FaUserInjured } from 'react-icons/fa';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, CartesianGrid } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,Legend, CartesianGrid } from "recharts";
 
 const Diagnoses = () => {
   const stats = [

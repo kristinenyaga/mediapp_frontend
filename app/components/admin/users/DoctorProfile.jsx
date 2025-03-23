@@ -10,7 +10,7 @@ import TableData from "./TableData";
 const DoctorProfile = () => {
   const { id } = useParams()
   const [doctor,setDoctor] = useState([])
-  const [isActive, setIsActive] = useState(doctor?.status === "Active");
+  // const [isActive, setIsActive] = useState(doctor?.status === "Active");
   const [loading, setLoading] = useState(true);
   const [appointments, setAppointments] = useState([])
   const [filter, setFilter] = useState("week");
@@ -22,10 +22,9 @@ const DoctorProfile = () => {
     patientName: "",
   });
 
-  const handleStatusToggle = () => {
-    setIsActive(!isActive);
-    // Call API to update status
-  };
+  // const handleStatusToggle = () => {
+  //   setIsActive(!isActive);
+  // };
 
   const appointmentStats = {
     totalAppointments: doctor.appointments?.length,
@@ -164,7 +163,7 @@ const DoctorProfile = () => {
       try {
         const response = await axios.get(`http://localhost:5000/api/doctor/${id}`);
         setDoctor(response.data);
-        setIsActive(response.data.status === "active");
+        // setIsActive(response.data.status === "active");
         setAppointments(response.data.appointments || [])
       } catch (error) {
         console.error("Error fetching doctor data:", error);

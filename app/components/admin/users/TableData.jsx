@@ -112,7 +112,7 @@ const TableData = ({ search, filters,data,columns,userType,name }) => {
 
         <TableBody>
           {displayedData.length > 0 ? (
-            displayedData.map((row,index) => (
+            displayedData.map((row) => (
               <TableRow sx={{
                 padding: "14px 18px",
                 color: "#495057",

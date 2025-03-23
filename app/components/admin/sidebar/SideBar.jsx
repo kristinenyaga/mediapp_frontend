@@ -4,16 +4,11 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import './sidebar.css';
-import { FaHome, FaUser, FaCalendarCheck, FaChartBar, FaBell, FaSignOutAlt, FaUsers } from "react-icons/fa";
-import { IoMdClose } from 'react-icons/io';
+import { FaHome, FaUser, FaCalendarCheck, FaChartBar, FaSignOutAlt, FaUsers } from "react-icons/fa";
 import { logo } from '@/public/constants/images';
 import { useAuth } from '@/app/context/authContext';
 import { useRole } from '@/app/context/RoleContext';
 
-interface SideBarProps {
-  showSideBar: boolean;
-  setShowSideBar: (show: boolean) => void;
-}
 
 const menuItems = [
   { name: 'Overview', path: '/admin/home', icon: <FaHome size={20} /> },
@@ -24,7 +19,7 @@ const menuItems = [
   { name: 'Profile', path: '/admin/profile', icon: <FaUser size={20} /> },
 ];
 
-const SideBar: React.FC<SideBarProps> = ({ showSideBar, setShowSideBar }) => {
+const SideBar = () => {
   const pathname = usePathname();
     const router = useRouter()
     const { user } = useAuth()

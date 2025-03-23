@@ -7,11 +7,9 @@ import {
   TableCell,
   TableContainer,
   Paper,
-  Switch,
-  Typography,
 } from "@mui/material";
 import { MdKeyboardDoubleArrowLeft, MdKeyboardDoubleArrowRight } from "react-icons/md";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { BsDownload, BsThreeDotsVertical } from "react-icons/bs";
 import { handleDownloadPDF } from "./handledownload";
 import Button from '@mui/material/Button';
@@ -27,16 +25,16 @@ import { isWithinInterval, parseISO } from "date-fns";
 const TableData = ({ filters, appointments, setAppointments,columns }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [openMenu, setOpenMenu] = useState(false);
-  const router = useRouter();
+  // const router = useRouter();
   const [open, setOpen] = React.useState(false);
   const [appointmentToReassign, setAppointmentToReassign] = useState(false)
   const [availableDoctors, setAvailableDoctors] = useState([])
   const [selectedDoctor, setSelectedDoctor] = useState({})
   const [openReassignModal, setOpenReassignModal] = useState(false);
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
+  // const handleClickOpen = () => {
+  //   setOpen(true);
+  // };
 
   const handleClose = () => {
     setOpen(false);
@@ -46,9 +44,9 @@ const TableData = ({ filters, appointments, setAppointments,columns }) => {
     setOpenMenu(openMenu === id ? null : id);
   };
 
-  const handleView = (id) => {
-    router.push(`/admin/appointments/${id}`);
-  };
+  // const handleView = (id) => {
+  //   router.push(`/admin/appointments/${id}`);
+  // };
 
   const handleReassign = async (appointment) => {
     setAppointmentToReassign(appointment)
@@ -66,7 +64,7 @@ const TableData = ({ filters, appointments, setAppointments,columns }) => {
       console.log(error)
     }
   };
-  const handleConfirmCancel = (id) => {
+  const handleConfirmCancel = () => {
     // handleCancel(id);
     setOpen(true)
   };
