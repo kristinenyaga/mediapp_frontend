@@ -22,6 +22,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/components/patient/doctors/Doctors.jsx", "app/components/patient/doctors/DoctorCard.jsx", "app/components/admin/users/AddDoctors.jsx", "app/components/admin/users/DoctorFilters.jsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/components/patient/doctors/Doctors.jsx", "app/components/patient/doctors/DoctorCard.jsx", "app/components/admin/users/AddDoctors.jsx", "app/components/admin/users/DoctorFilters.jsx", "app/components/authentication/ForgotPassword.jsx", "app/components/authentication/Otp.jsx", "app/components/authentication/ResetPassword.jsx", "app/components/authentication/SignIn.jsx", "app/components/authentication/SignUp.jsx"],
   "exclude": ["node_modules"]
 }

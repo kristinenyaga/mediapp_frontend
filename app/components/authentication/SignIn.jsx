@@ -72,7 +72,7 @@ const SignIn = () => {
           setLoading(false)
           Notify.failure(response.data.message || "Login failed");
         }
-      } catch (error:any) {
+      } catch (error) {
         setLoading(false)
         if (error.response) {
 

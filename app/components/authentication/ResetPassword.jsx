@@ -1,6 +1,5 @@
 "use client";
 import React, { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useFormik } from 'formik'
 import axios from 'axios'
@@ -72,31 +71,23 @@ const ResetPassword = () => {
           setLoading(false)
           Notify.failure(response.data.message || "Login failed");
         }
-      } catch (error: any) {
-
-        if (error.response) {
-          Notify.failure("Error response data:", error.response.data.message);
-
-          if (error.response.status === 401) {
-            setLoading(false)
-            Notify.failure(error.response.data.message || "Unauthorized: Invalid credentials.");
-          } else if (error.response.status === 400) {
-            setLoading(false)
-            Notify.failure(error.response.data.message || "Bad request.");
+      } catch (error) {
+        setLoading(false)
+        if (axios.isAxiosError(error)) {
+          if (error.response && error.response.data) {
+            Notify.failure("Error: " + error.response.data.error);
           } else {
-            setLoading(false)
-            Notify.failure(error.response.data.message || "An error occurred.");
+            Notify.failure("Unexpected Axios error: " + error.message);
           }
         } else {
-
-          setLoading(false)
-          console.error("Unexpected error:", error);
-          Notify.failure("A network error occurred. Please try again later.");
+          Notify.failure("Unexpected error: " + error);
         }
+        setLoading(false);
       }
     }
   })
 
+  if(loading) return <LoadingScreen />
 
   return (
     <>

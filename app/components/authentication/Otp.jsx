@@ -1,17 +1,16 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import { Notify } from "notiflix";
 import * as Yup from "yup";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { useAuth } from "@/app/context/authContext";
 import { useRole } from "@/app/context/RoleContext";
 import LoadingScreen from "../loader/Loader";
 
 const Otp = () => {
-  const inputRefs = useRef([]);
   const router = useRouter();
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
@@ -22,8 +21,8 @@ const Otp = () => {
       otp:''
     },
     validationSchema: Yup.object({
-      otp:(Yup.string().required("Required"))
-        .required("OTP is required"),
+      otp: Yup.string().required("OTP is required"),
+
     }),
     onSubmit: async (values) => {
       const otpCode = values.otp 
@@ -49,23 +48,19 @@ const Otp = () => {
           Notify.failure(response.data.message || "Login failed");
         }
       } catch (error) {
+          setIsLoading(false)
         if (axios.isAxiosError(error)) {
-          const axiosError = error as AxiosError;
-          if (axiosError.response && axiosError.response.data) {
-            console.error("Error:", axiosError.response.data.error);
-            setIsLoading(false)
-            Notify.failure(axiosError.response.data.error);
+          if (error.response && error.response.data) {
+            Notify.failure("Error: " + error.response.data.error);
           } else {
-            console.error("Unexpected Axios error:", axiosError.message);
-            setIsLoading(false)
-            Notify.failure("Something went wrong. Please try again.");
+            Notify.failure("Unexpected Axios error: " + error.message);
           }
         } else {
-          console.error("Unexpected error:", error);
-          setIsLoading(false)
-          Notify.failure("Something went wrong. Please try again.");
+          Notify.failure("Unexpected error: " + error);
         }
+        setIsLoading(false);
       }
+
     },
   });
 
@@ -101,8 +96,7 @@ const Otp = () => {
         Notify.failure("Failed to resend OTP. Please try again.");
       }
     } catch (error) {
-      console.log(error)
-      Notify.failure("Failed to resend OTP. Please try again.");
+      Notify.failure("Failed to resend OTP. Please try again.",error);
     }
   };
   

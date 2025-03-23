@@ -5,7 +5,7 @@ import { Notify } from "notiflix";
 import axios from "axios";
 import { useFormik } from "formik";
 import * as Yup from 'yup' 
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -15,31 +15,23 @@ import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { useRole } from "@/app/context/RoleContext";
-import { LOADIPHLPAPI } from "dns/promises";
 import LoadingScreen from "../loader/Loader";
 
 const SignUp = () => {
   const router = useRouter()
-  const [gender, setGender] = React.useState('');
-  const [dob, setDob] = React.useState<Dayjs | null>(dayjs('2007-01-01'));
 
-  const max = dayjs().subtract(18, 'year');
+  const max = dayjs().subtract(17, 'year');
   const min = dayjs().subtract(75, 'year');
   const [loading, setLoading] = useState(false)
-  const { role } = useRole()
 
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setGender((event.target as HTMLInputElement).value);
-  };
   const formik = useFormik({
     initialValues: {
       username: '',
       email: '',
       password: '',
-      dob: max.format("2007-01-01"),
-      gender:'female'
+      dob:max.format("YYYY-MM-DD"),
+      gender:''
       
     },
     validationSchema: Yup.object({
@@ -80,7 +72,7 @@ const SignUp = () => {
           Notify.failure(response.data.message || "Sign up failed")
         }
       }
-      catch (error: any) {
+      catch (error) {
         setLoading(false)
         if (error.response) {
 
