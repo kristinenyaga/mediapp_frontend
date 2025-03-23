@@ -8,6 +8,7 @@ import { useParams } from "next/navigation";
 import { Notify } from "notiflix";
 import api from "@/app/utils/axiosInstance";
 import { useRole } from "@/app/context/RoleContext";
+import GoBack from "../../goBack/GoBack";
 const Appointment = () => {
   const { id } = useParams()
   const { role } = useRole()
@@ -83,6 +84,7 @@ const Appointment = () => {
     <DoctorLayout>
       <div className="w-[90%]">
         {/* Title */}
+        <GoBack />
         <div className="flex items-center gap-2">
           <h2 className="text-2xl font-medium text-blue-700">Appointment Details</h2>
           <p className={`px-5 py-3 rounded-md

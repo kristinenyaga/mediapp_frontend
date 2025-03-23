@@ -12,6 +12,8 @@ import { useDoctor } from '@/app/context/doctorContext';
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
+
 const BookAppointment = () => {
  
   const [selectedDate, setSelectedDate] = useState(null); 
@@ -45,7 +47,7 @@ const BookAppointment = () => {
             "/api/appointment/available-slots",
             {
               doctorId: isDoctorRequired ? selectedDoctor : null,
-              date: new Date(selectedDate).toISOString().split("T")[0], // Ensure proper date format
+              date: selectedDate ? dayjs(selectedDate).format("YYYY-MM-DD") : null
             },
             {
               _role: role
@@ -253,7 +255,7 @@ const BookAppointment = () => {
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                       <DatePicker
                         value={selectedDate}
-                        onChange={(date) => setSelectedDate(date)}
+                        onChange={(date) => setSelectedDate(date ? dayjs(date) : null)}
                         disablePast
                         format="DD MMM YYYY"
                         className="w-[90%]"

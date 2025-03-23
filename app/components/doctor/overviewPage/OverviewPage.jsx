@@ -1,155 +1,163 @@
-"use client"
-import React, { useEffect, useState } from 'react'
-import DoctorLayout from '../doctorLayout'
-import Header from '../Header'
-import { FaCalendarCheck, FaUsers } from 'react-icons/fa';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, CartesianGrid } from "recharts";
-import api from '@/app/utils/axiosInstance'
-import LoadingScreen from '../../loader/Loader'
-const OverviewPage = () => {
-  const [appointments,setAppointments] = useState([])
-  const [upcomingAppointments, setUpcomingAppointments] = useState([])
-  const [filter, setFilter] = useState('otherMonths');
-  const [loading, setIsLoading] = useState(false)
-  const mostCommonDiagnoses = [
-    { name: "Flu", count: 300 },
-    { name: "Diabetes", count: 250 },
-    { name: "Hypertension", count: 230 },
-    { name: "COVID-19", count: 200 },
-    { name: "Asthma", count: 190 },
-  ];
-  const patientDemographics = [
-    { name: "18-25 years", value: 4 },
-    { name: "26-35 years", value: 3 },
-    { name: "36-50 years", value: 2 },
-    { name: "51+ years", value: 0 },
-  ];
-  const COLORS = ["#1d4ed8", "#0077b6", "#6B4DE6", "#2563eb "];
+"use client";
+import React, { useEffect, useState } from "react";
+import DoctorLayout from "../doctorLayout";
+import Header from "../Header";
+import { FaCalendarCheck } from "react-icons/fa";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+} from "recharts";
+import api from "@/app/utils/axiosInstance";
+import LoadingScreen from "../../loader/Loader";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc"; // Import the UTC plugin
+import timezone from "dayjs/plugin/timezone"; // (Optional) If needed
 
+// Extend dayjs with UTC support
+dayjs.extend(utc);
+dayjs.extend(timezone); // (Optional) If needed
+
+const OverviewPage = () => {
+  const [appointments, setAppointments] = useState([]);
+  const [upcomingAppointments, setUpcomingAppointments] = useState([]);
+  const [filter, setFilter] = useState("thisWeek");
+  const [selectedMonth, setSelectedMonth] = useState(dayjs());
+  const [loading, setIsLoading] = useState(false);
+  const [diagnoses, setDiagnoses] = useState([])
+  
+  useEffect(() => {
+    setIsLoading(true);
+    const fetchAppointments = async () => {
+      try {
+        const response = await api.get("/api/appointment/doctor-appointments");
+        setAppointments(response.data);
+
+      const today = new Date().toISOString().split("T")[0]; 
+
+      const upcoming = response.data
+        .filter((appt) => appt.date >= today) // Include today & future
+        .sort((a, b) => {
+          // Sort by date first, then by start time
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+          if (dateA.getTime() === dateB.getTime()) {
+            return a.startTime.localeCompare(b.startTime);
+          }
+          return dateA - dateB;
+        })
+        .slice(0, 5);
+
+        setUpcomingAppointments(upcoming)
+
+        setIsLoading(false);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    const fetchDiagnoses = async () => {
+      try {
+        const response = await api.get("/api/diagnosis/");
+        setDiagnoses(response.data.data);
+      } catch (error) {
+        console.error("Error fetching diagnoses:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchDiagnoses();
+    fetchAppointments();
+  }, []);
+
+  console.log('diagnoses',diagnoses)
 
   const getFilteredData = () => {
-    let filteredData = []
+    let filteredData = [];
+    const today = new Date();
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay()); // Get Sunday of the current week
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6); // Get Saturday of the same week
 
-    if (filter === 'thisWeek') {
-      const startOfWeek = new Date()
-      startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay())
+    if (filter === "today") {
+      filteredData = appointments.filter(
+        (appt) => new Date(appt.date).toDateString() === today.toDateString()
+      );
+    } else if (filter === "thisWeek") {
+      filteredData = appointments.filter(
+        (appt) => {
+          const appointmentDate = new Date(appt.date);
+          return appointmentDate >= startOfWeek && appointmentDate <= endOfWeek;
+        }
+      );
+    } else if (filter === "otherMonths") {
+      filteredData = appointments.filter(
+        (appt) =>
+          new Date(appt.date).getMonth() === selectedMonth.month() &&
+          new Date(appt.date).getFullYear() === selectedMonth.year()
+      );
+    }
+    return filteredData;
+  };
 
-      const endOfWeek = new Date(startOfWeek)
-      endOfWeek.setDate(startOfWeek.getDate() + 6)
+  const filteredAppointments = getFilteredData();
+  const completedAppointments = filteredAppointments.filter((appt) => appt.status === "completed");
+  const pendingAppointments = filteredAppointments.filter((appt) => appt.status === "pending");
+  const cancelledAppointments = filteredAppointments.filter((appt) => appt.status === "cancelled");
 
-      const weeklyAppointments = appointments.filter(appointment => {
-        const appointmentDate = new Date(appointment.date)
-        return appointmentDate >= startOfWeek && appointmentDate <= endOfWeek
-      })
+  const getUniquePatients = () => {
+    const uniquePatients = new Set();
+    filteredAppointments.forEach((appt) => uniquePatients.add(appt.patient?.id));
+    return uniquePatients.size;
+  };
+  const totalPatients = getUniquePatients();
 
-      const groupedData = {}
+  const getAppointmentTrendsData = () => {
+    let groupedData = {};
 
-      weeklyAppointments.forEach(appointment => {
-        const day = new Date(appointment.date).getDay()
-        groupedData[day] = (groupedData[day] || 0) + 1
+    if (filter === "today") {
+      const todayName = new Date().toLocaleString("en-us", { weekday: "long" });
+      groupedData[todayName] = filteredAppointments.length;
+    } else if (filter === "thisWeek") {
+      // Initialize days of the week with zero counts
+      const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+      daysOfWeek.forEach((day) => (groupedData[day] = 0));
 
-      })
-      filteredData = Object.keys(groupedData).map(day => ({
-        day: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][day],
-        appointments: groupedData[day]
-      }))
+      // Group appointments by weekday
+      filteredAppointments.forEach((appointment) => {
+        const appointmentDate = new Date(appointment.date);
+        const dayName = appointmentDate.toLocaleString("en-us", { weekday: "short" });
+        groupedData[dayName] = (groupedData[dayName] || 0) + 1;
+      });
+    } else if (filter === "otherMonths") {
+      groupedData = { "1-7": 0, "8-14": 0, "15-21": 0, "22-28": 0, "29-31": 0 };
 
+      filteredAppointments.forEach((appointment) => {
+        const dayOfMonth = new Date(appointment.date).getDate();
+
+        if (dayOfMonth <= 7) groupedData["1-7"]++;
+        else if (dayOfMonth <= 14) groupedData["8-14"]++;
+        else if (dayOfMonth <= 21) groupedData["15-21"]++;
+        else if (dayOfMonth <= 28) groupedData["22-28"]++;
+        else groupedData["29-31"]++;
+      });
     }
 
-    else if (filter === "thisMonth") {
-      const currentMonth = new Date().getMonth()
-      const currentYear = new Date().getFullYear()
-
-      const monthlyAppointments = appointments.filter(appointment => {
-        const appointmentDate = new Date(appointment.date)
-        return appointmentDate.getMonth() === currentMonth && appointmentDate.getFullYear() === currentYear
-      })
-      const groupedData = {}
-
-      monthlyAppointments.forEach(appointment => {
-        const week = Math.ceil(new Date(appointment.date).getDate() / 7)
-        groupedData[week] = (groupedData[week] || 0) + 1
-      })
-      filteredData = Object.keys(groupedData).map(week => ({
-        day: `week ${week}`,
-        appointments: groupedData[week]
-      }
-      ))
-    }
-
-    else if (filter === "otherMonths") {
-      const groupedData = {}
-
-      appointments.forEach(appointment => {
-        const appointmentDate = new Date(appointment.date)
-        const month = appointmentDate.toLocaleString('default', { month: 'short' })
-        groupedData[month] = (groupedData[month] || 0) + 1
-      })
-
-      filteredData = Object.keys(groupedData).map(month => ({
-        day: month,
-        appointments: groupedData[month]
-      }))
-    }
-    return filteredData
-  }
-  const getNoShowData = () => {
-    const groupedData = {};
-
-    appointments.forEach((appointment) => {
-      const appointmentDate = new Date(appointment.date);
-      const month = appointmentDate.toLocaleString("default", { month: "short" });
-
-      if (!groupedData[month]) {
-        groupedData[month] = { booked: 0, attended: 0 };
-      }
-
-      groupedData[month].booked += 1; 
-      if (appointment.status === 'completed') {
-        groupedData[month].attended += 1; 
-      }
-    });
-
-    return Object.keys(groupedData).map((month) => ({
-      month,
-      booked: groupedData[month].booked,
-      attended: groupedData[month].attended,
+    return Object.keys(groupedData).map((key) => ({
+      period: key,
+      appointments: groupedData[key],
     }));
   };
 
-  const noShowData = getNoShowData();
-
-  const filteredData = getFilteredData()
-
-  function getUniquePatients(appointments) {
-    const uniquePatients = new Map();
-
-    appointments.forEach(appointment => {
-      uniquePatients.set(appointment.patient.id, appointment.patient);
-    });
-
-    const uniquePatientsArray = [...uniquePatients.values()];
-    return uniquePatientsArray
-
-  }
-  useEffect(() => {
-    setIsLoading(true)
-    const fetchAppointments = async () => {
-      try {
-        const response = await api.get('http://localhost:5000/api/appointment/doctor-appointments')
-        setAppointments(response.data)
-        const sortedAppointments = response.data
-          .sort((a, b) => new Date(a.date) - new Date(b.date)) 
-          .slice(0, 5); 
-
-        setUpcomingAppointments(sortedAppointments);
-        setIsLoading(false)
-      } catch (error) {
-        console.log(error)
-      }
-    }
-    fetchAppointments()
-  }, [])
+  if (loading) return <LoadingScreen />;
   const formatTime = (timestring) => {
     if (!timestring) return "N/A";
     const [hours, minutes] = timestring.split(':');
@@ -158,110 +166,123 @@ const OverviewPage = () => {
     return date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
   };
 
-  const completedAppointments = appointments?.filter(appointment => appointment.status === 'completed')
-  const pendingAppointments = appointments?.filter(appointment => appointment.status === 'pending')
-  const cancelledAppointments = appointments?.filter(appointment => appointment.status === 'cancelled')
-  const doctorPatients = getUniquePatients(appointments)
-  if(loading) return <LoadingScreen />
+const getMostCommonPredictedDiagnoses = () => {
+  const diagnosisCounts = {};
+
+  // Get today's date in UTC
+  const today = dayjs().utc();
+  const startOfWeek = today.startOf("week"); // Sunday
+  const endOfWeek = today.endOf("week"); // Saturday
+
+  const relevantDiagnoses = diagnoses.filter((diagnosis) => {
+    const diagnosisDate = dayjs(diagnosis.createdAt).utc(); // Convert `createdAt` to UTC
+
+    if (filter === "today") {
+      return diagnosisDate.isSame(today, "day");
+    } else if (filter === "thisWeek") {
+      return diagnosisDate.isAfter(startOfWeek) && diagnosisDate.isBefore(endOfWeek);
+    } else if (filter === "otherMonths") {
+      return (
+        diagnosisDate.month() === selectedMonth.month() &&
+        diagnosisDate.year() === selectedMonth.year()
+      );
+    }
+    return true;
+  });
+
+  relevantDiagnoses.forEach((diagnosis) => {
+    const predicted = diagnosis.predictedDiagnosis;
+    if (predicted) {
+      diagnosisCounts[predicted] = (diagnosisCounts[predicted] || 0) + 1;
+    }
+  });
+
+  return Object.keys(diagnosisCounts).map((key) => ({
+    diagnosis: key,
+    count: diagnosisCounts[key],
+  }));
+};
+
+  console.log('filter', filter)
+  console.log('diagnoses',getMostCommonPredictedDiagnoses())
+            
+  console.log(('upcomging',upcomingAppointments))
   return (
     <DoctorLayout>
       <Header />
-      <div className='mt-8'>
-        <div className='flex gap-5 justify-between w-[100%] xl:w-[90%] pr-5'>
-          <div className='flex justify-between h-24 px-5 items-center border border-gray-300 w-[400px] rounded-md'>
-            <div className='flex gap-5 items-center'>
-              <div className='flex  justify-center items-center rounded-full w-14 h-14 bg-gray-200'>
-                <FaCalendarCheck className='text-2xl text-blue-700'/>
-              </div>
-              <p className='text-blue-700 text-sm font-medium'>Upcoming <br /> Apppointments</p>
-            </div>
-            <p className='text-gray-700 text-2xl pr-2'>{ pendingAppointments.length}</p>
-          </div>
-          <div className='flex justify-between h-24 px-5 items-center border border-gray-300 w-[400px] rounded-md'>
-            <div className='flex gap-5 items-center px-2'>
-              <div className='flex justify-center items-center rounded-full w-14 h-14 bg-gray-200'>
-                <FaCalendarCheck className='text-2xl text-brand-500' />
-              </div>
-              <p className=' text-brand-500 text-sm font-medium'>Comleted <br /> Apppointments</p>
-            </div>
-            <p className='text-gray-700 text-2xl pr-2'>{ completedAppointments.length}</p>
-          </div>
-          <div className='flex justify-between h-24 px-5 items-center border border-gray-300 w-[400px] rounded-md'>
-            <div className='flex gap-5 items-center px-2'>
-              <div className='flex justify-center items-center rounded-full w-14 h-14 bg-gray-200'>
-                <FaCalendarCheck className='text-2xl text-red-400' />
-              </div>
-              <p className=' text-red-400 text-sm font-medium'>Cancelled <br /> Apppointments</p>
-            </div>
-            <p className='text-gray-700 text-2xl pr-2'>{ cancelledAppointments.length}</p>
-          </div>
-          <div className='flex justify-between h-24 px-5 items-center border border-gray-300 w-[400px] rounded-md'>
-            <div className='flex gap-5 items-center px-2'>
-              <div className='flex justify-center items-center rounded-full w-14 h-14 bg-gray-200'>
-                <FaUsers className='text-3xl text-blue-300'/>
-              </div>
-              <p className=' text-blue-300 text-sm font-medium'>Total <br /> Patients</p>
-            </div>
-            <p className='text-gray-700 text-2xl pr-2'>{doctorPatients.length}</p>
-          </div>
+
+      <div className="mt-8">
+        <div className="flex gap-3 items-center mb-5">
+          <select
+            className="px-3 py-3.5 bg-white border border-gray-300 focus:outline-none rounded text-gray-700"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+          >
+            <option value="today">Today</option>
+            <option value="thisWeek">This Week</option>
+            <option value="otherMonths">Other Months</option>
+          </select>
+
+          {filter === "otherMonths" && (
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                views={["year", "month"]}
+                value={selectedMonth}
+                onChange={(date) => setSelectedMonth(date)}
+                disableFuture
+                format="MMMM YYYY"
+                className="w-40"
+              />
+            </LocalizationProvider>
+          )}
         </div>
-        <div className='grid grid-cols-2 w-[90%]'>
+        <div className="flex gap-5 justify-between w-[100%] xl:w-[90%] pr-5">
+          {[
+            { label: "Upcoming Appointments", value: pendingAppointments.length, color: "text-blue-700" },
+            { label: "Completed Appointments", value: completedAppointments.length, color: "text-green-600" },
+            { label: "Cancelled Appointments", value: cancelledAppointments.length, color: "text-red-500" },
+            { label: "Total Patients", value: totalPatients, color: "text-blue-300" },
+          ].map((stat, index) => (
+            <div key={index} className="flex justify-between h-24 px-5 items-center border border-gray-300 w-[400px] rounded-md">
+              <div className={`flex gap-5 items-center px-2 ${stat.color}`}>
+                <div className="flex justify-center items-center rounded-full w-14 h-14 bg-gray-200">
+                  <FaCalendarCheck className="text-2xl" />
+                </div>
+                <p className="text-sm font-medium">{stat.label}</p>
+              </div>
+              <p className="text-gray-700 text-2xl pr-2">{stat.value}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-2 w-[90%]">
           <GraphCard title="Appointment Trends Over Time">
-            <select className='bg-white  text-gray-700 mt-2 py-2 mb-4 border border-gray-400 rounded-md focus:outline-none' value={filter} onChange={(e) => setFilter(e.target.value)}>
-              <option value="thisWeek">This Week</option>
-              <option value="thisMonth">This Month</option>
-              <option value="otherMonths">Other Months</option>
-            </select>
             <ResponsiveContainer width="90%" height={250}>
-              <LineChart data={filteredData}>
-                {/* <CartesianGrid strokeDasharray="3 3" /> */}
-                <XAxis dataKey="day" />
+              <LineChart data={getAppointmentTrendsData()}>
+                <XAxis dataKey="period" />
                 <YAxis />
                 <Tooltip />
                 <Line type="monotone" dataKey="appointments" stroke="#6B4DE6" strokeWidth={2} />
               </LineChart>
             </ResponsiveContainer>
           </GraphCard>
-          <GraphCard title="Most Common Diagnoses">
-            <select className='bg-white  text-gray-700 mt-2 py-2 mb-4 border border-gray-400 rounded-md focus:outline-none' value={filter} onChange={(e) => setFilter(e.target.value)}>
-              <option value="thisWeek">This Week</option>
-              <option value="thisMonth">This Month</option>
-              <option value="otherMonths">Other Months</option>
-            </select>
+
+          <GraphCard title="Most Common Predicted Diagnoses">
             <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={mostCommonDiagnoses}>
-                <XAxis dataKey="name" />
+              <BarChart data={getMostCommonPredictedDiagnoses()} margin={{ bottom: 40 }}>
+                <XAxis 
+                  dataKey="diagnosis" 
+                  angle={-30} // Rotate labels for better fit
+                  textAnchor="end"
+                />
                 <YAxis />
                 <Tooltip />
                 <Bar dataKey="count" fill="#6B4DE6" />
               </BarChart>
             </ResponsiveContainer>
           </GraphCard>
-          <GraphCard title="Patient Age Distribution">
-            <ResponsiveContainer width="80%" height={300}>
-              <PieChart>
-                <Tooltip formatter={(value, name) => [`${value}`, name]} />
-                <Pie data={patientDemographics} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
-                  {patientDemographics.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-              </PieChart>
-            </ResponsiveContainer>
-          </GraphCard>
-          <GraphCard title="Appointment No-Show Rate (booked vs attended)">
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={noShowData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="booked" fill="#6B4DE6" name="Booked" />
-                <Bar dataKey="attended" fill="#50C878" name="Attended" />
-              </BarChart>
-            </ResponsiveContainer>
-          </GraphCard>
 
+ 
         </div>
         <div className="bg-white w-[90%] rounded-xl p-4">
           <h2 className="text-lg text-gray-700 mb-5">Upcoming Appointments</h2>
@@ -303,10 +324,9 @@ const OverviewPage = () => {
           </table>
         </div>
       </div>
-
     </DoctorLayout>
-  )
-}
+  );
+};
 
 const GraphCard = ({ title, children }) => (
   <div className="bg-white rounded-md mt-10">
@@ -315,4 +335,4 @@ const GraphCard = ({ title, children }) => (
   </div>
 );
 
-export default OverviewPage
+export default OverviewPage;
