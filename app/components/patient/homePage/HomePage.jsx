@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react";
 import { FiCalendar } from "react-icons/fi";
 import PatientLayout from "../patientLayout";
-import { FaCheck } from "react-icons/fa";
 import { BsArrowUpRight } from "react-icons/bs";
 import api from "@/app/utils/axiosInstance";
 import { useRole } from "@/app/context/RoleContext";
@@ -59,7 +58,7 @@ const HomePage = () => {
     }
   }, [lastAppointment]);
 
-  const appointmentId = lastAppointment?.id
+  // const appointmentId = lastAppointment?.id
   return (
     <PatientLayout>
       <div className="w-[95%] min-h-screen">

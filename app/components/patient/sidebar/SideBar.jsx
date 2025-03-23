@@ -17,7 +17,7 @@ const menuItems = [
   { name: 'Profile', path: '/patient/profile', icon: <FaUser size={18} /> },
 ];
 
-const Sidebar: React.FC = () => {
+const Sidebar = () => {
   const pathname = usePathname();
   const router = useRouter();
   const { user } = useAuth()

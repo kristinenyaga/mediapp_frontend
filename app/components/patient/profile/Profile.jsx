@@ -2,41 +2,17 @@
 import React, { useEffect, useState } from "react";
 import PatientLayout from "../patientLayout";
 import UpdateModal from "./UpdateModal";
-import { useAuth } from "@/app/context/authContext";
 import { Notify } from "notiflix";
 import api from "@/app/utils/axiosInstance";
 import LoadingScreen from "../../loader/Loader";
-interface EmergencyContact {
-  id: number;
-  patientId: number;
-  name: string;
-  relationship: string;
-  phone: string | null;
-  updatedAt: string;
-}
 
-interface MedicalInformation {
-  allergies?: string;
-  medications?: string;
-}
-
-interface ProfileDetails {
-  id:number,
-  username: string;
-  email: string;
-  dob:Date,
-  phone: string | null;
-  emergencycontact?: EmergencyContact;
-  medicalinformation?: MedicalInformation;
-}
 
 const Profile = () => {
   const [open, setOpen] = useState(false);
   const [currentSection, setCurrentSection] = useState("");
   const [fields, setFields] = useState([]);
   const [initialValues, setInitialValues] = useState({});
-  const { user } = useAuth()
-  const [profileDetails, setProfileDetails] = useState<ProfileDetails | null>(null);
+  const [profileDetails, setProfileDetails] = useState(null);
 
   const handleOpen = (section, fieldsData, initialValuesData) => {
     setCurrentSection(section);

@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useRole } from "@/app/context/RoleContext";
 import { useRouter } from "next/navigation";
-import { doctor, logo, patient, admin } from "@/public/constants/images";
+import { logo } from "@/public/constants/images";
 import Image from "next/image";
 import LoadingScreen from "../loader/Loader";
 import { FaUserMd, FaUserInjured, FaUserShield } from "react-icons/fa";
@@ -13,7 +13,7 @@ const WelcomePage = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const handleRoleSelection = (role: string) => {
+  const handleRoleSelection = (role) => {
     setLoading(true);
     setRole(role);
     router.push("/sign-in");

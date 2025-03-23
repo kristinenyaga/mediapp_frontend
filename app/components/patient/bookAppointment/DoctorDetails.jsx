@@ -143,11 +143,11 @@ const DoctorDetails = () => {
       console.log(error)
     }
   }
-  const patientSymptoms: unknown = []
+  const patientSymptoms = []
   return (
     <PatientLayout>
       <div className='flex items-center gap-10 '>
-        <div className='w-[20%] hidden h-[25vh] bg-gray-200 rounded-lg flex justify-center items-center'>
+        <div className='w-[20%] flex h-[25vh] bg-gray-200 rounded-lg justify-center items-center'>
           KN
         </div>
         <div className='w-[93%] lg:h-[25vh] rounded-lg border border-gray-300 p-5'>

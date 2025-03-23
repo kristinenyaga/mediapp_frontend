@@ -1,12 +1,10 @@
 "use client"
 import React, { useState,useEffect } from 'react'
-import { Modal, Box, Typography, Button, TextField, FormControl, InputLabel, Select, MenuItem } from '@mui/material'
-import { Formik, Form, Field } from "formik";
+import { Modal, Box, Typography } from '@mui/material'
 import api from '@/app/utils/axiosInstance';
-import { MdWarning, MdWarningAmber } from 'react-icons/md';
+import { MdWarning } from 'react-icons/md';
 import SymptomSelector from './SymptomSelector';
 import { Notify } from 'notiflix';
-import { useRouter } from 'next/navigation';
 const style = {
   position: "absolute",
   top: "50%",
@@ -33,13 +31,12 @@ const UpdateAppointment = ({ open,appointment, handleClose, date, role, doctor, 
 
   const [selectedDate, setSelectedDate] = useState(getValidDate(date)?.toISOString().split('T')[0] || '');
   const [selectedTime, setSelectedTime] = useState('')
-  const [selectedDoctor,setSelectedDoctor] = useState(doctor)
+  const selectedDoctor = doctor
   const [availableTimeslots, setAvailableTimeslots] = useState({
       morning: [],
       afternoon:[]
   });
   const [additionalInfo, setAdditionalInfo] = useState("");
-  const router = useRouter()
   const [selectedSymptoms, setSelectedSymptoms] = useState([]);
 
   useEffect(() => {
@@ -92,16 +89,16 @@ const UpdateAppointment = ({ open,appointment, handleClose, date, role, doctor, 
           const minAllowedTime = new Date(currentTime.getTime() + 30 * 60 * 1000);
 
           // Filter slots based on the minimum allowed time
-          const filteredSlots = slots.filter((slot: { startTime: any; }) => {
+          const filteredSlots = slots.filter((slot) => {
             const slotTime = new Date(`${selectedDate}T${slot.startTime}`);
             return !isToday || slotTime >= minAllowedTime;
           });
 
           const morningSlots = filteredSlots.filter(
-            (slot: { startTime: string; }) => parseInt(slot.startTime.split(":")[0]) < 12
+            (slot) => parseInt(slot.startTime.split(":")[0]) < 12
           );
           const afternoonSlots = filteredSlots.filter(
-            (slot: { startTime: string; }) => parseInt(slot.startTime.split(":")[0]) >= 12
+            (slot) => parseInt(slot.startTime.split(":")[0]) >= 12
           );
 
 
@@ -136,7 +133,7 @@ const UpdateAppointment = ({ open,appointment, handleClose, date, role, doctor, 
   }, [appointment, availableTimeslots]);
 
 
-  const handleSubmit = (e: { preventDefault: () => void }) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
     const updateAppointment = async () => {
@@ -171,7 +168,7 @@ const UpdateAppointment = ({ open,appointment, handleClose, date, role, doctor, 
 
 
   const submitSymptoms = async () => {
-    const symptomList = selectedSymptoms?.map((symptom: { value: any; }) => symptom.value);
+    const symptomList = selectedSymptoms?.map((symptom) => symptom.value);
     try {
       let response;
       if (patientSymptoms) {

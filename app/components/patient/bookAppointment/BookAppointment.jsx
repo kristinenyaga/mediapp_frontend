@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import PatientLayout from '../patientLayout';
 import { Notify } from 'notiflix';
 import { useRouter } from 'next/navigation';
-import DoctorCard from './DoctorCard';
 import api from '@/app/utils/axiosInstance';
 import { useRole } from '@/app/context/RoleContext';
 import SymptomSelector from '../appointments/SymptomSelector';
@@ -13,7 +12,6 @@ import { useDoctor } from '@/app/context/doctorContext';
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import dayjs from "dayjs";
 const BookAppointment = () => {
  
   const [selectedDate, setSelectedDate] = useState(null); 
@@ -127,6 +125,7 @@ const BookAppointment = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true)
 
     try {
       const response = await api.post('/api/appointment/book', {
@@ -144,14 +143,14 @@ const BookAppointment = () => {
         if (selectedSymptoms.length > 0) {
           await submitSymptoms(appointmentId);
         }
-
+        setLoading(false)
         // Show success message & redirect regardless of symptoms
         Notify.success("Appointment booked successfully");
         router.push(`/patient/appointments/${appointmentId}`);
       }
     } catch (error) {
-      console.error("Error booking appointment:", error);
-      Notify.failure("Failed to book appointment. Please try again.");
+      setLoading(false)
+      Notify.failure("Failed to book appointment. Please try again."+error);
     }
   };
 
@@ -178,7 +177,7 @@ const BookAppointment = () => {
       }
   }
   
-  const patientSymptoms: unknown = []
+  const patientSymptoms = []
 
   if(loading) return <LoadingScreen />
   return (

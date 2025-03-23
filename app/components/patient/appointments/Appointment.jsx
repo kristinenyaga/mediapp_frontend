@@ -5,11 +5,10 @@ import { useRouter } from "next/navigation";
 import api from "@/app/utils/axiosInstance";
 import { useRole } from "@/app/context/RoleContext";
 import { handleDownloadPDF } from "./handledownload";
-import { Box, Typography, Button } from "@mui/material";
 import { MdEventBusy } from "react-icons/md";
 const Appointment = () => {
   const [appointments, setAppointments] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  // const [currentPage, setCurrentPage] = useState(1);
   const [filteredAppointments, setFilteredAppointments] = useState([]);
   const [statusFilter, setStatusFilter] = useState("");
   const [searchDoctor, setSearchDoctor] = useState("");
