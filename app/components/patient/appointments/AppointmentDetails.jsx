@@ -205,7 +205,7 @@ const AppointmentDetails = () => {
         <div className="flex flex-wrap gap-2">
           {appointment?.patientSymptom?.symptoms.length > 0 ? (
             appointment?.patientSymptom?.symptoms.map((symptom, index) => (
-              <span key={index} className="px-3 py-1 bg-gray-200 rounded-md text-gray-800 text-sm">
+              <span key={index} className="px-3 py-1 bg-gray-200 rounded-md text-gray-800 text-lg">
                 {symptom?.name}
               </span>
             ))
@@ -240,7 +240,7 @@ const InfoItem = ({ title, content, status }) => {
 
   return (
     <div>
-      <p className="text-sm text-gray-500">{title}</p>
+      <p className="text-lg text-gray-500">{title}</p>
       <p className={`mt-2 text-lg font-medium ${status ? statusColor : "text-gray-800"}`}>{content}</p>
     </div>
   );

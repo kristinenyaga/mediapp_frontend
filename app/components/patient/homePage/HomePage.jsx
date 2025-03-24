@@ -36,11 +36,25 @@ const HomePage = () => {
         })).sort((a, b) => a.date - b.date)
 
         const today = new Date()
-        const upcomingAppointment = fetchedAppointments.filter((appointment) => appointment.date >= today)
+        // const upcomingAppointment = fetchedAppointments.filter((appointment) => appointment.date >= today)
         const pastAppointment = fetchedAppointments.filter(appointment => appointment.date <= today)
         
-        setLastAppointment(pastAppointment[pastAppointment.length - 1] || null)
-        setNextAppointment(upcomingAppointment[0] || null)
+      const completedAppointments = fetchedAppointments.filter(appt => appt.status === "completed");
+      const lastCompletedAppointment = completedAppointments.length > 0 
+        ? completedAppointments.reduce((latest, current) => current.date > latest.date ? current : latest) 
+        : null;
+
+      const pendingAppointments = fetchedAppointments.filter(appt => 
+        appt.status === "pending" && appt.date >= today // Include today and future
+
+      );
+        console.log(pendingAppointments)
+      const nextPendingAppointment = pendingAppointments.length > 0 ? pendingAppointments[0] : null;
+console.log(nextPendingAppointment)
+      // Set state with the appropriate appointments
+        setLastAppointment(lastCompletedAppointment); 
+        
+        setNextAppointment(nextPendingAppointment || null)
         setPreviousVisits(pastAppointment.reverse().slice(0, 5))
         
         setAppointments(fetchedAppointments)
@@ -58,7 +72,16 @@ const HomePage = () => {
     }
   }, [lastAppointment]);
 
+    const formatTime = (timestring) => {
+    if (!timestring) return "N/A";
+    const [hours, minutes] = timestring.split(':');
+    const date = new Date();
+    date.setHours(hours, minutes, 0);
+    return date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+  };
+
   // const appointmentId = lastAppointment?.id
+  console.log(previousVisits)
   return (
     <PatientLayout>
       <div className="w-[95%] min-h-screen">
@@ -90,7 +113,7 @@ const HomePage = () => {
         <section className="mt-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-            <div className="bg-brand-100 p-5 rounded-lg shadow-sm">
+            <div className="bg-yellow-50 p-5 rounded-lg shadow-sm">
               <p className="text-gray-800">Next Appointment</p>
               {nextAppointment ? (
                 <>
@@ -102,7 +125,7 @@ const HomePage = () => {
                     }).format(new Date(nextAppointment.date))}
                   </p>
                   <p className="text-gray-600 text-xs mt-1">{nextAppointment.room_number}</p>
-                  <button className="mt-4 text-green-600 text-sm font-medium flex items-center gap-2">
+                  <button onClick={()=>router.push(`appointments/${nextAppointment.id}`)} className="mt-4 text-green-600 text-sm font-medium flex items-center gap-2">
                     View details <BsArrowUpRight />
                   </button>
                 </>
@@ -164,9 +187,9 @@ const HomePage = () => {
                       } hover:bg-gray-100 transition`}
                   >
                     <td className="px-6 py-3">{new Date(appointment.date).toDateString()}</td>
-                    <td className="px-6 py-3">{`${appointment.startTime} - ${appointment.endTime}`}</td>
+                    <td className="px-6 py-3">{formatTime(appointment?.startTime)} - {formatTime(appointment?.endTime)}</td>
                     <td className="px-6 py-3">{appointment.doctor.username}</td>
-                    <td className="px-6 py-3">{appointment.room_number}</td>
+                    <td className="px-6 py-3">{appointment.doctor.room_number}</td>
                   </tr>
                 ))}
               </tbody>

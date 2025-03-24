@@ -6,8 +6,6 @@ import {
   Typography,
   Button,
   TextField,
-  FormControlLabel,
-  Checkbox,
 } from "@mui/material";
 
 const style = {
@@ -27,8 +25,6 @@ const WorkingHoursModal = ({
   open,
   handleClose,
   sameHours,
-  setSameHours,
-  applySameHours,
   handleSaveWorkingHours,
   daysOfWeek,
   workingHours,
@@ -53,7 +49,7 @@ const sortedWorkingHours = [...workingHours].sort((a,b)=>daysOrder[a.dayOfWeek] 
           Update Working Hours
         </Typography>
 
-        <FormControlLabel
+        {/* <FormControlLabel
           control={
             <Checkbox
               checked={sameHours}
@@ -70,7 +66,7 @@ const sortedWorkingHours = [...workingHours].sort((a,b)=>daysOrder[a.dayOfWeek] 
           }
           label="Apply same working hours for all days"
           sx={{ mb: 3 }}
-        />
+        /> */}
         <div className="grid grid-cols-1 gap-4">
           {daysOfWeek.map((day) => {
             const currentDayHours =

@@ -43,18 +43,21 @@ const OverviewPage = () => {
 
       const today = new Date().toISOString().split("T")[0]; 
 
-      const upcoming = response.data
-        .filter((appt) => appt.date >= today) // Include today & future
-        .sort((a, b) => {
-          // Sort by date first, then by start time
-          const dateA = new Date(a.date);
-          const dateB = new Date(b.date);
-          if (dateA.getTime() === dateB.getTime()) {
-            return a.startTime.localeCompare(b.startTime);
-          }
-          return dateA - dateB;
-        })
-        .slice(0, 5);
+const upcoming = response.data
+  .filter((appt) => appt.date >= today && appt.status === "pending") // Filter pending appointments only
+  .sort((a, b) => {
+    // Sort by date first, then by start time
+    const dateA = new Date(a.date);
+    const dateB = new Date(b.date);
+    if (dateA.getTime() === dateB.getTime()) {
+      return a.startTime.localeCompare(b.startTime);
+    }
+    return dateA - dateB;
+  })
+  .slice(0, 5); // Limit to 5 upcoming appointments
+
+setUpcomingAppointments(upcoming);
+
 
         setUpcomingAppointments(upcoming)
 
@@ -303,8 +306,8 @@ const getMostCommonPredictedDiagnoses = () => {
                   <td className="p-2">{formatTime(appt?.startTime)} - {formatTime(appt?.endTime)}</td>
                   <td className="p-2">
                     <span
-                      className={`px-2 py-1 text-xs rounded-full ${appt.status === "Confirmed"
-                          ? "bg-green-100 text-green-700"
+                      className={`px-2 py-1 text-xs rounded-full ${appt.status === "completed"
+                          ? "bg-brand-100 text-brand-600"
                           : "bg-yellow-100 text-yellow-700"
                         }`}
                     >

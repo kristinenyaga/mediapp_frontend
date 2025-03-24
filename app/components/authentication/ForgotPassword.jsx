@@ -18,6 +18,7 @@ const ForgotPassword = () => {
   const [emailError, setEmailError] = useState("");
   const [otpError, setOtpError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState("");
   
   const router = useRouter()
   const { role } = useRole()
@@ -87,21 +88,35 @@ const ForgotPassword = () => {
       alert("Invalid or expired OTP. Please try again.");
     }
   };
-
+  const validatePassword = (password) => {
+    if (password.length < 6) return "Password must be at least 6 characters.";
+    if (password.length > 64) return "Password cannot exceed 64 characters.";
+    if (!/[A-Z]/.test(password)) return "Password must contain at least one uppercase letter.";
+    if (!/\d/.test(password)) return "Password must contain at least one number.";
+    if (/\s/.test(password)) return "Password must not contain spaces.";
+    return ""; // No error
+  };
 
   const handleResetPassword = async () => {
-    if (!password || !confirmPassword) {
-      setPasswordError("Please enter and confirm your new password.");
+    const passwordValidationError = validatePassword(password);
+    if (passwordValidationError) {
+      setPasswordError(passwordValidationError);
       return;
+    } else {
+      setPasswordError("");
     }
-    if (password !== confirmPassword) {
-      setPasswordError("Passwords do not match.");
+
+    // Validate confirm password
+    if (confirmPassword !== password) {
+      setConfirmPasswordError("Passwords do not match.");
       return;
+    } else {
+      setConfirmPasswordError("");
     }
-    setPasswordError("")
 
     try {
       setLoading(true)
+
       const response = await axios.post('http://localhost:5000/api/patient/resetpassword', {
         email,
         newPassword: password,
@@ -186,6 +201,7 @@ const ForgotPassword = () => {
               className={`w-full mt-5 p-3 ${passwordError ? "border border-red-300" : "border border-gray-300"}  rounded-lg focus:outline-none focus:border-gray-500 mb-4`}
 
             />
+            {passwordError && <p className="text-red-500 text-sm">{passwordError}</p>}
             <input
               type="password"
               value={confirmPassword}
@@ -194,7 +210,7 @@ const ForgotPassword = () => {
               className={`w-full mt-5 p-3 ${passwordError ? "border border-red-300" : "border border-gray-300"}  rounded-lg focus:outline-none focus:border-gray-500 mb-4`}
 
             />
-            {passwordError && <p className="text-red-500 text-sm">{passwordError}</p>}
+            {confirmPasswordError && <p className="text-red-500 text-sm">{confirmPasswordError}</p>}
             <button
               onClick={handleResetPassword}
               className="w-full bg-gradient-to-r from-[#6B4DE6] to-[#927de7] text-white h-12 rounded-md mt-3 font-semibold transition-all hover:scale-105"

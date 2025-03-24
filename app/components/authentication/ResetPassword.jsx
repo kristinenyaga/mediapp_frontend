@@ -30,10 +30,21 @@ const ResetPassword = () => {
         .email("invalid email address")
         .required("Email is required"),
       password: Yup.string()
-        .min(4, "Password must be greater than 4 characters")
+        .min(6, "Password must be at least 6 characters long")
+        .max(64, "Password must not exceed 64 characters")
+        .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
+        .matches(/\d/, "Password must contain at least one number")
+        .matches(/^\S*$/, "Password must not contain spaces")
+        .notOneOf(["password", "123456", "qwerty", "abc123"], "Password is too common")
         .required("Password is required"),
       confirmPassword: Yup.string()
         .oneOf([Yup.ref("password"), null], "Passwords must match")
+        .min(6, "Password must be at least 6 characters long")
+        .max(64, "Password must not exceed 64 characters")
+        .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
+        .matches(/\d/, "Password must contain at least one number")
+        .matches(/^\S*$/, "Password must not contain spaces")
+        .notOneOf(["password", "123456", "qwerty", "abc123"], "Password is too common")
         .required("Confirm password is required"),
 
     }),

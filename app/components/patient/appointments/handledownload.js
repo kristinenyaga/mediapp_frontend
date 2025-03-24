@@ -8,6 +8,17 @@ export const formatDate = (date) => {
     year: "numeric",
   }).format(new Date(date));
 };
+export const formatTime = (timestring) => {
+      if (!timestring) return "N/A";
+      const [hours, minutes] = timestring.split(":");
+      const date = new Date();
+      date.setHours(hours, minutes, 0);
+      return date.toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      });
+    };
 
 export const handleDownloadPDF = (data, filters) => {
   const doc = new jsPDF();
@@ -70,7 +81,7 @@ export const handleDownloadPDF = (data, filters) => {
       day: "numeric",
       year: "numeric",
     }).format(new Date(row.date)),
-    `${row.startTime} - ${row.endTime}` || "-",
+    `${formatTime(row.startTime)}-${formatTime(row.endTime)}` || "-",
     row.appointmentDuration || "-",
     row.status || "-",
     row.queueNumber || "-",

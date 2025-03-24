@@ -27,7 +27,7 @@ const SymptomSelector = ({ symptoms, selectedSymptoms, setSelectedSymptoms, addi
   );
   return (
     <div className="mt-8 max-w-[90%]">
-      <h2 className="mb-4 text-secondary font-medium">Select Symptoms <span className='text-sm text-gray-600'>(optional)</span></h2>
+      <h2 className="mb-4 text-secondary font-medium text-xl">Select Symptoms <span className='text-sm text-gray-600'>(optional)</span></h2>
 
       <Select
         options={filteredOptions}
@@ -35,13 +35,13 @@ const SymptomSelector = ({ symptoms, selectedSymptoms, setSelectedSymptoms, addi
           handleAddSymptom(selectedOption);
         }}
         placeholder="Search and select symptoms..."
-        className="mb-4 focus:outline-none placeholder:text-sm"
+        className="mb-4 focus:outline-none placeholder:text-base"
         isClearable
         value={null}
         styles={{
           control: (base) => ({
             ...base,
-            padding: '0.2rem 0',
+            padding: '0.5rem 0',
           }),
           menu: (base) => ({
             ...base,
@@ -52,12 +52,12 @@ const SymptomSelector = ({ symptoms, selectedSymptoms, setSelectedSymptoms, addi
 
       {/* Selected Symptoms Display */}
       <div className="mt-8">
-        <h3 className=" mb-2">Selected Symptoms:</h3>
+        <h3 className=" mb-2 text-lg">Selected Symptoms:</h3>
         <div className="flex flex-wrap gap-2">
           {selectedSymptoms?.map((symptom) => (
             <span
               key={symptom.value}
-              className="bg-[#6c4de612] text-secondary px-3 py-1 text-sm rounded-full flex items-center gap-2"
+              className="bg-[#6c4de612] text-secondary px-3 py-1 text-base rounded-full flex items-center gap-2"
             >
               {symptom.label}
               <button

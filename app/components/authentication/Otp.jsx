@@ -39,7 +39,7 @@ const Otp = () => {
             router.push('/doctor/overview')
           }
           else if (role === 'patient') {
-            router.push("/patient/book-appointment");
+            router.push("/patient/home");
           }
           else {
             router.push("/admin/home")

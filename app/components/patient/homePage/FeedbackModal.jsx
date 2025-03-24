@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Modal, Box, Typography, TextField, Button, IconButton } from "@mui/material";
 import { Star, StarBorder } from "@mui/icons-material";
 import api from "@/app/utils/axiosInstance";
+import { Notify } from "notiflix";
 
 const style = {
   position: "absolute",
@@ -21,6 +22,7 @@ const FeedbackModal = ({ open, handleClose, lastAppointment }) => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [loading, setLoading] = useState(false);
+  console.log(lastAppointment)
 
   const handleStarClick = (index) => {
     setRating(index);
@@ -34,10 +36,14 @@ const FeedbackModal = ({ open, handleClose, lastAppointment }) => {
     setLoading(true);
 
     try {
-      await api.post(`/api/feedback/appointments/${lastAppointment?.id}/submit`, {
+      const response = await api.post(`/api/feedback/appointments/${lastAppointment?.id}/submit`, {
         rating,
         comment,
       });
+
+      if (response.status === 200) {
+        Notify.success("Feedback submitted successfully")
+      }
 
       setRating(0);
       setComment("");
@@ -53,7 +59,11 @@ const FeedbackModal = ({ open, handleClose, lastAppointment }) => {
   const handleDecline = async () => {
     setLoading(true)
     try {
-      await api.patch(`/api/feedback/appointments/${lastAppointment?.id}/decline`, {});
+      const response = await api.patch(`/api/feedback/appointments/${lastAppointment?.id}/decline`, {});
+
+      if (response.status === 200) {
+        Notify.success("Feedback declined ")
+      }
 
       handleClose();
     } catch (error) {

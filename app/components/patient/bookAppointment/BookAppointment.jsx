@@ -186,7 +186,7 @@ const BookAppointment = () => {
     <PatientLayout>
       <div className="bg-white">
         <div className="pb-4 mb-4">
-          <h2 className="text-2xl font-medium text-blue-700">Book Appointment</h2>
+          <h2 className="text-3xl font-medium text-blue-700">Book Appointment</h2>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -274,7 +274,7 @@ const BookAppointment = () => {
                     <select
                       value={selectedTime}
                       onChange={(e) => setSelectedTime(e.target.value)}
-                      className="w-full p-3 bg-white border-gray-300 border rounded-md focus:outline-none"
+                      className="w-full text-lg p-3 bg-white border-gray-300 border rounded-md focus:outline-none"
                     >
                       <option value="">Select a Morning Slot</option>
                       {availableTimeslots.morning.map((slot, index) => (
@@ -289,7 +289,7 @@ const BookAppointment = () => {
                     <select
                       value={selectedTime}
                       onChange={(e) => setSelectedTime(e.target.value)}
-                      className="w-full p-3 bg-white border-gray-300 border rounded-md focus:outline-none"
+                      className="w-full p-3 text-lg bg-white border-gray-300 border rounded-md focus:outline-none"
                     >
                       <option value="">Select an Afternoon Slot</option>
                       {availableTimeslots.afternoon.map((slot, index) => (
@@ -317,7 +317,7 @@ const BookAppointment = () => {
                 <div className="">
                   <button
                     type="submit"
-                    className="bg-secondary text-white py-3 px-6 rounded-lg shadow-md hover:bg-blue-700 transition duration-200"
+                    className="bg-secondary text-lg text-white py-3 px-6 rounded-lg shadow-md hover:bg-blue-700 transition duration-200"
                   >
                     Book Appointment
                   </button>
