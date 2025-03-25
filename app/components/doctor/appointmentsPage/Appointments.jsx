@@ -84,10 +84,10 @@ const Appointments = () => {
       <div className='w-[90%]'>
         <div className="border-b pb-4 mb-6 flex flex-col gap-3">
           <div>
-            <h2 className="text-2xl font-medium text-blue-700">Appointments</h2>
-            <p className="text-gray-700 text-sm">Here are all your appointments</p>
+            <h2 className="text-3xl font-medium text-blue-700">Appointments</h2>
+            <p className="text-gray-800 text-base">Here are all your appointments</p>
           </div>
-          <div className='flex items-center gap-5 text-gray-700'>
+          <div className='flex items-center text-base gap-5 text-gray-800'>
             <p>Appointments for</p>
             <p className='border p-3 border-gray-200 rounded-md text-blue-700'>
               {filters.startDate && filters.endDate
@@ -98,12 +98,12 @@ const Appointments = () => {
         <div className="mb-4 flex gap-4">
           <button
             onClick={() => setShowDatePicker(!showDatePicker)}
-            className="border text-sm p-2 rounded-md bg-blue-600 text-white"
+            className="border text-base p-2 rounded-md bg-blue-600 text-white"
           >
             select date range
           </button>
           {showDatePicker && (
-            <div className="absolute z-10 bg-white shadow-lg rounded-md p-4 top-16">
+            <div className="absolute z-10 text-base bg-white shadow-lg rounded-md p-4 top-16">
               <DateRange
                 ranges={dateRange}
                 onChange={handleDateRange}
@@ -133,15 +133,15 @@ const Appointments = () => {
             value={filters.search}
             onChange={handleFilterChange}
             placeholder="Search by patient name"
-            className="border p-2 rounded-md placeholder:text-sm placeholder:text-gray-700 outline-none focus:border-gray-300"
+            className="border p-2 py-3 rounded-md placeholder:text-base placeholder:text-gray-800 outline-none focus:border-gray-300"
           />
-          <select name="status" value={filters.status} onChange={handleFilterChange} className="border bg-white text-sm text-gray-700 p-2 rounded-md outline-none focus:border-gray-300">
+          <select name="status" value={filters.status} onChange={handleFilterChange} className="border bg-white text-gray-800 p-2 py-3 text-base rounded-md outline-none focus:border-gray-300">
             <option value="">All Statuses</option>
             <option value="pending">Pending</option>
             <option value="completed">Completed</option>
             <option value="canceled">Canceled</option>
           </select>
-          <select name="sex" value={filters.sex} onChange={handleFilterChange} className="border bg-white text-sm text-gray-700 p-2 rounded-md outline-none focus:border-gray-300">
+          <select name="sex" value={filters.sex} onChange={handleFilterChange} className="border bg-white text-base text-gray-800 p-2 py-3 rounded-md outline-none focus:border-gray-300">
             <option value="">All Genders</option>
             <option value="female">Female</option>
             <option value="male">Male</option>

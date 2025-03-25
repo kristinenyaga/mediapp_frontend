@@ -8,20 +8,32 @@ export const formatDate = (date) => {
     year: "numeric",
   }).format(new Date(date));
 }
+export const formatTime = (timestring) => {
+  if (!timestring) return "N/A";
+  const [hours, minutes] = timestring.split(":");
+  const date = new Date();
+  date.setHours(hours, minutes, 0);
+  return date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+};
 
-export const handleDownloadPDF = (data, filters) => {
+export const handleDownloadPDF = (data, filters,user) => {
+  console.log(filters)
   const doc = new jsPDF();
-
   const logoUrl = "/images/logo.png";
-  doc.addImage(logoUrl, "PNG", 10,10,30,10);
-
+  doc.addImage(logoUrl, "PNG", 90, 10, 30, 10);
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "light");
+  doc.text("Intelligent medical Diagnostic System", 80, 24);
   doc.setFontSize(14);
   doc.setFont("helvetica", "bold");
-  doc.text("APPOINTMENT REPORT", 80, 20);
+  doc.text("APPOINTMENT REPORT", 80, 35);
 
-  doc.setFontSize(10);
-  doc.setFont("helvetica", "normal");
-  doc.text("Intelligent Medical Diagnostic System", 80, 27);
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "light");
   doc.text(
     "Generated on: " +
       new Intl.DateTimeFormat("en-US", {
@@ -30,8 +42,39 @@ export const handleDownloadPDF = (data, filters) => {
         year: "numeric",
       }).format(new Date()),
     85,
-    34
+    50
   );
+let reportDateRange = `From ${formatDate(
+  new Date().toISOString().split("T")[0]
+)} - ${formatDate(new Date().toISOString().split("T")[0])}`;
+
+// Check if dateRange is defined and has valid startDate & endDate
+if (
+  filters.startDate &&
+  filters.endDate
+) {
+  const startDate = new Date(filters.startDate);
+  const endDate = new Date(filters.endDate);
+
+  // Format the dates properly
+  const formattedStartDate = new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(startDate);
+
+  const formattedEndDate = new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(endDate);
+
+  reportDateRange = `From ${formattedStartDate} - ${formattedEndDate}`;
+}
+
+doc.setFontSize(11);
+doc.setFont("helvetica");
+doc.text(reportDateRange, 80, 41);
 
   let reportTitle = "All Appointments ";
   let fileName = "Appointments_";
@@ -62,9 +105,26 @@ export const handleDownloadPDF = (data, filters) => {
     fileName += ` for ${filters.sex} patients`
   }
 
+  doc.setFontSize(13);
+  doc.setFont("helvetica");
+  doc.text("Doctor Information", 15, 68);
   doc.setFontSize(10);
   doc.setFont("helvetica");
-  doc.text(reportTitle, 14, 50);
+  doc.text("Name", 15, 75);
+  doc.setFontSize(10);
+  doc.text(`${user.username}`, 35, 75);
+  doc.setFontSize(10);
+  doc.setFont("helvetica");
+  doc.text("Email", 15, 80);
+  doc.setFontSize(10);
+  doc.text(`${user.email}`, 35, 80);
+  doc.setFontSize(10);
+  doc.setFont("helvetica");
+  doc.text("Phone", 15, 85);
+
+  doc.setFontSize(13);
+  doc.setFont("helvetica");
+  doc.text(reportTitle, 15, 100);
 
   // Table Headers
   const tableColumn = ["Date", "Doctor", "Patient", "Appointment Time", "Status", "Gender"];
@@ -76,17 +136,18 @@ export const handleDownloadPDF = (data, filters) => {
     }).format(new Date(row.date)),
     row.doctor?.username || "-",
     row.patient?.username || "-",
-    `${row.startTime} - ${row.endTime}` || "-",
+    `${formatTime(row.startTime)} - ${formatTime(row.endTime)}` || "-",
     row.status || "-",
     row.patient?.gender || "-",
   ]);
 
   // Table
   doc.autoTable({
-    startY: 60,
+    startY: 105,
     head: [tableColumn],
     body: tableRows,
-    styles: { fontSize: 7 },
+    theme: "grid",
+    styles: { fontSize: 10 },
     headStyles: { fillColor: [0, 51, 153], textColor: 255 },
     alternateRowStyles: { fillColor: [240, 240, 240] },
     margin: { top: 10 },

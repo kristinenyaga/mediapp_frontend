@@ -11,17 +11,17 @@ export const formatDate = (date) => {
 
 export const handleDownloadPDF = (data, filters) => {
   const doc = new jsPDF();
-
   const logoUrl = "/images/logo.png";
-  doc.addImage(logoUrl, "PNG", 10,10,30,10);
-
+  doc.addImage(logoUrl, "PNG", 90, 10, 30, 10);
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "light");
+  doc.text("Intelligent medical Diagnostic System", 78, 24);
   doc.setFontSize(14);
   doc.setFont("helvetica", "bold");
-  doc.text("PATIENT REPORT", 85, 20);
+  doc.text("PATIENTS REPORT", 83, 35);
 
-  doc.setFontSize(10);
-  doc.setFont("helvetica", "normal");
-  doc.text("Intelligent Medical Diagnostic System", 80, 27);
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "light");
   doc.text(
     "Generated on: " +
       new Intl.DateTimeFormat("en-US", {
@@ -29,9 +29,16 @@ export const handleDownloadPDF = (data, filters) => {
         day: "numeric",
         year: "numeric",
       }).format(new Date()),
-    85,
-    34
+    83,
+    48
   );
+
+let reportDateRange = "From Dec 2024 - March 2025";
+
+    doc.setFontSize(11);
+    doc.setFont("helvetica");
+    doc.text(reportDateRange, 80, 41);
+  
 
   let reportTitle = "All Patients ";
   let fileName = "Patients";
@@ -57,9 +64,9 @@ export const handleDownloadPDF = (data, filters) => {
     fileName += `All_${filters.gender}_patients`
   }
 
-  doc.setFontSize(10);
+  doc.setFontSize(12);
   doc.setFont("helvetica");
-  doc.text(reportTitle, 14, 50);
+  doc.text(reportTitle, 14, 65);
 
   // Table Headers
   const tableColumn = ["Name", "Email", "Phone", "Dob","Sex", "Appointments", "Registered"];
@@ -79,12 +86,12 @@ export const handleDownloadPDF = (data, filters) => {
 
   // Table
   doc.autoTable({
-    startY: 60,
+    startY: 70,
     head: [tableColumn],
     body: tableRows,
-    styles: { fontSize: 7 },
+    theme: "grid",
+    styles: { fontSize: 10 },
     headStyles: { fillColor: [0, 51, 153], textColor: 255 },
-    alternateRowStyles: { fillColor: [240, 240, 240] },
     margin: { top: 10 },
   });
 

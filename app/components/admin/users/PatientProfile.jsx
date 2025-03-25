@@ -23,7 +23,7 @@ export const formatDate = (date) => {
 
 const PatientProfile = () => {
   const { id } = useParams()
-  const [patient,setPatient] = useState<Patient | null>([])
+  const [patient,setPatient] = useState([])
 
   useEffect(() => {
     const fetchPatientData = async () => {

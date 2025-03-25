@@ -11,6 +11,7 @@ import { BsArrowClockwise, BsPencilSquare, BsTrash } from 'react-icons/bs';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
 import { Warning } from '@mui/icons-material';
 import { Notify } from 'notiflix';
+import GoBack from '../../goBack/GoBack';
 
 const AppointmentDetails = () => {
   const { id } = useParams(); 
@@ -131,6 +132,8 @@ const AppointmentDetails = () => {
   return (
     <PatientLayout>
       <div className="max-w-[90%]">
+          <GoBack/>
+
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-medium text-blue-700">Appointment Details</h1>
           <div className="flex gap-3">

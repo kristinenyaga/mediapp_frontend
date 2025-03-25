@@ -13,6 +13,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
+import { MdErrorOutline } from 'react-icons/md';
 
 const BookAppointment = () => {
  
@@ -31,6 +32,34 @@ const BookAppointment = () => {
   const { role } = useRole()
   const [loading, setLoading] = useState(false)
   const { selectedDoctor, setDoctorId } = useDoctor()
+  const [hasPendingAppointment, setHasPendingAppointment] = useState(false);
+
+  useEffect(() => {
+    const checkPendingAppointments = async () => {
+      try {
+        const response = await api.get("/api/appointment/patient-appointments", { _role: role });
+
+
+
+        if (response.status === 200) {
+          const today = dayjs().format("YYYY-MM-DD");
+          console.log('today',today)
+
+          // Check if there's a pending appointment for today
+          const pendingToday = response.data.appointments.some(
+            (appointment) => appointment.date === today && appointment.status === "pending"
+          );
+
+          setHasPendingAppointment(pendingToday);
+        }
+      } catch (error) {
+        console.error("Error fetching appointments:", error);
+      }
+    };
+
+    checkPendingAppointments();
+  }, [role]);
+
 
   const handleDoctorSelection = (id) => {
     setDoctorId(id); 
@@ -188,7 +217,14 @@ const BookAppointment = () => {
         <div className="pb-4 mb-4">
           <h2 className="text-3xl font-medium text-blue-700">Book Appointment</h2>
         </div>
-
+        {hasPendingAppointment && (
+          <div className="bg-red-100 w-[90%] text-red-700 p-4 rounded-lg mb-6">
+            <MdErrorOutline />
+            <p className="text-lg font-medium">You already have a pending appointment scheduled for today.</p>
+            <p className="text-sm">You cannot book another appointment until it is completed.</p>
+          </div>
+        )}
+        {!hasPendingAppointment && (
         <form onSubmit={handleSubmit} className="space-y-6">
           {!selectedDoctor && (
             <div className="bg-white rounded-lg mb-9">
@@ -327,6 +363,10 @@ const BookAppointment = () => {
           </div>
 
         </form>
+        )}
+
+
+
       </div>
     </PatientLayout>
   );

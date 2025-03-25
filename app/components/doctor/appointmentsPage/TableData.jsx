@@ -17,6 +17,7 @@ import { isWithinInterval, parseISO } from "date-fns";
 import { handleDownloadPDF } from './handleDownload'
 import api from "@/app/utils/axiosInstance";
 import { Notify } from "notiflix";
+import { useAuth } from "@/app/context/authContext";
 
 const TableData = ({ data,columns,filters }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -78,7 +79,19 @@ const TableData = ({ data,columns,filters }) => {
   const totalPages = Math.ceil(filteredAppointments.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const displayedData = filteredAppointments.slice(startIndex, startIndex + itemsPerPage);
-
+  const formatTime = (timestring) => {
+  if (!timestring) return "N/A";
+  const [hours, minutes] = timestring.split(":");
+  const date = new Date();
+  date.setHours(hours, minutes, 0);
+  return date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+  };
+  const { user } = useAuth()
+  
   return (
     <TableContainer component={Paper} sx={{
       mt: 4,
@@ -87,14 +100,14 @@ const TableData = ({ data,columns,filters }) => {
       borderRadius: "8px",
       overflowX: "auto"
     }}>
-      <button onClick={() => handleDownloadPDF(filteredAppointments, filters)} className="flex gap-2 items-center p-3 pl-3 bg-[#6c4de60a] rounded-md m-3 text-blue-700">download <BsDownload className=" font-medium text-lg text-blue-700" /></button>
+      <button onClick={() => handleDownloadPDF(filteredAppointments, filters,user)} className="flex gap-2 items-center p-3 pl-3 bg-[#6c4de60a] text-base font-medium rounded-md m-3 text-blue-700">download <BsDownload className=" font-medium text-lg text-blue-700" /></button>
       <Table>
         <TableHead>
           <TableRow>
             {columns.map((col,index) => (
-              <TableCell sx={{ fontWeight: 600, color: "#333", padding: "12px 16px"}} key={index} >{ col.label}</TableCell>
+              <TableCell sx={{ fontWeight: 500, color: "#000", padding: "12px 16px",fontSize:'16px'}} key={index} >{ col.label}</TableCell>
             ))}
-            <TableCell>Actions</TableCell>
+            <TableCell sx={{ fontWeight: 500, color: "#000", padding: "12px 16px",fontSize:'16px'}}>Actions</TableCell>
           </TableRow>
         </TableHead>
 
@@ -106,7 +119,7 @@ const TableData = ({ data,columns,filters }) => {
                 "&:hover": { bgcolor: "#F1F1F1" }, color:'#4F5653'
               }} key={row.id}>
                 {columns.map((col) => (
-                  <TableCell sx={{ padding: "12px 16px", color: "#444", fontSize: "14px" }} key={col.key}>
+                  <TableCell sx={{ padding: "12px 16px", color: "#444", fontSize: "16px" }} key={col.key}>
                     {col.key === "patient" && typeof row.patient === "object" ? (
                       row.patient.username
                     ) : col.key === "sex" && typeof row.patient === "object" ? (
@@ -124,7 +137,7 @@ const TableData = ({ data,columns,filters }) => {
                               size="small"
                               sx={{
                                 minWidth: 120,
-                                fontSize: "14px",
+                                fontSize: "16px",
                                 fontWeight: 600,
                                 color:
                                   (status[row.id] || row.status) === "pending"
@@ -141,14 +154,14 @@ const TableData = ({ data,columns,filters }) => {
                               <MenuItem value="completed" sx={{ color: "#388E3C", fontWeight: 600 }}>Completed</MenuItem>
                               <MenuItem disabled value="cancelled" sx={{ color: "#D32F2F", fontWeight: 600 }}>Cancelled</MenuItem>
                             </Select>
-                      ):col.key === 'startTime' ? (`${row.startTime} - ${row.endTime}`):
+                      ):col.key === 'startTime' ? (`${formatTime(row.startTime)} - ${formatTime(row.endTime)}`):
                       (
                         Array.isArray(row[col.key]) ? row[col.key].length : row[col.key]
                     )}
                   </TableCell>
                 ))}
                   <TableCell sx={{ padding: "12px 16px" }}>
-                  <button className="px-3 py-1 mx-1 border rounded-md bg-gray-200 hover:bg-gray-300"
+                  <button className="px-3 py-1 mx-1 text-base border rounded-md bg-gray-200 hover:bg-gray-300"
                     onClick={() => router.push(`/doctor/appointments/${row.id}`)}>View</button>
                 </TableCell>
               </TableRow>

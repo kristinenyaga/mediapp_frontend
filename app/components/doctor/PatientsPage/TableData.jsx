@@ -50,6 +50,22 @@ const TableData = ({ data,columns,filters }) => {
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const displayedData = filteredData.slice(startIndex, startIndex + itemsPerPage);
+  
+const calculateAge = (dobString) => {
+  const dob = new Date(dobString);
+  const today = new Date();
+
+  let age = today.getFullYear() - dob.getFullYear();
+  const monthDiff = today.getMonth() - dob.getMonth();
+  const dayDiff = today.getDate() - dob.getDate();
+
+  // Adjust age if the birthday has not occurred yet this year
+  if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+    age--;
+  }
+
+  return age;
+};
 
   return (
     <TableContainer component={Paper} sx={{
@@ -59,14 +75,14 @@ const TableData = ({ data,columns,filters }) => {
       borderRadius: "8px",
       overflowX: "auto"
     }}>
-      <button onClick={()=>handleDownloadPDF(filteredData,filters)} className="flex gap-2 items-center p-3 pl-3 bg-[#6c4de60a] rounded-md m-3 text-blue-700">download <BsDownload className=" font-medium text-lg text-blue-700" /></button>
+      <button onClick={()=>handleDownloadPDF(filteredData,filters)} className="flex gap-2 items-center p-3 pl-3 bg-[#6c4de60a] text-base rounded-md m-3 text-blue-700">download <BsDownload className=" font-medium text-lg text-blue-700" /></button>
       <Table>
         <TableHead>
           <TableRow>
             {columns.map((col,index) => (
-              <TableCell sx={{ fontWeight: 600, color: "#333", padding: "12px 16px"}} key={index} >{ col.label}</TableCell>
+              <TableCell sx={{ fontWeight: 500, color: "#000", padding: "12px 16px",fontSize:'16px'}} key={index} >{ col.label}</TableCell>
             ))}
-            <TableCell>Actions</TableCell>
+            <TableCell sx={{ fontWeight: 500, color: "#000", padding: "12px 16px",fontSize:'16px'}}>Actions</TableCell>
           </TableRow>
         </TableHead>
 
@@ -78,10 +94,10 @@ const TableData = ({ data,columns,filters }) => {
                 "&:hover": { bgcolor: "#F1F1F1" }, color:'#4F5653'
               }} key={row.id}>
                 {columns.map((col) => (
-                  <TableCell sx={{ padding: "12px 16px", color: "#444", fontSize: "14px" }} key={col.key}>
+                  <TableCell sx={{ padding: "12px 16px", color: "#444", fontSize: "16px" }} key={col.key}>
                     {col.key === "patient" && typeof row.patient === "object" ? (
                       row.patient.username || row.patient.name
-                    ) : col.key === "createdAt" ? (
+                    ) :col.key==="age"?(calculateAge(row.dob)): col.key === "createdAt" ? (
                         new Intl.DateTimeFormat("en-US", {
                           month: "short",
                           day: "numeric",
@@ -97,7 +113,7 @@ const TableData = ({ data,columns,filters }) => {
                   <TableCell sx={{ padding: "12px 16px" }}>
                   {/* <button className="px-3 py-1 mx-1 border rounded-md bg-gray-200 hover:bg-gray-300">Edit</button> */}
                   <button className="px-3 py-1 mx-1 border rounded-md bg-gray-200 hover:bg-gray-300"
-                    onClick={() => router.push(userType === 'doctor' ? `/admin/users/doctors/${row.id}` : `/admin/users/patients/${row.id}`)}>View</button>
+                    onClick={() => router.push(`/doctor/patients/${row.id}`)}>View</button>
                 </TableCell>
 
               </TableRow>

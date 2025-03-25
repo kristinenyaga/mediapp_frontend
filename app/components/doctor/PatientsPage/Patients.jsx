@@ -45,7 +45,7 @@ const Patients = () => {
     { key: "username", label: "Name" },
     { key: "email", label: "Email" },
     { key: "phone", label: "Phone" },
-    { key: "dob", label: "Dob" },
+    { key: "age", label: "Age" },
     { key: "gender", label: "Sex" },
     { key: "appointments", label: "Appointments" },
     { key: "createdAt", label: "Registered" }
@@ -58,8 +58,8 @@ const Patients = () => {
       <div className='w-[90%]'>
         <div className="border-b pb-4 mb-6 flex gap-10 items-center">
           <div>
-            <h2 className="text-2xl font-medium text-blue-700">Patients</h2>
-            <p className="text-gray-500 text-sm">Here are all your patients</p>
+            <h2 className="text-3xl font-medium text-blue-700">Patients</h2>
+            <p className="text-gray-500 text-base">Here are all your patients</p>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-4 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
@@ -69,14 +69,14 @@ const Patients = () => {
             placeholder="Search by name or email"
             value={filters.search}
             onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-            className="border border-gray-300 p-2 px-4 rounded-md text-sm placeholder:text-gray-700 outline-none w-64"
+            className="border border-gray-300 py-3 px-4 rounded-md text-base placeholder:text-gray-800 outline-none w-64"
           />
 
           {/* Gender Filter */}
           <select
             value={filters.gender}
             onChange={(e) => setFilters({ ...filters, gender: e.target.value })}
-            className="border bg-white text-sm text-gray-700 border-gray-300 p-2 px-4 rounded-md outline-none"
+            className="border bg-white text-base text-gray-800 border-gray-300 py-3 px-4 rounded-md outline-none"
           >
             <option value="">All Genders</option>
             <option value="female">Female</option>
@@ -84,7 +84,7 @@ const Patients = () => {
           </select>
 
           {/* Has Appointments */}
-          <label className="flex items-center text-sm gap-2 text-gray-700">
+          <label className="flex items-center text-base gap-2 text-gray-800">
             <input
               type="checkbox"
               checked={filters.hasAppointments}
@@ -96,19 +96,19 @@ const Patients = () => {
 
           {/* Registration Date Range */}
           <fieldset className="flex items-center gap-2 border border-gray-300 p-2 px-4 rounded-md">
-            <legend className="text-sm text-gray-600 px-2">Registered Between</legend>
+            <legend className="text-base text-gray-800 px-2">Registered Between</legend>
             <input
               type="date"
               value={filters.startDate}
               onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
-              className="border border-gray-300 p-2 rounded-md text-sm bg-white text-gray-700 outline-none"
+              className="border border-gray-300 p-2 rounded-md text-base bg-white text-gray-700 outline-none"
             />
             <span className="text-gray-500">to</span>
             <input
               type="date"
               value={filters.endDate}
               onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
-              className="border border-gray-300 p-2 rounded-md text-sm bg-white text-gray-700 outline-none"
+              className="border border-gray-300 p-2 rounded-md text-base bg-white text-gray-700 outline-none"
             />
           </fieldset>
         </div>

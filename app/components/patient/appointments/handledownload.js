@@ -20,19 +20,19 @@ export const formatTime = (timestring) => {
       });
     };
 
-export const handleDownloadPDF = (data, filters) => {
+export const handleDownloadPDF = (data,user, filters) => {
   const doc = new jsPDF();
-
   const logoUrl = "/images/logo.png";
-  doc.addImage(logoUrl, "PNG", 10, 10, 30, 10);
-
+  doc.addImage(logoUrl, "PNG", 90, 10, 30, 10);
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "light");
+  doc.text("Intelligent medical Diagnostic System", 80, 24);
   doc.setFontSize(14);
   doc.setFont("helvetica", "bold");
-  doc.text("APPOINTMENT REPORT", 80, 20);
-  doc.setFontSize(10);
-  doc.setFont("helvetica", "normal");
-  doc.text(`All Appointments for Kristine Nyaga`, 80, 27);
+  doc.text("APPOINTMENT REPORT", 80, 35);
 
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "light");
   doc.text(
     "Generated on: " +
       new Intl.DateTimeFormat("en-US", {
@@ -41,8 +41,40 @@ export const handleDownloadPDF = (data, filters) => {
         year: "numeric",
       }).format(new Date()),
     85,
-    34
+    50
   );
+let reportDateRange = "From Dec 2024 - March 2025";
+
+// Check if dateRange is defined and has valid startDate & endDate
+if (
+  filters.dateRange &&
+  filters.dateRange.length > 0 &&
+  filters.dateRange[0].startDate &&
+  filters.dateRange[0].endDate
+) {
+  const startDate = new Date(filters.dateRange[0].startDate);
+  const endDate = new Date(filters.dateRange[0].endDate);
+
+  // Format the dates properly
+  const formattedStartDate = new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(startDate);
+
+  const formattedEndDate = new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(endDate);
+
+  reportDateRange = `From ${formattedStartDate} - ${formattedEndDate}`;
+}
+
+doc.setFontSize(11);
+doc.setFont("helvetica");
+doc.text(reportDateRange, 80, 41);
+
   let reportTitle = "All Appointments";
 
   const { statusFilter, searchDoctor, sortOrder } = filters;
@@ -57,25 +89,44 @@ export const handleDownloadPDF = (data, filters) => {
     reportTitle += ` with Dr. ${searchDoctor}`;
   }
 
-  if (sortOrder === "newest") {
-    reportTitle += " (Newest First)";
+  if (sortOrder === "latest") {
+    reportTitle += " (Latest First)";
   } else if (sortOrder === "oldest") {
     reportTitle += " (Oldest First)";
   }
 
   doc.setFontSize(10);
   doc.setFont("helvetica");
-  doc.text(reportTitle, 14, 50);
+  doc.text(reportTitle, 14, 85);
+
+  doc.setFontSize(13);
+  doc.setFont("helvetica", "medium");
+  doc.text("Patient Information", 14, 60);
+
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "light");
+  doc.text("Name", 14, 68);
+
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "light");
+    doc.text(`${user.username}`, 30, 68);
+
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "light");
+  doc.text("Age", 14, 75);
+  
+  
 
   if (data.length === 0) {
-    doc.text("No data available", 14, 35);
+    doc.text("No data available", 14, 85);
     doc.save(`${reportTitle.replace(/\s+/g, "_")}.pdf`);
     return;
   }
 
-  const tableColumn = ["Date", "Appointment time", "Appointment Duration", "Status", "Queue Number", "Doctor"]
+  const tableColumn = ["S/N","Date", "Appointment time", "Appointment Duration", "Status", "Doctor"]
   
-  const tableRows = data.map((row) => [
+  const tableRows = data.map((row, index) => [
+    index+1,
     new Intl.DateTimeFormat("en-US", {
       month: "short",
       day: "numeric",
@@ -84,15 +135,14 @@ export const handleDownloadPDF = (data, filters) => {
     `${formatTime(row.startTime)}-${formatTime(row.endTime)}` || "-",
     row.appointmentDuration || "-",
     row.status || "-",
-    row.queueNumber || "-",
     row.doctor.username || "-",
   ]);
 
   doc.autoTable({
-    startY: 60,
+    startY: 90,
     head: [tableColumn],
     body: tableRows,
-    styles: { fontSize: 7 },
+    styles: { fontSize: 9 },
     headStyles: { fillColor: [0, 51, 153], textColor: 255 },
     alternateRowStyles: { fillColor: [240, 240, 240] },
     margin: { top: 10 },
