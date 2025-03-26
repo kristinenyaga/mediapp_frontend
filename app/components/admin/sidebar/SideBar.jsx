@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import './sidebar.css';
-import { FaHome, FaUser, FaCalendarCheck, FaChartBar, FaSignOutAlt, FaUsers } from "react-icons/fa";
+import { FaHome,FaCalendarCheck, FaChartBar, FaSignOutAlt, FaUsers } from "react-icons/fa";
 import { logo } from '@/public/constants/images';
 import { useAuth } from '@/app/context/authContext';
 import { useRole } from '@/app/context/RoleContext';
