@@ -64,10 +64,13 @@ const SignIn = () => {
           setLoading(false)
           Notify.success("Credentials verified!");
 
-          const { doctor, accessToken, refreshToken } = response.data
+          const { doctor, accessToken, refreshToken,email,username } = response.data
 
           sessionStorage.setItem('access_token', accessToken);
           sessionStorage.setItem('refreshtoken', refreshToken);
+          sessionStorage.setItem('email', email)
+          sessionStorage.setItem('username',username)
+          
 
           if (doctor?.isFirstLogin === 'true') {
             router.push('/reset-password')

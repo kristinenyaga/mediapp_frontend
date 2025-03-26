@@ -148,9 +148,11 @@ const UpdateAppointment = ({ open,appointment, handleClose, date, role, doctor, 
           }, {
             _role: role
           });
-
           if (response.status === 200) {
             Notify.success("Appointment updated successfully");
+            refreshData()
+            handleClose()
+            
           }
         } catch (error) {
           console.error("Error updating appointment:", error);
@@ -191,8 +193,8 @@ const UpdateAppointment = ({ open,appointment, handleClose, date, role, doctor, 
       }
       if (response.status === 200) {
         Notify.success("appointment updated successfully")
-        refreshData()
         handleClose()
+        refreshData()
 
       }
 

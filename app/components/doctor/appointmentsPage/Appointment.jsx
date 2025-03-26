@@ -150,7 +150,7 @@ const Appointment = () => {
         </div>
 
         {/* Doctor's Decision */}
-        {statusMessage ? (
+        {(statusMessage ||diagnosis?.finalDiagnosis)?  (
             <div
               className={`mt-6 border rounded-lg p-4 flex items-center gap-3 ${
                 diagnosis?.isApproved
@@ -166,16 +166,16 @@ const Appointment = () => {
 
               <div>
                 <h3 className="text-lg font-medium">{statusMessage}</h3>
-              {doctorDiagnosis && (
+              {(doctorDiagnosis || diagnosis?.finalDiagnosis)&&(
                 <div className="flex items-center gap-5">
-                  <p className="text-lg">Doctor Diagnosis is:</p>
-                  <p className="text-lg font-medium capitalize">{doctorDiagnosis}</p>
+                  <p className="text-lg">Final Diagnosis is:</p>
+                  <p className="text-lg font-medium capitalize">{doctorDiagnosis || diagnosis?.finalDiagnosis}</p>
                 </div>
                 )}
               </div>
             </div>
         ) : (
-            diagnosis?.predictedDiagnosis && ( 
+            diagnosis?.predictedDiagnosis && (!diagnosis?.finalDiagnosis)&&( 
               <div className="mt-6 border rounded-lg p-4 border-gray-200">
                 <h3 className="text-lg font-medium text-gray-700 mb-3">Is the predicted diagnosis accurate?</h3>
                 <FormControl>

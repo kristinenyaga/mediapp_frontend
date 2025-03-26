@@ -6,13 +6,11 @@ import { useFormik } from "formik";
 import { Notify } from "notiflix";
 import * as Yup from "yup";
 import axios from "axios";
-import { useAuth } from "@/app/context/authContext";
 import { useRole } from "@/app/context/RoleContext";
 import LoadingScreen from "../loader/Loader";
 
 const Otp = () => {
   const router = useRouter();
-  const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const { role } = useRole()
 
@@ -72,11 +70,6 @@ const Otp = () => {
   }
 
   const handleResendOTP = async () => {
-    if (!user?.email) {
-      Notify.failure("User email not found. Please log in again.");
-      return;
-    }
-
     try {
       setIsLoading(true)
 

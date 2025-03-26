@@ -121,7 +121,7 @@ const Profile = () => {
         </section>
 
         {/* Health Information Section */}
-        <section className="border border-gray-200 p-5 rounded-lg mb-6">
+        {/* <section className="border border-gray-200 p-5 rounded-lg mb-6">
           <div className="flex gap-5 items-center mb-4">
             <h3 className="text-lg font-medium text-gray-800">Health Information</h3>
             <button
@@ -148,7 +148,7 @@ const Profile = () => {
             <InfoField label="Allergies" value={profileDetails?.medicalinformation?.allergies || "No allergies provided"} />
             <InfoField label="Ongoing Medications" value={profileDetails?.medicalinformation?.medications || "No ongoing medications"} />
           </div>
-        </section>
+        </section> */}
 
         {/* Emergency Contact Section */}
         <section className="border border-gray-2 p-5 rounded-lg">
