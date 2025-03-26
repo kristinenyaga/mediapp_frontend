@@ -72,7 +72,7 @@ const SignIn = () => {
           sessionStorage.setItem('username',username)
           
 
-          if (doctor?.isFirstLogin === 1) {
+          if (doctor?.isFirstLogin === true) {
             router.push('/reset-password')
           }
           else {
