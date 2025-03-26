@@ -16,7 +16,7 @@ const menuItems = [
   { name: 'Appointments Management ', path: '/admin/appointments', icon: <FaCalendarCheck size={20} /> },
   { name: 'Analytics', path: '/admin/analytics', icon: <FaChartBar size={20} /> },
   // { name: 'System Settings', path: '/doctor/notifications', icon: <FaBell size={20} /> },
-  { name: 'Profile', path: '/admin/profile', icon: <FaUser size={20} /> },
+  // { name: 'Profile', path: '/admin/profile', icon: <FaUser size={20} /> },
 ];
 
 const SideBar = () => {
@@ -28,6 +28,8 @@ const SideBar = () => {
     const handleLogout = () => {
       sessionStorage.removeItem('access_token');
       sessionStorage.removeItem('refreshtoken')
+      sessionStorage.removeItem('email');
+      sessionStorage.removeItem('username')
       localStorage.removeItem('role')
       router.push('/welcomepage')
     }

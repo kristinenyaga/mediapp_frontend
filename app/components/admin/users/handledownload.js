@@ -11,19 +11,27 @@ export const formatDate = (date) => {
 
 export const handleDownloadPDF = (data, filters, userType) => {
   const doc = new jsPDF();
-
-  // Add the system logo
   const logoUrl = "/images/logo.png";
-  doc.addImage(logoUrl, "PNG", 10, 10, 30, 10);
-
-  // Report Header
+  doc.addImage(logoUrl, "PNG", 90, 10, 30, 10);
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "light");
+  doc.text("Intelligent medical Diagnostic System", 78, 24);
   doc.setFontSize(14);
   doc.setFont("helvetica", "bold");
-  doc.text("SYSTEM USERS REPORT", 80, 20);
-  doc.setFontSize(10);
-  doc.setFont("helvetica", "normal");
-  doc.text("Intelligent Medical Diagnostic System", 80, 27);
-  doc.text("Generated on: " + formatDate(new Date()), 85, 34);
+  doc.text("SYSTEM USERS REPORT", 78, 35);
+
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "light");
+  doc.text(
+    "Generated on: " +
+      new Intl.DateTimeFormat("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      }).format(new Date()),
+    83,
+    40
+  );
 
   let reportTitle = "Report";
   let filename = "report.pdf";
@@ -124,7 +132,8 @@ export const handleDownloadPDF = (data, filters, userType) => {
     startY: 55,
     head: [tableColumns],
     body: tableRows,
-    styles: { fontSize: 7 },
+    theme:"grid",
+    styles: { fontSize: 10 },
     headStyles: { fillColor: [0, 51, 153], textColor: 255 },
     alternateRowStyles: { fillColor: [240, 240, 240] },
     margin: { top: 10 },

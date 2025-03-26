@@ -76,10 +76,12 @@ const FeedbackModal = ({ open, handleClose, lastAppointment }) => {
   return (
     <Modal open={open} onClose={handleClose} aria-labelledby="modal-title">
       <Box sx={style}>
-        <Typography id="modal-title" variant="h6" fontWeight="bold" textAlign="center" mb={2}>
+        <Typography id="modal-title" variant="h6" fontWeight="bold" textAlign="center" mb={1}>
           How was your last appointment?
         </Typography>
-
+        <Typography id="modal-title" variant="h3" fontWeight="normal" textAlign="center" mb={2}>
+          Feedback is anonymous
+        </Typography>
         {/* Star Rating */}
         <Box display="flex" justifyContent="center" mb={2}>
           {[1, 2, 3, 4, 5].map((index) => (

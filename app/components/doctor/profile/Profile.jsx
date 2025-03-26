@@ -29,17 +29,13 @@ const Profile = () => {
   const handleWorkingHoursClose = () => setOpenHoursModal(false);
 
 const handleWorkingHourChange = (day, field, value) => {
-  const updatedHours = workingHours.map((hour) => {
-    if (hour.dayOfWeek === day) {
-      return {
-        ...hour,
-        [field]: value,
-      };
-    }
-    return hour;
+  setWorkingHours((prevHours) => {
+    return prevHours.map((hour) =>
+      hour.dayOfWeek === day ? { ...hour, [field]: value } : hour
+    );
   });
-  setWorkingHours(updatedHours);
 };
+
 
   const applySameHours = (start, end) => {
     const updatedHours = daysOfWeek.map((day) => ({
@@ -76,24 +72,33 @@ const handleWorkingHourChange = (day, field, value) => {
 
   };
 
-  useEffect(() => {
-    setIsLoading(true)
-    const fetchProfileDetails = async () => {
-      const response = await axios.get('http://localhost:5000/api/doctor/profile', {
-        headers: { Authorization: `Bearer ${sessionStorage.getItem('access_token')}` },
-      });
+useEffect(() => {
+  setIsLoading(true);
+  const fetchProfileDetails = async () => {
+    const response = await axios.get('http://localhost:5000/api/doctor/profile', {
+      headers: { Authorization: `Bearer ${sessionStorage.getItem('access_token')}` },
+    });
 
-      setProfileDetails(response.data);
-      if (response.data.workinghours) {
-        setWorkingHours(response.data.workinghours);
-      }
-      setIsLoading(false)
-    };
-    fetchProfileDetails();
-  }, []);
+    setProfileDetails(response.data);
+
+    // Ensure all days of the week exist in the state
+    const existingHours = response.data.workinghours || [];
+    const updatedHours = daysOfWeek.map((day) => {
+      return existingHours.find((hour) => hour.dayOfWeek === day) || {
+        dayOfWeek: day,
+        startTime: "",
+        endTime: "",
+      };
+    });
+
+    setWorkingHours(updatedHours);
+    setIsLoading(false);
+  };
+  fetchProfileDetails();
+}, []);
+
 
   const handleSubmit = async (updatedValues) => {
-    console.log(`Updated ${currentSection}:`, updatedValues);
     let payload = {}
     switch (currentSection) {
       case "Personal Information":

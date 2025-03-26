@@ -1,234 +1,200 @@
-"use client"
+"use client";
 import React, { useEffect, useState } from "react";
-import AdminLayout from "../AdminLayout";
-import { useParams } from "next/navigation";
-import axios from "axios";
-import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
-import { BsDownload } from "react-icons/bs";
-import jsPDF from "jspdf";
-import "jspdf-autotable";
-import { MdEmail, MdMedicalServices, MdPhone } from "react-icons/md";
-import { FaUserShield } from "react-icons/fa";
 import GoBack from "../../goBack/GoBack";
+import { useParams } from "next/navigation";
+import api from "@/app/utils/axiosInstance";
+import { Table, TableHead, TableBody, TableRow, TableCell, TableContainer, Paper } from "@mui/material";
+import { BsDownload } from "react-icons/bs";
+import { generatePatientReport } from "./generatePatientReport";
+import AdminLayout from "../AdminLayout";
+const PatientDetails = () => {
+  const { id } = useParams();
+  const [patientDetails, setPatientDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [symptomList, setSymptomList] = useState([]);
 
-
-export const formatDate = (date) => {
-  return new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }).format(new Date(date));
-}
-
-
-const PatientProfile = () => {
-  const { id } = useParams()
-  const [patient,setPatient] = useState([])
-
-  useEffect(() => {
-    const fetchPatientData = async () => {
-      const response = await axios.get(`http://localhost:5000/api/patient/${id}`)
-      setPatient(response.data)
+useEffect(() => {
+  const fetchSymptoms = async () => {
+    try {
+      const response = await api.get("/api/symptoms");
+      setSymptomList(response.data); // Store symptoms in state
+    } catch (error) {
+      console.error("Error fetching symptoms:", error);
     }
-    if (id) {
-      fetchPatientData()
-    }
-  }, [id,setPatient])
+  };
+  fetchSymptoms();
+}, []);
+  const getSymptomNames = (symptomIds) => {
+  if (!symptomList.length || !symptomIds) return [];
 
-  if (!patient) {
-    return <p>loading ...</p>
+  return symptomIds
+    .map((id) => {
+      const symptom = symptomList.find((s) => s.id === id);
+      return symptom ? symptom.name : "Unknown Symptom";
+    })
+    .join(", ");
+};
+
+const calculateAge = (dobString) => {
+  const dob = new Date(dobString);
+  const today = new Date();
+
+  let age = today.getFullYear() - dob.getFullYear();
+  const monthDiff = today.getMonth() - dob.getMonth();
+  const dayDiff = today.getDate() - dob.getDate();
+
+  // Adjust age if the birthday has not occurred yet this year
+  if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+    age--;
   }
-  const formatTime = (timestring) => {
-    if (!timestring) return "N/A";
-    const [hours, minutes] = timestring.split(':');
-    const date = new Date();
-    date.setHours(hours, minutes, 0);
-    return date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
-  };
-  const handleDownloadPDF = () => {
-    const doc = new jsPDF();
-    const logoUrl = "/images/logo.png";
-    doc.addImage(logoUrl, "PNG", 10, 10, 30, 10);
 
-    doc.setFontSize(14);
-    doc.setFont("helvetica", "bold");
-    doc.text("PATIENT REPORT", 83, 20);
+  return age;
+};
+  useEffect(() => {
+    const fetchPatientDetails = async () => {
+      try {
+        const response = await api.get(`/api/patient/${id}`);
+        setPatientDetails(response.data);
+      } catch (error) {
+        console.error("Error fetching patient details:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPatientDetails();
+  }, [id]);
 
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    doc.text("Intelligent Medical Diagnostic System", 80, 27);
-    doc.text(
-      "Generated on: " +
-      new Intl.DateTimeFormat("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      }).format(new Date()),
-      85,
-      34
-    );
-
-    const reportTitle = `${patient.username}'s appointments `
-    
-    doc.setFontSize(12);
-    doc.text(`${patient.username}'s appointments `, 14, 45);
-  
-  
-    const tableColumn  = [
-      'Date',
-      'Appointment Time',
-      'Doctor',
-      'status'
-    ]
-    const tableRows = patient.appointments?.map((row) =>
-      tableColumn.map((key) => {
-        if (key === "Appointment Time") {
-          return `${formatTime(row.startTime)} - ${formatTime(row.endTime)}` || "-"; 
-        }
-        if (key === "Doctor") {
-          return row.doctor.username;
-        }
-        if (key === "Date") {
-          return row.date;
-        }
-        return row[key] || "-"; 
-      })
-    );
-  
-    doc.autoTable({
-      startY: 53,
-      head: [tableColumn],
-      body: tableRows,
-      styles: { fontSize: 9 },
-      headStyles: { fillColor: [0, 51, 153], textColor: 255 },
-      alternateRowStyles: { fillColor: [240, 240, 240] },
-      margin: { top: 10 },
-    });
-    doc.setFontSize(10);
-    doc.text(
-      "This report is system-generated.",
-      14,
-      doc.internal.pageSize.height - 30
-    );
-    doc.text(
-      "For inquiries:nyagakristine@gmail.com",
-      14,
-      doc.internal.pageSize.height - 20
-    );
-    doc.text(
-      "Page " + doc.internal.getNumberOfPages(),
-      doc.internal.pageSize.width - 30,
-      doc.internal.pageSize.height - 10
-    );
-
-    doc.save(`${reportTitle.replace(/\s+/g, "_")}.pdf`);
-  };
+  if (loading) return <p className="text-gray-600 text-center mt-6">Loading patient details...</p>;
+  if (!patientDetails) return <p className="text-red-500 text-center mt-6">Patient details not found.</p>;
 
   return (
     <AdminLayout>
-      <div className="bg-white shadow-md rounded-xl">
-        {/* Patient Info Section */}
-        <GoBack/>
-        <div className="mb-6 border-b pb-4">
-          <h2 className="text-3xl font-medium text-blue-700">{patient.username}</h2>
-          <div className="text-gray-600 space-y-1 mt-2">
-            <p className="flex items-center gap-2"><MdEmail className="text-blue-600" /> {patient.email}</p>
-            <p className="flex items-center gap-2"><MdPhone className="text-blue-600" /> {patient.phone}</p>
+      <div className="w-[90%]">
+        
+        <GoBack />
+        <div className="flex gap-5">
+          <h2 className="text-[28px] mt-4 font-medium text-blue-700">Patient Details</h2>
+          <button onClick={() => generatePatientReport(patientDetails, symptomList)} className="flex gap-2 items-center p-3 pl-3 bg-[#6c4de60a] text-base rounded-md m-3 text-blue-700">download <BsDownload className=" font-medium text-lg text-blue-700" /></button>
+        </div>
+
+        <div className="border p-6 mt-6">
+          <h3 className="text-xl font-medium text-gray-800 mb-4">Patient Information</h3>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex items-center gap-3 rounded-md">
+              <p className="text-gray-700"><strong>Name:</strong> {patientDetails.username}</p>
+            </div>
+
+            <div className="flex items-center gap-3 rounded-md">
+              <p className="text-gray-700"><strong>Age:</strong> {calculateAge(patientDetails.dob)}</p>
+            </div>
+
+            <div className="flex items-center gap-3 rounded-md">
+              <p className="text-gray-700"><strong>Phone:</strong> {patientDetails.phone}</p>
+            </div>
+
+            <div className="flex items-center gap-3 rounded-md">
+              <p className="text-gray-700"><strong>Medical Info:</strong> {patientDetails.medicalinformation || "None provided"}</p>
+            </div>
           </div>
         </div>
 
-        {/* Emergency Contact Section */}
-        {patient?.emergencycontact && (
-          <div className="mb-6 p-4 rounded-lg bg-blue-50 shadow-sm">
-            <h3 className="text-lg font-medium text-blue-700 flex items-center gap-2">
-              <FaUserShield /> Emergency Contact
-            </h3>
-            <p className="text-gray-700 mt-1">{patient.emergencycontact.name} ({patient.emergencycontact.relationship})</p>
-            <p className="text-gray-700">{patient.emergencycontact.phone}</p>
+        {patientDetails.emergencycontact && (
+          <div className="border p-6 mt-6">
+            <h3 className="text-xl font-medium text-gray-800 mb-4">Emergency Contact</h3>
+        
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="flex items-center gap-3 rounded-md">
+                <p className="text-gray-700"><strong>Name:</strong> {patientDetails.emergencycontact.name}</p>
+              </div>
+        
+              <div className="flex items-center gap-3 rounded-md">
+                <p className="text-gray-700"><strong>Relationship:</strong> {patientDetails.emergencycontact.relationship}</p>
+              </div>
+        
+              <div className="flex items-center gap-3 rounded-md">
+                <p className="text-gray-700"><strong>Phone:</strong> {patientDetails.emergencycontact.phone}</p>
+              </div>
+            </div>
           </div>
         )}
 
-        {/* Medical Information Section */}
-        <div className="mt-6 p-4 bg-green-50 rounded-lg shadow-sm">
-          <h3 className="text-lg font-medium text-green-700 flex items-center gap-2">
-            <MdMedicalServices /> Medical Information
-          </h3>
-          <p className="text-gray-600 mt-2">
-            {patient?.medicalinformation ? JSON.stringify(patient?.medicalinformation) : "No medical information available."}
-          </p>
-        </div>
-
-        {/* Appointments Section */}
-        <div className="mt-8">
-          <h3 className="text-lg font-medium text-blue-700 mb-4 flex items-center gap-2">
-            Appointments
-          </h3>
-          <div className="overflow-x-auto">
-            <TableContainer component={Paper} sx={{ mt: 1, border: "1px solid #F9F9F9", boxShadow: "none", borderRadius: "8px" }}>
-              <Button
-                onClick={() => handleDownloadPDF()}
-                sx={{
-                  px: 2,
-                  mt: 2,
-                  ml: 1.7,
-                  fontWeight: 500,
-                  display: 'flex',
-                  gap: 2,
-                  alignItems: 'center',
-                  fontSize:'16px',
-                  bgcolor: 'rgb(0,150, 199, 10%)',
-                }}
-              >
-                Download <BsDownload className="font-medium text-lg" />
-              </Button>
-
-              <Table sx={{marginTop:'20px'}}>
-                <TableHead sx={{ bgcolor: "#F9F9F9" }}>
-                  <TableRow>
-                    <TableCell sx={{ fontWeight: "medium", color: "#000",fontSize:'16px' }}>Date</TableCell>
-                    <TableCell sx={{ fontWeight: "medium", color: "#000", fontSize: '16px' }}>Appointment Time</TableCell>
-                    <TableCell sx={{ fontWeight: "medium", color: "#000", fontSize: '16px' }}>Doctor</TableCell>
-                    <TableCell sx={{ fontWeight: "medium", color: "#000",fontSize:'16px' }}>Status</TableCell>
+        <div className="mt-10">
+          <h3 className="text-xl font-medium text-blue-700">Appointments</h3>
+          {patientDetails.appointments.length > 0 ? (
+            <TableContainer component={Paper} className="mt-4 max-h-64 overflow-y-auto">
+              <Table stickyHeader>
+                <TableHead>
+                  <TableRow className="bg-blue-100">
+                    <TableCell><strong>Date</strong></TableCell>
+                    <TableCell><strong>Time</strong></TableCell>
+                    <TableCell><strong>Doctor</strong></TableCell>
+                    <TableCell><strong>Status</strong></TableCell>
                   </TableRow>
                 </TableHead>
-
                 <TableBody>
-                  {patient.appointments?.length > 0 ? (
-                    patient.appointments.map((appointment) => (
-                      <TableRow key={appointment.id} sx={{ "&:hover": { bgcolor: "#F9FAFB" } }}>
-                        <TableCell sx={{ fontWeight: "medium", color: "#363D3A", fontSize: '15px' }}>{appointment.date}</TableCell>
-
-                        <TableCell sx={{ fontWeight: "medium", color: "#363D3A", fontSize: '15px' }}>{`${formatTime(appointment?.startTime)} - ${formatTime(appointment?.endTime)}`}</TableCell>
-                        <TableCell sx={{ fontWeight: "medium", color: "#363D3A", fontSize: '15px' }}>Dr. {appointment.doctor.username}</TableCell>
-                        <TableCell>
-                          <span
-                            className={`px-3 py-2 rounded-lg text-white text-sm font-medium ${appointment.status === "completed"
-                                ? "bg-brand-600"
-                                : appointment.status === "pending"
-                                  ? "bg-yellow-500"
-                                  : "bg-red-500"
-                              }`}
-                          >
-                            {appointment.status}
-                          </span>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={3} className="text-center text-gray-500">
-                        No Appointments
+                  {patientDetails.appointments.map((appointment) => (
+                    <TableRow key={appointment.id} className="hover:bg-gray-50">
+                      <TableCell>
+                        {new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(new Date(appointment.date))}
+                      </TableCell>
+                      <TableCell>{appointment.startTime} - {appointment.endTime}</TableCell>
+                      <TableCell>Dr. {appointment.doctor.username}</TableCell>
+                      <TableCell className={appointment.status === "pending" ? "text-orange-600" : "text-green-600"}>
+                        {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
                       </TableCell>
                     </TableRow>
-                  )}
+                  ))}
                 </TableBody>
               </Table>
             </TableContainer>
-          </div>
+          ) : (
+            <p className="text-gray-600 mt-4">No appointments found.</p>
+          )}
+        </div>
+
+        <div className="mt-10">
+          <h3 className="text-xl font-medium text-blue-700">Diagnoses</h3>
+          {patientDetails.appointments.some((apt) => apt.diagnosis) ? (
+            <TableContainer component={Paper} className="mt-4 max-h-64 overflow-y-auto">
+              <Table stickyHeader>
+                <TableHead>
+                  <TableRow className="bg-blue-100">
+                    <TableCell><strong>Appointment Date</strong></TableCell>
+                    <TableCell><strong>Symptoms</strong></TableCell>
+                    <TableCell><strong>Predicted Diagnosis</strong></TableCell>
+                    <TableCell><strong>Final Diagnosis</strong></TableCell>
+                    <TableCell><strong>Approval Status</strong></TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {patientDetails.appointments
+                    .filter((appointment) => appointment.diagnosis) // Only include diagnosed appointments
+                    .map((appointment) => (
+                      <TableRow key={appointment.diagnosis.id} className="hover:bg-gray-50">
+                        <TableCell>
+                          {new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(new Date(appointment.date))}
+                        </TableCell>
+                        <TableCell>
+                          {getSymptomNames(appointment.patientSymptom?.symptoms)}
+                        </TableCell>
+                        <TableCell>{appointment.diagnosis.predictedDiagnosis}</TableCell>
+                        <TableCell>{appointment.diagnosis.finalDiagnosis || "Not yet confirmed"}</TableCell>
+                        <TableCell className={appointment.diagnosis.isApproved ? "text-green-600" : "text-red-600"}>
+                          {appointment.diagnosis.isApproved ? "Approved" : "Pending"}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          ) : (
+            <p className="text-gray-600 mt-4">No diagnoses found.</p>
+          )}
         </div>
       </div>
     </AdminLayout>
   );
 };
 
-export default PatientProfile;
+export default PatientDetails;

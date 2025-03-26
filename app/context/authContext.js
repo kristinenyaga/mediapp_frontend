@@ -27,6 +27,9 @@ export const AuthProvider = ({ children }) => {
 
     const { id, email, username } = response.data;
     setUser({ id, email, username });
+    sessionStorage.setItem('email', email)
+    sessionStorage.setItem("username", username);
+    
   } catch (error) {
     console.error("Error fetching user details:", error);
     setUser(null);

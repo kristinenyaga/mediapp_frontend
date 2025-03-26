@@ -21,7 +21,6 @@ export const formatTime = (timestring) => {
 };
 
 export const handleDownloadPDF = (data, filters,user) => {
-  console.log(filters)
   const doc = new jsPDF();
   const logoUrl = "/images/logo.png";
   doc.addImage(logoUrl, "PNG", 90, 10, 30, 10);
@@ -118,9 +117,6 @@ doc.text(reportDateRange, 80, 41);
   doc.text("Email", 15, 80);
   doc.setFontSize(10);
   doc.text(`${user.email}`, 35, 80);
-  doc.setFontSize(10);
-  doc.setFont("helvetica");
-  doc.text("Phone", 15, 85);
 
   doc.setFontSize(13);
   doc.setFont("helvetica");

@@ -7,6 +7,10 @@ import { useEffect, useState } from "react";
 import LoadingScreen from "../../loader/Loader";
 import moment from "moment";
 import { generateReport } from './generateReport'
+import { generateFeedbackReport } from './generateFeedbackReport'
+import { generateDiagnosisReport } from './generateDiagnosesReport'
+
+
 
 const COLORS = ["#1d4ed8", "#6B4DE6", "#FFBB28", "#FF8042"];
 
@@ -16,12 +20,33 @@ const Reports = () => {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("currentMonth");
   const [symptomData, setSymptomsData] = useState([])
-  
+  const [symptomMap, setSymptomMap] = useState({});
+
+useEffect(() => {
+  const fetchSymptoms = async () => {
+    try {
+      const response = await api.get("/api/symptoms"); // Fetch all symptoms
+      const symptoms = response.data;
+      
+      // Create a mapping of { id: name }
+      const symptomMapping = {};
+      symptoms.forEach((symptom) => {
+        symptomMapping[symptom.id] = symptom.name;
+      });
+
+      setSymptomMap(symptomMapping); // Store in state
+    } catch (error) {
+      console.error("Error fetching symptoms:", error);
+    }
+  };
+
+  fetchSymptoms();
+}, []);
   useEffect(() => {
     const fetchFeedback = async () => {
       try {
-        const response = await api.get("/api/feedback/");
-        setFeedback(response.data.data);
+        const response = await api.get("/api/feedback/doctorfeedbacks");
+        setFeedback(response.data.feedbacks);
       } catch (error) {
         console.error("Error fetching feedback:", error);
       }
@@ -58,12 +83,12 @@ const Reports = () => {
 
   // --- Filter Logic ---
   const filterDataByDate = (data) => {
+    if (filter === "all") return data; 
     const now = moment();
     return data.filter((item) => {
       const itemDate = moment(item.createdAt);
       if (filter === "currentMonth") return itemDate.isSame(now, "month");
       if (filter === "thisWeek") return itemDate.isSame(now, "week");
-      if (filter === "otherMonths") return !itemDate.isSame(now, "month"); // Show all except current month
       return true;
     });
   };
@@ -131,10 +156,16 @@ const Reports = () => {
             onChange={(e) => setFilter(e.target.value)}
             className="border p-2 rounded-lg"
           >
+            <option value="all">All</option>
             <option value="thisWeek">This Week</option>
             <option value="currentMonth">Current Month</option>
-            <option value="otherMonths">Other Months</option>
           </select>
+        </div>
+
+        <div className="flex items-center gap-5 mb-5">
+          <button onClick={()=>generateDiagnosisReport(filteredDiagnoses,filter,symptomMap)} className="bg-gray-200 p-2 border rounded-md border-black">Download Diagnoses report</button>
+          <button onClick={()=>generateFeedbackReport(filteredFeedback,filter)} className="bg-gray-200 p-2 border rounded-md border-black">Download Feedback report</button>
+
         </div>
 
         <div className="grid grid-cols-2 gap-10 w-[90%]">

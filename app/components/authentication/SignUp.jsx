@@ -16,10 +16,13 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import LoadingScreen from "../loader/Loader";
+import Navbar from "./Navbar";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 const SignUp = () => {
   const router = useRouter()
-
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const max = dayjs().subtract(17, 'year');
   const min = dayjs().subtract(75, 'year');
   const [loading, setLoading] = useState(false)
@@ -30,6 +33,7 @@ const SignUp = () => {
       username: '',
       email: '',
       password: '',
+      confirmPassword:'',
       dob:max.format("YYYY-MM-DD"),
       gender:''
       
@@ -45,13 +49,16 @@ const SignUp = () => {
         .email("invalid email address")
         .required("email is required"),
       password: Yup.string()
-    .min(6, "Password must be at least 6 characters long")
-    .max(64, "Password must not exceed 64 characters")
-    .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
-    .matches(/\d/, "Password must contain at least one number")
-    .matches(/^\S*$/, "Password must not contain spaces")
-    .notOneOf(["password", "123456", "qwerty", "abc123"], "Password is too common")
-    .required("Password is required"),
+        .min(6, "Password must be at least 6 characters long")
+        .max(64, "Password must not exceed 64 characters")
+        .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
+        .matches(/\d/, "Password must contain at least one number")
+        .matches(/^\S*$/, "Password must not contain spaces")
+        .notOneOf(["password", "123456", "qwerty", "abc123"], "Password is too common")
+        .required("Password is required"),
+      confirmPassword: Yup.string()
+        .oneOf([Yup.ref("password"), null], "Passwords must match")
+        .required("Confirm Password is required"),
     }),
     onSubmit: async (initialValues) => {
       try {
@@ -100,7 +107,8 @@ const SignUp = () => {
   
   return (
     <>
-      <div className="flex flex-row justify-between space-y-14 gap-y-0.5 p-5 ">
+      <Navbar />
+      <div className="flex flex-row justify-between gap-y-0.5 p-5 ">
         <div></div>
         <div className="shadow-md rounded-md border p-5">
           <div className="mb-6 flex flex-col gap-2">
@@ -116,7 +124,7 @@ const SignUp = () => {
               <input
                 name="username"
                 type="username"
-                className={`w-[400px] h-12 border rounded-md px-3 mt-2 mb-5 text-sm ${formik.touched.username && formik.errors.username ? "border-red-500 focus:outline-red-500" : "border-gray-400"} focus: outline-[#6B4DE6] placeholder:text-gray-500`}
+                className={`w-full h-12 border rounded-md px-3 mt-2 mb-5 text-sm ${formik.touched.username && formik.errors.username ? "border-red-500 focus:outline-red-500" : "border-gray-400"} focus: outline-[#6B4DE6] placeholder:text-gray-500`}
                 placeholder="Enter your username"
                 value={formik.values.username}
                 onChange={formik.handleChange}
@@ -133,7 +141,7 @@ const SignUp = () => {
               <input
                 name="email"
                 type="email"
-                className={`w-[400px] h-12 border rounded-md px-3 mt-2 mb-5 text-sm ${formik.touched.email && formik.errors.email ? "border-red-500 focus:outline-red-500" : "border-gray-400"} focus: outline-[#6B4DE6] placeholder:text-gray-500`}
+                className={`w-full h-12 border rounded-md px-3 mt-2 mb-5 text-sm ${formik.touched.email && formik.errors.email ? "border-red-500 focus:outline-red-500" : "border-gray-400"} focus: outline-[#6B4DE6] placeholder:text-gray-500`}
                 placeholder="johndoe@gmail.com"
                 value={formik.values.email}
                 onChange={formik.handleChange}
@@ -143,22 +151,53 @@ const SignUp = () => {
                 <p className="text-red-500 text-sm">{formik.errors.email}</p>
               )}
               <br />
-              <label htmlFor="password" className="text-base font-normal w-80">
-                Password*
-              </label>
-              <br />
-              <input
-                name="password"
-                type="password"
-                className={`w-[400px] h-12 border rounded-md px-3 mt-2 mb-5 text-sm ${formik.touched.password && formik.errors.password ? "border-red-500 focus:outline-red-500" : "border-gray-400"} focus: outline-[#6B4DE6] placeholder:text-gray-500`}
-                placeholder="Enter your password"
-                value={formik.values.password}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-              />
-              {formik.touched.password && formik.errors.password && (
-                <p className="text-red-500 text-sm mt-2">{formik.errors.password}</p>
-              )}
+              <div>
+                
+              </div>
+        <div className="relative ">
+          <label className="text-base font-normal">Password*</label>
+          <input
+            name="password"
+            type={showPassword ? "text" : "password"}
+            className={`w-full h-12 border rounded-md px-3 mt-2 text-sm ${formik.touched.password && formik.errors.password ? "border-red-500 focus:outline-red-500" : "border-gray-400"} focus:outline-[#6B4DE6] placeholder:text-gray-500 pr-10`}
+            placeholder="Enter your password"
+            value={formik.values.password}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+          />
+          <span
+            className="absolute right-3 top-11 cursor-pointer text-gray-500"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? <AiOutlineEyeInvisible size={20} /> : <AiOutlineEye size={20} />}
+          </span>
+          {formik.touched.password && formik.errors.password && (
+            <p className="text-red-500 text-sm mt-1">{formik.errors.password}</p>
+          )}
+              </div>
+              <div className="relative mt-5">
+                
+          <label className="text-base font-normal">Confirm Password*</label>
+          <input
+            name="confirmPassword"
+            type={showConfirmPassword ? "text" : "password"}
+            className={`w-full h-12 border rounded-md px-3 mt-2 text-sm ${formik.touched.confirmPassword && formik.errors.confirmPassword ? "border-red-500 focus:outline-red-500" : "border-gray-400"} focus:outline-[#6B4DE6] placeholder:text-gray-500 pr-10`}
+            placeholder="Confirm your password"
+            value={formik.values.confirmPassword}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+          />
+          <span
+            className="absolute right-3 top-11 cursor-pointer text-gray-500"
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+          >
+            {showConfirmPassword ? <AiOutlineEyeInvisible size={20} /> : <AiOutlineEye size={20} />}
+          </span>
+          {formik.touched.confirmPassword && formik.errors.confirmPassword && (
+            <p className="text-red-500 text-sm mt-1">{formik.errors.confirmPassword}</p>
+          )}
+        </div>
+     
               <br />
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DemoContainer components={["DatePicker"]}>
@@ -172,7 +211,7 @@ const SignUp = () => {
                       },
                     }}
                   >
-                    <div className="w-[400px]">
+                    <div className="w-full">
                       <DatePicker
                         defaultValue={max}
                         maxDate={max}

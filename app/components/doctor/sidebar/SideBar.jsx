@@ -29,6 +29,8 @@ const SideBar = () => {
   const handleLogout = () => {
     sessionStorage.removeItem('access_token');
     sessionStorage.removeItem('refreshtoken')
+    sessionStorage.removeItem('email');
+    sessionStorage.removeItem('username')
     localStorage.removeItem('role')
     router.push('/welcomepage')
   }

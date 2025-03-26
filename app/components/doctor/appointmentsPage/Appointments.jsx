@@ -139,7 +139,7 @@ const Appointments = () => {
             <option value="">All Statuses</option>
             <option value="pending">Pending</option>
             <option value="completed">Completed</option>
-            <option value="canceled">Canceled</option>
+            <option value="cancelled">Cancelled</option>
           </select>
           <select name="sex" value={filters.sex} onChange={handleFilterChange} className="border bg-white text-base text-gray-800 p-2 py-3 rounded-md outline-none focus:border-gray-300">
             <option value="">All Genders</option>

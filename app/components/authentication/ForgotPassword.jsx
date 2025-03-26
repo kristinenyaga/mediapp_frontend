@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { Notify } from 'notiflix';
 import React, { useState } from 'react'
 import LoadingScreen from '../loader/Loader';
+import GoBack from '../goBack/GoBack';
+import Navbar from './Navbar';
 
 
 const ForgotPassword = () => {
@@ -56,8 +58,8 @@ const ForgotPassword = () => {
       }
     } catch (error) {
       setLoading(false)
-      console.error("Error sending OTP:", error);
-      alert("Something went wrong. Please try again.");
+      Notify.failure(error.response.data.message)
+      // alert("Something went wrong. Please try again.");
     }
   };
 
@@ -141,8 +143,11 @@ const ForgotPassword = () => {
 
   if(loading) return <LoadingScreen />
   return (
-    <div className="p-6 max-w-md m-auto">
+    <>
+      <Navbar />
+      <div className="p-6 max-w-md m-auto">
       <div className='mt-32'>
+        <GoBack />
         {step === 1 && (
           <div className='border p-5 shadow-lg'>
             <h2 className="text-[28px] font-medium">Forgot Password?</h2>
@@ -233,6 +238,8 @@ const ForgotPassword = () => {
         )}
       </div>
     </div>
+    </>
+
   );
 
 }

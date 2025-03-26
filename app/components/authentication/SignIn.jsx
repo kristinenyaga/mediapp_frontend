@@ -8,10 +8,13 @@ import { Notify } from 'notiflix'
 import * as Yup from 'yup'
 import { useRole } from "@/app/context/RoleContext";
 import LoadingScreen from "@/app/components/loader/Loader";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import Navbar from "./Navbar";
 const SignIn = () => {
   const router = useRouter()
   const { role } = useRole()
-  const [loading,setLoading] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSignUp = () => {
     router.push('/sign-up')
@@ -83,6 +86,7 @@ const SignIn = () => {
 
           if (error.response.status === 401) {
             setLoading(false)
+            console.log(error)
             Notify.failure(error.response.data.message || "Unauthorized: Invalid credentials.Try again");
           } else if (error.response.status === 400) {
             setLoading(false)
@@ -107,7 +111,8 @@ const SignIn = () => {
 
   return (
     <>
-      <div className="flex flex-row justify-between space-y-32 gap-y-0.5">
+      <Navbar />
+      <div className="flex flex-row justify-between space-y-20 gap-y-0.5">
         <div></div>
         <div className="border p-5 shadow-md rounded-md">
           <div className="mb-6 flex flex-col gap-2">
@@ -137,15 +142,24 @@ const SignIn = () => {
                 Password*
               </label>
               <br />
-              <input
-                name="password"
-                type="password"
-                className={`w-full h-12 border rounded-md px-3 mt-2 mb-3 text-sm ${formik.touched.password && formik.errors.password ? "border-red-500 focus:outline-red-500" : "border-gray-400"} focus: outline-[#6B4DE6] placeholder:text-gray-500`}
-                placeholder="Enter your password"
-                value={formik.values.password}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-              />
+              <div className="relative w-full">
+                <input
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  className={`w-full h-12 border rounded-md px-3 mt-2 mb-3 text-sm ${formik.touched.password && formik.errors.password ? "border-red-500 focus:outline-red-500" : "border-gray-400"} focus:outline-[#6B4DE6] placeholder:text-gray-500 pr-10`}
+                  placeholder="Enter your password"
+                  value={formik.values.password}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                />
+                <span
+                  className="absolute right-3 top-5 cursor-pointer text-gray-500"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <AiOutlineEyeInvisible size={20} /> : <AiOutlineEye size={20} />}
+                </span>
+              </div>
+
               {formik.touched.password && formik.errors.password && (
                 <p className="text-red-500 text-sm">{formik.errors.password}</p>
               )}

@@ -109,8 +109,8 @@ const TableData = ({ filters, appointments, setAppointments,columns }) => {
       const { startDate, endDate, status, username } = filters;
 
       const appointmentDate = parseISO(appointment.date);
-      const filterStartDate = startDate ? parseISO(startDate) : new Date();
-      const filterEndDate = endDate ? parseISO(endDate) : new Date();
+      const filterStartDate = startDate ? parseISO(startDate) : new Date().toDateString()
+      const filterEndDate = startDate ? parseISO(endDate) : new Date().toDateString()
 
       // Status Filtering
       const statusMatch = status === 'all' || appointment.status === status;

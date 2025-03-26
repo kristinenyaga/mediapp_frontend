@@ -37,14 +37,24 @@ const Users = () => {
     }
     fetchPatients()
   }, [])
-  
-  useEffect(() => {
-    const fetchDoctors = async () => {
+      const fetchDoctors = async () => {
       const response = await axios.get('http://localhost:5000/api/doctor')
       setDoctors(response.data)
     }
+  useEffect(() => {
+
     fetchDoctors()
   }, [])
+  useEffect(() => {
+    const handleRouteChange = () => {
+      fetchDoctors();
+    };
+
+    router.events?.on("routeChangeComplete", handleRouteChange);
+    return () => {
+      router.events?.off("routeChangeComplete", handleRouteChange);
+    };
+  }, [router]);
 
   const doctorsColumns = [
     { key: "username", label: "Name" },

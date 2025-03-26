@@ -51,11 +51,14 @@ const Otp = () => {
           setIsLoading(false)
         if (axios.isAxiosError(error)) {
           if (error.response && error.response.data) {
+            setIsLoading(false)
             Notify.failure("Error: " + error.response.data.error);
           } else {
+            setIsLoading(false)
             Notify.failure("Unexpected Axios error: " + error.message);
           }
         } else {
+          setIsLoading(false)
           Notify.failure("Unexpected error: " + error);
         }
         setIsLoading(false);
@@ -75,6 +78,7 @@ const Otp = () => {
     }
 
     try {
+      setIsLoading(true)
 
       let endpoint = ""
       if (role === 'patient') {
@@ -85,17 +89,20 @@ const Otp = () => {
         endpoint = "http://localhost:5000/api/admin/resendotp"
       }
       const response = await axios.post(endpoint, {
-        email: user.email,
+        email: sessionStorage.getItem('email'),
       }, {
         withCredentials: true,
       });
 
       if (response.status === 200) {
+        setIsLoading(false)
         Notify.success("OTP resent successfully!");
       } else {
+        setIsLoading(false)
         Notify.failure("Failed to resend OTP. Please try again.");
       }
     } catch (error) {
+      setIsLoading(false)
       Notify.failure("Failed to resend OTP. Please try again.",error);
     }
   };
@@ -107,7 +114,6 @@ const Otp = () => {
         <p className="text-2xl font-medium mb-5 text-center">Two-Factor Authentication</p>
         <div className="text-[14px] text-center font-normal mb-6 text-gray-700">
           <span>We&apos;ve sent a 6-digit code to your email </span>
-          <span className="font-medium text-blue-300">{user?.email}</span>.
           <div className="mt-3 text-center text-purple-600">Please enter the code below.</div>
         </div>
         <form onSubmit={formik.handleSubmit}>

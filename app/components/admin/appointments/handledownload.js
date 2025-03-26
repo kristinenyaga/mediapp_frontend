@@ -8,6 +8,18 @@ export const formatDate = (date) => {
     year: "numeric",
   }).format(new Date(date));
 };
+export const formatTime = (timestring) => {
+  if (!timestring) return "N/A";
+  const [hours, minutes] = timestring.split(":");
+  const date = new Date();
+  date.setHours(hours, minutes, 0);
+  return date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+};
+
 
 export const handleDownloadPDF = (data, filters) => {
   const doc = new jsPDF();
@@ -53,7 +65,7 @@ export const handleDownloadPDF = (data, filters) => {
     return;
   }
 
-  const tableColumn = ["Date","Appointment Time","Duration","Queue Number","Status","Patient","Doctor"]
+  const tableColumn = ["Date","Appointment Time","Duration","Status","Patient","Doctor"]
   
     const tableRows = data.map((row) => [
       new Intl.DateTimeFormat("en-US", {
@@ -61,9 +73,8 @@ export const handleDownloadPDF = (data, filters) => {
         day: "numeric",
         year: "numeric",
       }).format(new Date(row.date)),
-      `${row.startTime} - ${row.endTime}` || "-",
+         `${formatTime(row.startTime)} - ${formatTime(row.endTime)}` || "-",
       row.appointmentDuration || "-",
-      row.queueNumber || "-",
       row.status || "-",
       row.patient?.username || "-",
       row.doctor?.username || "-",
@@ -73,7 +84,7 @@ export const handleDownloadPDF = (data, filters) => {
     startY: 60,
     head: [tableColumn],
     body: tableRows,
-    styles: { fontSize: 7 },
+    styles: { fontSize: 10 },
     headStyles: { fillColor: [0, 51, 153], textColor: 255 },
     alternateRowStyles: { fillColor: [240, 240, 240] },
     margin: { top: 10 },

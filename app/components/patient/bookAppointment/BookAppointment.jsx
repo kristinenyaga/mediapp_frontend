@@ -33,32 +33,33 @@ const BookAppointment = () => {
   const [loading, setLoading] = useState(false)
   const { selectedDoctor, setDoctorId } = useDoctor()
   const [hasPendingAppointment, setHasPendingAppointment] = useState(false);
+  const [pendingAppointment,setPendingAppointment] = useState([])
+useEffect(() => {
+  const checkPendingAppointments = async () => {
+    try {
+      const response = await api.get("/api/appointment/patient-appointments", { _role: role });
 
-  useEffect(() => {
-    const checkPendingAppointments = async () => {
-      try {
-        const response = await api.get("/api/appointment/patient-appointments", { _role: role });
+      if (response.status === 200) {
+        const today = dayjs().format("YYYY-MM-DD");
 
+        const futurePendingAppointment = response.data.appointments.find(
+          (appointment) => 
+            (dayjs(appointment.date).isAfter(today) || appointment.date === today) &&
+            appointment.status === "pending"
+        );
 
-
-        if (response.status === 200) {
-          const today = dayjs().format("YYYY-MM-DD");
-          console.log('today',today)
-
-          // Check if there's a pending appointment for today
-          const pendingToday = response.data.appointments.some(
-            (appointment) => appointment.date === today && appointment.status === "pending"
-          );
-
-          setHasPendingAppointment(pendingToday);
-        }
-      } catch (error) {
-        console.error("Error fetching appointments:", error);
+        // Store the pending appointment if found
+        setPendingAppointment(futurePendingAppointment || null);
+        setHasPendingAppointment(!!futurePendingAppointment);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching appointments:", error);
+    }
+  };
 
-    checkPendingAppointments();
-  }, [role]);
+  checkPendingAppointments();
+}, [role]);
+
 
 
   const handleDoctorSelection = (id) => {
@@ -220,7 +221,7 @@ const BookAppointment = () => {
         {hasPendingAppointment && (
           <div className="bg-red-100 w-[90%] text-red-700 p-4 rounded-lg mb-6">
             <MdErrorOutline />
-            <p className="text-lg font-medium">You already have a pending appointment scheduled for today.</p>
+            <p className="text-lg font-medium">You already have a pending appointment scheduled on {pendingAppointment?.date}.</p>
             <p className="text-sm">You cannot book another appointment until it is completed.</p>
           </div>
         )}
@@ -283,9 +284,8 @@ const BookAppointment = () => {
             </div>
           ) : null}
           <div>
-            {
-              selectedDoctorDetails && (
-                <div className="bg-white rounded-lg">
+
+              <div className="bg-white rounded-lg">
                   <div>
                     <label className="block text-gray-700 text-base font-medium mb-2">Select Date:</label>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -299,8 +299,6 @@ const BookAppointment = () => {
                     </LocalizationProvider>
                   </div>
                 </div>
-              )
-            }
 
             {selectedDate && (
               <div className="bg-white shadow-sm rounded-lg py-4">

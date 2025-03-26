@@ -24,24 +24,11 @@ const style = {
 const WorkingHoursModal = ({
   open,
   handleClose,
-  sameHours,
   handleSaveWorkingHours,
   daysOfWeek,
   workingHours,
   handleWorkingHourChange,
 }) => {
-  const daysOrder = {
-  Monday: 0,
-  Tuesday: 1,
-  Wednesday: 2,
-  Thursday: 3,
-  Friday: 4,
-  Saturday: 5,
-  Sunday: 6,
-};
-const sortedWorkingHours = [...workingHours].sort((a,b)=>daysOrder[a.dayOfWeek] - daysOrder[b.dayOfWeek])
-  console.log(workingHours)
-  console.log(daysOfWeek)
   return (
     <Modal open={open} onClose={handleClose} aria-labelledby="modal-title">
       <Box sx={style}>
@@ -49,85 +36,47 @@ const sortedWorkingHours = [...workingHours].sort((a,b)=>daysOrder[a.dayOfWeek] 
           Update Working Hours
         </Typography>
 
-        {/* <FormControlLabel
-          control={
-            <Checkbox
-              checked={sameHours}
-              onChange={(e) => {
-                setSameHours(e.target.checked);
-                if (e.target.checked) {
-                  applySameHours(
-                    workingHours[0]?.startTime || "",
-                    workingHours[0]?.endTime || ""
-                  );
-                }
-              }}
-            />
-          }
-          label="Apply same working hours for all days"
-          sx={{ mb: 3 }}
-        /> */}
         <div className="grid grid-cols-1 gap-4">
           {daysOfWeek.map((day) => {
             const currentDayHours =
-            sortedWorkingHours.find((hour) => hour.dayOfWeek === day) || {
-              startTime: "",
-              endTime: "",
-            };
+              workingHours.find((hour) => hour.dayOfWeek === day) || {
+                startTime: "",
+                endTime: "",
+              };
             return (
-            <div key={day} className="flex flex-col gap-2">
-              <span className="text-sm font-medium text-gray-700">{day}</span>
-              <div className="flex gap-4">
-                <TextField
-                type="time"
-                size="small"
-                value={currentDayHours.startTime}
-                onChange={(e) =>
-                handleWorkingHourChange(day, "startTime", e.target.value)
-              }
-                fullWidth
-                disabled={sameHours}
-              />
-              <TextField
-                type="time"
-                size="small"
-                value={currentDayHours.endTime}
-                onChange={(e) =>
-                  handleWorkingHourChange(day, "endTime", e.target.value)
-              }
-                fullWidth
-                disabled={sameHours}
-                />
+              <div key={day} className="flex flex-col gap-2">
+                <span className="text-sm font-medium text-gray-700">{day}</span>
+                <div className="flex gap-4">
+                  <TextField
+                    type="time"
+                    size="small"
+                    value={currentDayHours.startTime}
+                    onChange={(e) =>
+                      handleWorkingHourChange(day, "startTime", e.target.value)
+                    }
+                    fullWidth
+                  />
+                  <TextField
+                    type="time"
+                    size="small"
+                    value={currentDayHours.endTime}
+                    onChange={(e) =>
+                      handleWorkingHourChange(day, "endTime", e.target.value)
+                    }
+                    fullWidth
+                  />
                 </div>
-                </div>
-                );
-                })}
-            </div>
-
+              </div>
+            );
+          })}
+        </div>
 
         {/* Action Buttons */}
         <div className="flex justify-end gap-4 mt-6">
-          <Button
-            variant="outlined"
-            onClick={handleClose}
-            sx={{
-              borderRadius: "8px",
-              textTransform: "none",
-            }}
-          >
+          <Button variant="outlined" onClick={handleClose} sx={{ borderRadius: "8px", textTransform: "none" }}>
             Cancel
           </Button>
-          <Button
-            variant="contained"
-            onClick={handleSaveWorkingHours}
-            sx={{
-              backgroundColor: "#1976d2",
-              color: "white",
-              borderRadius: "8px",
-              textTransform: "none",
-              "&:hover": { backgroundColor: "#1565c0" },
-            }}
-          >
+          <Button variant="contained" onClick={handleSaveWorkingHours} sx={{ backgroundColor: "#1976d2", color: "white", borderRadius: "8px", textTransform: "none", "&:hover": { backgroundColor: "#1565c0" } }}>
             Save
           </Button>
         </div>
