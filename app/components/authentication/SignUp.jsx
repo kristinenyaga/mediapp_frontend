@@ -30,7 +30,8 @@ const SignUp = () => {
 
   const formik = useFormik({
     initialValues: {
-      username: '',
+      firstName: '',
+      lastName:'',
       email: '',
       password: '',
       confirmPassword:'',
@@ -39,13 +40,20 @@ const SignUp = () => {
       
     },
     validationSchema: Yup.object({
-      username: Yup.string()
-      .required("username is required"),
+  firstName: Yup.string()
+    .matches(/^[a-zA-Z ]*$/, "First name must only contain letters")
+    .min(2, "First name must be at least 2 characters")
+    .max(50, "First name is too long")
+    .required("First name is required"),
+  lastName: Yup.string()
+    .matches(/^[a-zA-Z ]*$/, "Last name must only contain letters")
+    .min(2, "Last name must be at least 2 characters")
+    .max(50, "Last name is too long")
+    .required("Last name is required"),
       email: Yup.string()
         .matches(
           /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-          "Invalid email address"
-      )
+          "Invalid email address")
         .email("invalid email address")
         .required("email is required"),
       password: Yup.string()
@@ -61,12 +69,14 @@ const SignUp = () => {
         .required("Confirm Password is required"),
     }),
     onSubmit: async (initialValues) => {
+console.log("Submitting Form with Values:", initialValues);
       try {
         setLoading(true)
       
         const response = await axios.post(
-          "http://localhost:5000/api/patient/signup" , {
-            username: initialValues.username,
+          "http://localhost:5000/api/patient/signup", {
+            firstName: initialValues.firstName,
+            lastName:initialValues.lastName,
             email: initialValues.email,
             password: initialValues.password,
             dob: initialValues.dob,
@@ -117,23 +127,45 @@ const SignUp = () => {
               Get started with us !
             </p>
             <form onSubmit={formik.handleSubmit} className="">
-              <label htmlFor="username" className="text-base font-normal">
-                Username*
+              <div className="flex items-center gap-5">
+                <div>
+              <label htmlFor="firstName" className="text-base font-normal">
+                First Name*
               </label>
               <br />
               <input
-                name="username"
-                type="username"
-                className={`w-full h-12 border rounded-md px-3 mt-2 mb-5 text-sm ${formik.touched.username && formik.errors.username ? "border-red-500 focus:outline-red-500" : "border-gray-400"} focus: outline-[#6B4DE6] placeholder:text-gray-500`}
-                placeholder="Enter your username"
-                value={formik.values.username}
+                name="firstName"
+                type="text"
+                className={`w-full h-12 border rounded-md px-3 mt-2 mb-1 text-sm ${formik.touched.firstName && formik.errors.firstName ? "border-red-500 focus:outline-red-500" : "border-gray-400"} focus: outline-[#6B4DE6] placeholder:text-gray-500`}
+                placeholder="Enter your firstName"
+                value={formik.values.firstName}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
               />
-              {formik.touched.username && formik.errors.username && (
-                <p className="text-red-500 text-sm">{formik.errors.username}</p>
+              {formik.touched.firstName && formik.errors.firstName && (
+                <p className="text-red-500 text-sm">{formik.errors.firstName}</p>
               )}
+                </div>
+                <div>
+              <label htmlFor="firstName" className="text-base font-normal">
+                Last Name*
+              </label>
               <br />
+              <input
+                name="lastName"
+                type="text"
+                className={`w-full h-12 border rounded-md px-3 mt-2 mb-1 text-sm ${formik.touched.lastName && formik.errors.lastName ? "border-red-500 focus:outline-red-500" : "border-gray-400"} focus: outline-[#6B4DE6] placeholder:text-gray-500`}
+                placeholder="Enter your lastName"
+                value={formik.values.lastName}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+              />
+              {formik.touched.lastName && formik.errors.lastName && (
+                <p className="text-red-500 text-sm">{formik.errors.lastName}</p>
+              )}
+                </div>
+              </div>
+              <br/>
               <label htmlFor="email" className="text-base font-normal">
                 Email*
               </label>
@@ -141,7 +173,7 @@ const SignUp = () => {
               <input
                 name="email"
                 type="email"
-                className={`w-full h-12 border rounded-md px-3 mt-2 mb-5 text-sm ${formik.touched.email && formik.errors.email ? "border-red-500 focus:outline-red-500" : "border-gray-400"} focus: outline-[#6B4DE6] placeholder:text-gray-500`}
+                className={`w-full h-12 border rounded-md px-3 mt-2 mb-1 text-sm ${formik.touched.email && formik.errors.email ? "border-red-500 focus:outline-red-500" : "border-gray-400"} focus: outline-[#6B4DE6] placeholder:text-gray-500`}
                 placeholder="johndoe@gmail.com"
                 value={formik.values.email}
                 onChange={formik.handleChange}
@@ -151,9 +183,6 @@ const SignUp = () => {
                 <p className="text-red-500 text-sm">{formik.errors.email}</p>
               )}
               <br />
-              <div>
-                
-              </div>
         <div className="relative ">
           <label className="text-base font-normal">Password*</label>
           <input
@@ -290,7 +319,7 @@ const SignUp = () => {
                 className="w-full bg-gradient-to-r from-[#6B4DE6] to-[#927de7] text-white h-12 rounded-md mt-8 font-semibold transition-all hover:scale-105"
                 type="submit"
               >
-                Sign in
+                Sign up
               </button>
             </form>
             <div className="mt-5 text-center items-center gap-1 justify-center text-[14px]">

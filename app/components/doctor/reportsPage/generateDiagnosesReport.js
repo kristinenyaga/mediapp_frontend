@@ -52,7 +52,7 @@ export const generateDiagnosisReport = (filteredDiagnoses, filter, symptomMap) =
     "Symptoms",
     "Predicted Diagnosis",
     "Final Diagnosis",
-    "Approval Status",
+    "Doctor's Approval",
   ];
   const tableRows = filteredDiagnoses.map((row) => {
     const symptomIds = row.appointment?.patientSymptom?.symptoms || [];
@@ -67,7 +67,7 @@ export const generateDiagnosisReport = (filteredDiagnoses, filter, symptomMap) =
       symptomNames,
       row.predictedDiagnosis,
       row.finalDiagnosis || "Not Confirmed",
-      row.isApproved ? "Approved" : "Pending",
+      row.isApproved ? "Yes" : "No",
     ];
   });
 

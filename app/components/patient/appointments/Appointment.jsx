@@ -19,6 +19,7 @@ const Appointment = () => {
   const [searchDoctor, setSearchDoctor] = useState("");
   const [sortOrder, setSortOrder] = useState("latest");
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const[profile,setProfileDetails] = useState()
   const [dateRange, setDateRange] = useState([
     {
       startDate: null, // ✅ Default: No date selected
@@ -30,6 +31,14 @@ const Appointment = () => {
   const router = useRouter();
   const { role } = useRole();
   const { user } = useAuth();
+    useEffect(() => {
+    const fetchProfileDetails = async () => {
+      const response = await api.get('/api/patient/profile');
+      
+      setProfileDetails(response.data);
+    }
+    fetchProfileDetails()
+  },[])
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -117,7 +126,7 @@ const Appointment = () => {
           </div>
           {filteredAppointments.length > 0 && (
             <button
-              onClick={() => handleDownloadPDF(filteredAppointments, user, { sortOrder, searchDoctor, statusFilter,dateRange })}
+              onClick={() => handleDownloadPDF(filteredAppointments, user, { sortOrder, searchDoctor, statusFilter,dateRange },profile)}
               className="border border-blue-700 py-2 px-3 text-base text-blue-700 rounded-lg"
             >
               Download Report
@@ -166,7 +175,9 @@ const Appointment = () => {
                 <option value="">All Statuses</option>
                 <option value="pending">Pending</option>
                 <option value="completed">Completed</option>
-                <option value="cancelled">Cancelled</option>
+                  <option value="cancelled">Cancelled</option>
+                <option value="missed">Missed</option>
+                  
               </select>
 
               <input

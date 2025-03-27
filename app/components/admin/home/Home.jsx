@@ -29,8 +29,9 @@ const Home = () => {
     return todayAppointments
   }
 
-  const pendingAppointments = appointments.filter(appointment => appointment.status === 'pending')
+  // const pendingAppointments = appointments.filter(appointment => appointment.status === 'pending')
   const cancelledAppointments = appointments.filter(appointment => appointment.status === 'cancelled')
+  const completedAppointments=appointments.filter(appointment => appointment.status === 'completed')
 
 
   const stats = [
@@ -39,7 +40,7 @@ const Home = () => {
     { title: "Total Appointments", value: appointments?.length, bgColor: "#f7900912", textColor: "#F79009" },
     { title: "Appointments Today", value: appointmentsToday(), bgColor: "#6941C612", textColor: "#6941C6" },
     { title: "Canceled Appointments", value: cancelledAppointments.length, bgColor: "#F0443812", textColor: "#F04438" },
-    { title: "Pending Appointments", value:pendingAppointments.length, bgColor: "#EAAA0812", textColor: "#EAAA08" }
+    { title: "Completed Appointments", value:completedAppointments.length, bgColor: "#E7F4DC", textColor: "#76AB35" }
   ];
 
   const patientDemographics = [
@@ -268,7 +269,7 @@ const Home = () => {
             </ResponsiveContainer>
           </GraphCard>
 
-          <GraphCard title="Patient Age Distribution">
+          {/* <GraphCard title="Patient Age Distribution">
             <ResponsiveContainer width="100%" height={350}>
               <PieChart>
                 <Tooltip formatter={(value, name) => [`${value}`, name]} />
@@ -311,7 +312,7 @@ const Home = () => {
                 <Bar dataKey="count" fill="#FF8042" />
               </BarChart>
             </ResponsiveContainer>
-          </GraphCard>
+          </GraphCard> */}
         </div>
       </div>
     </AdminLayout>

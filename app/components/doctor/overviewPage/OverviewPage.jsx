@@ -80,7 +80,6 @@ setUpcomingAppointments(upcoming);
     fetchAppointments();
   }, []);
 
-  console.log('diagnoses',diagnoses)
 
   const getFilteredData = () => {
     let filteredData = [];
@@ -206,14 +205,49 @@ const getMostCommonPredictedDiagnoses = () => {
   }));
 };
 
-  console.log('filter', filter)
-  console.log('diagnoses',getMostCommonPredictedDiagnoses())
-            
-  console.log(('upcomging',upcomingAppointments))
+
   return (
     <DoctorLayout>
       <Header />
-
+        <div className="bg-white w-[90%] rounded-xl p-4">
+          <h2 className="text-lg text-gray-800 mb-5 mt-5">Your Upcoming Appointments</h2>
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b text-base text-gray-700">
+                <th className="p-2">Patient</th>
+                <th className="p-2">Date</th>
+                <th className="p-2">Time</th>
+                <th className="p-2">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {upcomingAppointments.map((appt, index) => (
+                <tr key={index} className="border-b text-base text-gray-600">
+                  <td className="p-2">{appt.patient.username}</td>
+                  <td className="p-2">{new Date(appt.date).toLocaleDateString()}</td>
+                  <td className="p-2">{formatTime(appt?.startTime)} - {formatTime(appt?.endTime)}</td>
+                  <td className="p-2">
+                    <span
+                      className={`px-2 py-1 text-base rounded-full ${appt.status === "completed"
+                          ? "bg-brand-100 text-brand-600"
+                          : "bg-yellow-100 text-yellow-700"
+                        }`}
+                    >
+                      {appt.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+              {upcomingAppointments.length === 0 && (
+                <tr>
+                  <td colSpan="4" className="p-3 text-center text-gray-500">
+                    No upcoming appointments
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       <div className="mt-8">
         <div className="flex gap-3 items-center mb-5">
           <select
@@ -270,7 +304,7 @@ const getMostCommonPredictedDiagnoses = () => {
             </ResponsiveContainer>
           </GraphCard>
 
-          <GraphCard title="Most Common Predicted Diagnoses">
+          <GraphCard title=" Predicted Diagnoses">
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={getMostCommonPredictedDiagnoses()} margin={{ bottom: 40 }}>
                 <XAxis 
@@ -287,45 +321,7 @@ const getMostCommonPredictedDiagnoses = () => {
 
  
         </div>
-        <div className="bg-white w-[90%] rounded-xl p-4">
-          <h2 className="text-lg text-gray-700 mb-5">Upcoming Appointments</h2>
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b text-sm text-gray-700">
-                <th className="p-2">Patient</th>
-                <th className="p-2">Date</th>
-                <th className="p-2">Time</th>
-                <th className="p-2">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {upcomingAppointments.map((appt, index) => (
-                <tr key={index} className="border-b text-sm text-gray-600">
-                  <td className="p-2">{appt.patient.username}</td>
-                  <td className="p-2">{new Date(appt.date).toLocaleDateString()}</td>
-                  <td className="p-2">{formatTime(appt?.startTime)} - {formatTime(appt?.endTime)}</td>
-                  <td className="p-2">
-                    <span
-                      className={`px-2 py-1 text-xs rounded-full ${appt.status === "completed"
-                          ? "bg-brand-100 text-brand-600"
-                          : "bg-yellow-100 text-yellow-700"
-                        }`}
-                    >
-                      {appt.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-              {upcomingAppointments.length === 0 && (
-                <tr>
-                  <td colSpan="4" className="p-3 text-center text-gray-500">
-                    No upcoming appointments
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+
       </div>
     </DoctorLayout>
   );

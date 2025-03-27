@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import './sidebar.css';
-import { FaHome,FaCalendarCheck, FaChartBar, FaSignOutAlt, FaUsers } from "react-icons/fa";
+import { FaHome,FaCalendarCheck, FaChartBar, FaSignOutAlt, FaUsers, FaBell } from "react-icons/fa";
 import { logo } from '@/public/constants/images';
 import { useAuth } from '@/app/context/authContext';
 import { useRole } from '@/app/context/RoleContext';
@@ -15,7 +15,7 @@ const menuItems = [
   { name: 'User Management', path: '/admin/users', icon: <FaUsers size={20} /> },
   { name: 'Appointments Management ', path: '/admin/appointments', icon: <FaCalendarCheck size={20} /> },
   { name: 'Analytics', path: '/admin/analytics', icon: <FaChartBar size={20} /> },
-  // { name: 'System Settings', path: '/doctor/notifications', icon: <FaBell size={20} /> },
+  { name: 'System Settings', path: '/admin/system', icon: <FaBell size={20} /> },
   // { name: 'Profile', path: '/admin/profile', icon: <FaUser size={20} /> },
 ];
 

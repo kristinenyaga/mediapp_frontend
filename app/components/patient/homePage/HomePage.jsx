@@ -45,12 +45,11 @@ const HomePage = () => {
         : null;
 
       const pendingAppointments = fetchedAppointments.filter(appt => 
-        appt.status === "pending" && appt.date >= today // Include today and future
+        appt.status === "pending" // Include today and future
 
       );
-        console.log(pendingAppointments)
+
       const nextPendingAppointment = pendingAppointments.length > 0 ? pendingAppointments[0] : null;
-console.log(nextPendingAppointment)
       // Set state with the appropriate appointments
         setLastAppointment(lastCompletedAppointment); 
         
@@ -80,8 +79,7 @@ console.log(nextPendingAppointment)
     return date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
   };
 
-  // const appointmentId = lastAppointment?.id
-  console.log(previousVisits)
+
   return (
     <PatientLayout>
       <div className="w-[95%] min-h-screen">

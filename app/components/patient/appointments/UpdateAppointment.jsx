@@ -5,6 +5,10 @@ import api from '@/app/utils/axiosInstance';
 import { MdWarning } from 'react-icons/md';
 import SymptomSelector from './SymptomSelector';
 import { Notify } from 'notiflix';
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
 const style = {
   position: "absolute",
   top: "50%",
@@ -16,20 +20,11 @@ const style = {
   p: 4,
 };
 
-const formatDate = (date) => {
-  if (!date || isNaN(new Date(date).getTime())) return '';
-  return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(date));
-};
 
-const UpdateAppointment = ({ open,appointment, handleClose, date, role, doctor, symptoms, patientSymptoms, appointmentId, symptomId, refreshData }) => {
+const UpdateAppointment = ({ open,appointment, handleClose, role, doctor, symptoms, patientSymptoms, appointmentId, symptomId, refreshData }) => {
 
-  const getValidDate = (date) => {
-    if (!date) return null;
-    const parsedDate = new Date(date);
-    return isNaN(parsedDate.getTime()) ? null : parsedDate;
-  };
 
-  const [selectedDate, setSelectedDate] = useState(getValidDate(date)?.toISOString().split('T')[0] || '');
+  const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState('')
   const selectedDoctor = doctor
   const [availableTimeslots, setAvailableTimeslots] = useState({
@@ -39,11 +34,6 @@ const UpdateAppointment = ({ open,appointment, handleClose, date, role, doctor, 
   const [additionalInfo, setAdditionalInfo] = useState("");
   const [selectedSymptoms, setSelectedSymptoms] = useState([]);
 
-  useEffect(() => {
-    if (date) {
-      setSelectedDate(getValidDate(date)?.toISOString().split('T')[0]);
-    }
-  }, [date]);
 
   useEffect(() => {
     if (patientSymptoms?.length > 0) {
@@ -54,46 +44,33 @@ const UpdateAppointment = ({ open,appointment, handleClose, date, role, doctor, 
     }
   }, [patientSymptoms]); 
 
-  
-  const getDateOptions = () => {
-    const dates = []
-    const today = new Date()
-    for (let i = 0; i < 3; i++){
-      const date = new Date(today)
-      date.setDate(today.getDate() + i)
-      dates.push(date)
-    }
-    return dates
-  }
-  const dates = getDateOptions()
-
-
-
-  useEffect(() => {
-    const fetchTimeslots = async () => {
+  const fetchTimeslots = async (date) => {
         try {
           const response = await api.post(
             "/api/appointment/available-slots",
             {
               doctorId: selectedDoctor?selectedDoctor : null,
-              date: selectedDate,
+              date: date ? dayjs(date).format("YYYY-MM-DD") : null,
             }, {
             _role: role
           }
           );
+          
           const slots = response.data.slots || [];
-          const currentTime = new Date();
-          const isToday = new Date(selectedDate).toDateString() === currentTime.toDateString();
+          const currentDateTime = new Date();
+          
+          const selectedDateTime = new Date(selectedDate);
 
-          // Add 30 minutes to the current time
-          const minAllowedTime = new Date(currentTime.getTime() + 30 * 60 * 1000);
+          const isToday = selectedDateTime.toDateString() === currentDateTime.toDateString();
+          // Calculate the minimum allowed time (30 minutes from now)
+          const minAllowedTime = new Date(currentDateTime.getTime() + 30 * 60 * 1000);
 
           // Filter slots based on the minimum allowed time
           const filteredSlots = slots.filter((slot) => {
-            const slotTime = new Date(`${selectedDate}T${slot.startTime}`);
-            return !isToday || slotTime >= minAllowedTime;
+            const slotTime = dayjs(`${dayjs(selectedDate).format("YYYY-MM-DD")}T${slot.startTime}`).toDate();
+            return isToday ? slotTime >= minAllowedTime : true;
           });
-
+          
           const morningSlots = filteredSlots.filter(
             (slot) => parseInt(slot.startTime.split(":")[0]) < 12
           );
@@ -106,13 +83,19 @@ const UpdateAppointment = ({ open,appointment, handleClose, date, role, doctor, 
         } catch (error) {
           console.error("Error fetching timeslots:", error);
         }
-    }
-    if (selectedDate !== '') {
-      fetchTimeslots()
-    }
+     }
+  
+useEffect(() => {
+  if (appointment?.date) {
+    setSelectedDate(dayjs(appointment.date)); // Set selectedDate to current appointment date
+  }
+}, [appointment]);
 
-  }, [selectedDate]);
-
+  useEffect(() => {
+  if (selectedDate) {
+    fetchTimeslots(selectedDate);
+  }
+}, [selectedDate]);
   useEffect(() => {
     if (appointment?.timeSlot) {
       const availableSlots =
@@ -210,21 +193,21 @@ const UpdateAppointment = ({ open,appointment, handleClose, date, role, doctor, 
         <p className='flex gap-2 items-center text-sm text-amber-600 mt-2'><MdWarning className='text-amber-600' /> you can not change the selected doctor</p>
 
         <form onSubmit={handleSubmit}>
-          <div className="bg-white rounded-lg mt-8">
-            <label className="block text-gray-900 text-base">Select Date</label>
-            <select
-              value={selectedDate || ''}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              className="w-full p-3 mt-2 border rounded-lg outline-none focus:outline-none"
-            >
-              <option value="">Choose a Date</option>
-              {dates.map((date, index) => (
-                <option key={index} value={date.toISOString().split('T')[0]}>
-                  {formatDate(date)}
-                </option>
-              ))}
-            </select>
-          </div>
+              <div className="bg-white rounded-lg">
+                  <div>
+                    <label className="block text-gray-700 text-base font-medium mb-2">Select Date:</label>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DatePicker
+                        value={selectedDate}
+                        onChange={(date) => setSelectedDate(date ? dayjs(date) : null)}
+                        disablePast
+                        format="DD MMM YYYY"
+                        className="w-[90%]"
+                      />
+                    </LocalizationProvider>
+                  </div>
+                </div>
+
           {selectedDate && (
             <div>
               <div className="bg-white shadow-sm rounded-lg py-4 mt-5">

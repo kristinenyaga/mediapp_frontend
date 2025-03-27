@@ -22,7 +22,6 @@ const FeedbackModal = ({ open, handleClose, lastAppointment }) => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [loading, setLoading] = useState(false);
-  console.log(lastAppointment)
 
   const handleStarClick = (index) => {
     setRating(index);

@@ -29,8 +29,8 @@ const DoctorProfile = () => {
   const appointmentStats = {
     totalAppointments: doctor.appointments?.length,
     thisMonth: doctor?.appointments?.filter((a) => a.date.startsWith("2025-02")).length,
-    thisWeek: doctor?.appointments?.filter((a) => a.date >= "2025-02-05").length,
-    canceled: doctor?.appointments?.filter((a) => a.status === "canceled").length,
+    thisWeek: doctor?.appointments?.filter((a) => a.date >= "2025-03-23").length,
+    canceled: doctor?.appointments?.filter((a) => a.status === "cancelled").length,
   };
   function getWeekNumber(date) {
     const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
@@ -204,7 +204,7 @@ const DoctorProfile = () => {
         <Grid container spacing={3}>
 
           <Typography sx={{paddingLeft:3,paddingTop:2,marginTop:3,fontSize:'24px'}} variant="h5" fontWeight={500}>
-            {doctor.username}
+            Dr. {doctor.username}
           </Typography>
         
           {/* Appointment Statistics */}

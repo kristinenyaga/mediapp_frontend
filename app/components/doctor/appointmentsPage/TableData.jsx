@@ -152,7 +152,7 @@ const TableData = ({ data,columns,filters }) => {
                             >
                               <MenuItem  value="pending" sx={{ color: "#FFA000", fontWeight: 600 }}>Pending</MenuItem>
                               <MenuItem value="completed" sx={{ color: "#388E3C", fontWeight: 600 }}>Completed</MenuItem>
-                              <MenuItem disabled value="cancelled" sx={{ color: "#D32F2F", fontWeight: 600 }}>Cancelled</MenuItem>
+                              <MenuItem value="cancelled" sx={{ color: "#D32F2F", fontWeight: 600 }}>Cancelled</MenuItem>
                             </Select>
                       ):col.key === 'startTime' ? (`${formatTime(row.startTime)} - ${formatTime(row.endTime)}`):
                       (

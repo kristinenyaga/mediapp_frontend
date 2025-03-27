@@ -19,7 +19,8 @@ import GoBack from "../../goBack/GoBack";
 const AddDoctors = () => {
   const [doctors, setDoctors] = useState([]);
   const [newDoctor, setNewDoctor] = useState({
-    username: "",
+    firstName: "",
+    lastName: "",
     email: "",
     phone: "",
     specialization: "",
@@ -29,6 +30,21 @@ const AddDoctors = () => {
   const [csvFile, setCsvFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef(null);
+  const [editIndex, setEditIndex] = useState(null);
+  const handleInputChange = (index, field, value) => {
+    const updatedDoctors = [...doctors];
+    updatedDoctors[index][field] = value;
+    setDoctors(updatedDoctors);
+  };
+
+  const handleEdit = (index) => {
+    setEditIndex(index);
+  };
+
+  const handleSave = () => {
+    setEditIndex(null);
+    Notify.success("Changes saved successfully!");
+  };
 
   const handleChange = (field, value) => {
     setNewDoctor({ ...newDoctor, [field]: value });
@@ -41,7 +57,8 @@ const AddDoctors = () => {
     }
     setDoctors([...doctors, newDoctor]);
     setNewDoctor({
-      username: "",
+      firstName: "",
+      lastName:"",
       email: "",
       phone: "",
       specialization: "",
@@ -108,7 +125,8 @@ const AddDoctors = () => {
   };
   useEffect(() => {
     const expectedHeaders = [
-      "name",
+      "firstname",
+      "lastname",
       "email",
       "phone",
       "specialization",
@@ -133,7 +151,8 @@ const AddDoctors = () => {
           }
 
           const parsedDoctors = result.data.map((row) => ({
-            username: row.username || row.name,
+            firstName: row.firstname,
+            lastName:row.lastname,
             email: row.email,
             phone: row.phone,
             specialization: row.specialization || row.field,
@@ -169,7 +188,7 @@ const AddDoctors = () => {
           <p className="text-sm bg-yellow-50 py-4 text-gray-800  mb-4 flex items-center gap-2">
             <BsFillInfoCircleFill />{" "}
             <span>Ensure your CSV file has columns:</span>
-            name, email, phone, specialization, experience, room
+            firstname,lastname, email, phone, specialization, experience, room
           </p>
 
           <label className="block font-medium text-blue-600 mb-4">
@@ -211,48 +230,55 @@ const AddDoctors = () => {
         <div className="text-center my-6 text-blue-600 text-lg">OR</div>
 
         {/* Manual Doctor Entry */}
-        <div className="grid grid-cols-3 gap-4 rounded-lg">
+        <div className="grid grid-cols-4 gap-4 rounded-lg">
           <input
             type="text"
-            placeholder="Name"
-            value={newDoctor.username}
-            onChange={(e) => handleChange("username", e.target.value)}
-            className="border p-2 rounded-md text-base border-gray-300 placeholder:text-gray-600 placeholder:text-base py-3"
+            placeholder="First Name"
+            value={newDoctor.firstName}
+            onChange={(e) => handleChange("firstName", e.target.value)}
+            className="border p-2 rounded-md text-base border-gray-300 placeholder:text-gray-700 placeholder:text-base py-3"
+          />
+          <input
+            type="text"
+            placeholder="Last Name"
+            value={newDoctor.lastName}
+            onChange={(e) => handleChange("lastName", e.target.value)}
+            className="border p-2 rounded-md text-base border-gray-300 placeholder:text-gray-700 placeholder:text-base py-3"
           />
           <input
             type="email"
             placeholder="Email"
             value={newDoctor.email}
             onChange={(e) => handleChange("email", e.target.value)}
-            className="border p-2 rounded-md text-base border-gray-300 placeholder:text-gray-600 placeholder:text-base py-3"
+            className="border p-2 rounded-md text-base border-gray-300 placeholder:text-gray-700 placeholder:text-base py-3"
           />
           <input
             type="text"
             placeholder="Phone"
             value={newDoctor.phone}
             onChange={(e) => handleChange("phone", e.target.value)}
-            className="border p-2 rounded-md text-base border-gray-300 placeholder:text-gray-600 placeholder:text-base py-3"
+            className="border p-2 rounded-md text-base border-gray-300 placeholder:text-gray-700 placeholder:text-base py-3"
           />
           <input
             type="text"
             placeholder="Specialization"
             value={newDoctor.specialization}
             onChange={(e) => handleChange("specialization", e.target.value)}
-            className="border p-2 rounded-md text-base border-gray-300 placeholder:text-gray-600 placeholder:text-base py-3"
+            className="border p-2 rounded-md text-base border-gray-300 placeholder:text-gray-700 placeholder:text-base py-3"
           />
           <input
             type="number"
             placeholder="Experience (Years)"
             value={newDoctor.experience}
             onChange={(e) => handleChange("experience", e.target.value)}
-            className="border p-2 rounded-md text-base border-gray-300 placeholder:text-gray-600 placeholder:text-base py-3"
+            className="border p-2 rounded-md text-base border-gray-300 placeholder:text-gray-700 placeholder:text-base py-3"
           />
           <input
             type="text"
             placeholder="Room Number"
             value={newDoctor.roomNumber}
             onChange={(e) => handleChange("roomNumber", e.target.value)}
-            className="border p-2 rounded-md text-base border-gray-300 placeholder:text-gray-600 placeholder:text-base py-3"
+            className="border p-2 rounded-md text-base border-gray-300 placeholder:text-gray-700 placeholder:text-base py-3"
           />
         </div>
 
@@ -281,40 +307,122 @@ const AddDoctors = () => {
               <Table stickyHeader>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Name</TableCell>
-                    <TableCell>Email</TableCell>
-                    <TableCell>Phone</TableCell>
-                    <TableCell>Specialization</TableCell>
-                    <TableCell>Experience</TableCell>
-                    <TableCell>Room Number</TableCell>
-                    <TableCell>Actions</TableCell>
+                    <TableCell sx={{fontSize:'17px',color:'#000'}}>First Name</TableCell>
+                    <TableCell sx={{fontSize:'17px',color:'#000'}}>Last Name</TableCell>
+                    <TableCell sx={{fontSize:'17px',color:'#000'}}>Email</TableCell>
+                    <TableCell sx={{fontSize:'17px',color:'#000'}}>Phone</TableCell>
+                    <TableCell sx={{fontSize:'17px',color:'#000'}}>Specialization</TableCell>
+                    <TableCell sx={{fontSize:'17px',color:'#000'}}>Experience</TableCell>
+                    <TableCell sx={{fontSize:'17px',color:'#000'}}>Room Number</TableCell>
+                    <TableCell sx={{fontSize:'17px',color:'#000'}}>Actions</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {doctors.map((doctor, index) => (
-                    <TableRow key={index}>
-                      <TableCell sx={{ color: "#4F5653" }}>
-                        {doctor.username}
-                      </TableCell>
-                      <TableCell sx={{ color: "#4F5653" }}>
-                        {doctor.email}
-                      </TableCell>
-                      <TableCell sx={{ color: "#4F5653" }}>
-                        {doctor.phone}
-                      </TableCell>
-                      <TableCell sx={{ color: "#4F5653" }}>
-                        {doctor.specialization}
-                      </TableCell>
-                      <TableCell sx={{ color: "#4F5653" }}>
-                        {doctor.experience}
-                      </TableCell>
-                      <TableCell sx={{ color: "#4F5653" }}>
-                        {doctor.roomNumber}
+<TableRow key={index}>
+                      <TableCell>
+                        {editIndex === index ? (
+                          <input
+                            type="text"
+                            value={doctor.firstName}
+                            onChange={(e) => handleInputChange(index, "firstName", e.target.value)}
+                            className="border p-1 rounded text-base "
+                          />
+                        ) : (
+                          doctor.firstName
+                        )}
                       </TableCell>
                       <TableCell>
+                        {editIndex === index ? (
+                          <input
+                            type="text"
+                            value={doctor.lastName}
+                            onChange={(e) => handleInputChange(index, "lastName", e.target.value)}
+                            className="border p-1 rounded text-base "
+                          />
+                        ) : (
+                          doctor.lastName
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {editIndex === index ? (
+                          <input
+                            type="email"
+                            value={doctor.email}
+                            onChange={(e) => handleInputChange(index, "email", e.target.value)}
+                            className="border p-1 rounded text-base"
+                          />
+                        ) : (
+                          doctor.email
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {editIndex === index ? (
+                          <input
+                            type="text"
+                            value={doctor.phone}
+                            onChange={(e) => handleInputChange(index, "phone", e.target.value)}
+                            className="border p-1 rounded text-base"
+                          />
+                        ) : (
+                          doctor.phone
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {editIndex === index ? (
+                          <input
+                            type="text"
+                            value={doctor.specialization}
+                            onChange={(e) => handleInputChange(index, "specialization", e.target.value)}
+                            className="border p-1 rounded text-base"
+                          />
+                        ) : (
+                          doctor.specialization
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {editIndex === index ? (
+                          <input
+                            type="number"
+                            value={doctor.experience}
+                            onChange={(e) => handleInputChange(index, "experience", e.target.value)}
+                            className="border p-1 rounded text-base"
+                          />
+                        ) : (
+                          doctor.experience
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {editIndex === index ? (
+                          <input
+                            type="text"
+                            value={doctor.roomNumber}
+                            onChange={(e) => handleInputChange(index, "roomNumber", e.target.value)}
+                            className="border p-1 rounded text-base"
+                          />
+                        ) : (
+                          doctor.roomNumber
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {editIndex === index ? (
+                          <button
+                            onClick={() => handleSave(index)}
+                            className="text-brand-600 ml-4 hover:underline text-base"
+                          >
+                            Save
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleEdit(index)}
+                            className="text-blue-600 hover:underline text-base ml-4"
+                          >
+                            Edit
+                          </button>
+                        )}
                         <button
                           onClick={() => removeDoctor(index)}
-                          className="text-red-600 hover:underline text-sm"
+                          className="text-red-600 hover:underline text-base ml-4"
                         >
                           Remove
                         </button>

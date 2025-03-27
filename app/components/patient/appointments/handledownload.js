@@ -19,8 +19,22 @@ export const formatTime = (timestring) => {
         hour12: true,
       });
     };
+export const calculateAge = (dobString) => {
+  const dob = new Date(dobString);
+  const today = new Date();
 
-export const handleDownloadPDF = (data,user, filters) => {
+  let age = today.getFullYear() - dob.getFullYear();
+  const monthDiff = today.getMonth() - dob.getMonth();
+  const dayDiff = today.getDate() - dob.getDate();
+
+  // Adjust age if the birthday has not occurred yet this year
+  if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+    age--;
+  }
+
+  return age;
+};
+export const handleDownloadPDF = (data,user, filters,profile) => {
   const doc = new jsPDF();
   const logoUrl = "/images/logo.png";
   doc.addImage(logoUrl, "PNG", 90, 10, 30, 10);
@@ -114,7 +128,10 @@ doc.text(reportDateRange, 80, 41);
   doc.setFontSize(11);
   doc.setFont("helvetica", "light");
   doc.text("Age", 14, 75);
-  
+
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "light");
+    doc.text(`${calculateAge(profile?.dob)}`, 30, 75);
   
 
   if (data.length === 0) {
