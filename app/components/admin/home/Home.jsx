@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect, useState } from 'react'
 import AdminLayout from '../AdminLayout'
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from "recharts";
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
 import axios from 'axios';
 const Home = () => {
   const [patients, setPatients] = useState([])
@@ -43,25 +43,25 @@ const Home = () => {
     { title: "Completed Appointments", value:completedAppointments.length, bgColor: "#E7F4DC", textColor: "#76AB35" }
   ];
 
-  const patientDemographics = [
-    { name: "18-25 years", value: 4 },
-    { name: "26-35 years", value: 3 },
-    { name: "36-50 years", value: 2},
-    { name: "51+ years", value: 0 },
-  ];
+  // const patientDemographics = [
+  //   { name: "18-25 years", value: 4 },
+  //   { name: "26-35 years", value: 3 },
+  //   { name: "36-50 years", value: 2},
+  //   { name: "51+ years", value: 0 },
+  // ];
 
-  const completedVsCanceled = [
-    { name: "Completed", value: 12 },
-    { name: "Canceled", value: 4 },
-  ];
+  // const completedVsCanceled = [
+  //   { name: "Completed", value: 12 },
+  //   { name: "Canceled", value: 4 },
+  // ];
 
-  const mostCommonDiagnoses = [
-    { name: "Flu", count: 300 },
-    { name: "Diabetes", count: 250 },
-    { name: "Hypertension", count: 230 },
-    { name: "COVID-19", count: 200 },
-    { name: "Asthma", count: 190 },
-  ];
+  // const mostCommonDiagnoses = [
+  //   { name: "Flu", count: 300 },
+  //   { name: "Diabetes", count: 250 },
+  //   { name: "Hypertension", count: 230 },
+  //   { name: "COVID-19", count: 200 },
+  //   { name: "Asthma", count: 190 },
+  // ];
   const getFilteredData = () => {
     let filteredData = []
     
@@ -179,7 +179,7 @@ const Home = () => {
   }
   const filteredData = getFilteredData()
   const doctorFilteredData = getFilteredAppointmentByDoctor()
-  const COLORS = ["#0077B6", "#00C49F", "#FFBB28", "#FF8042"];
+  // const COLORS = ["#0077B6", "#00C49F", "#FFBB28", "#FF8042"];
 
   useEffect(() => {
     const fetchPatients = async () => {
