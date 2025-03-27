@@ -19,27 +19,27 @@ const System = () => {
   const diseases = ["Diabetes", "Hypertension", "Malaria", "Pneumonia"];
 
   // Data for bar chart (F1-score per disease)
-  const barChartData = {
-    labels: classificationReport.map((item) => item.disease),
-    datasets: [
-      {
-        label: "F1 Score",
-        data: classificationReport.map((item) => item.f1Score),
-        backgroundColor: ["#3b82f6", "#f97316", "#22c55e", "#eab308"],
-      },
-    ],
-  };
+  // const barChartData = {
+  //   labels: classificationReport.map((item) => item.disease),
+  //   datasets: [
+  //     {
+  //       label: "F1 Score",
+  //       data: classificationReport.map((item) => item.f1Score),
+  //       backgroundColor: ["#3b82f6", "#f97316", "#22c55e", "#eab308"],
+  //     },
+  //   ],
+  // };
 
-  // Data for accuracy donut chart
-  const doughnutChartData = {
-    labels: ["Correct Predictions", "Incorrect Predictions"],
-    datasets: [
-      {
-        data: [accuracy, 100 - accuracy],
-        backgroundColor: ["#10b981", "#ef4444"],
-      },
-    ],
-  };
+  // // Data for accuracy donut chart
+  // const doughnutChartData = {
+  //   labels: ["Correct Predictions", "Incorrect Predictions"],
+  //   datasets: [
+  //     {
+  //       data: [accuracy, 100 - accuracy],
+  //       backgroundColor: ["#10b981", "#ef4444"],
+  //     },
+  //   ],
+  // };
 
   return (
     <AdminLayout>
