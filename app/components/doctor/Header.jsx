@@ -8,7 +8,6 @@ const Header = () => {
         <p className='text-gray-500 text-sm'>Here is an overview of appointments and patient data</p>
       </div>
       <div>
-        <p className='text-sm'>DR. Kris Nyaga</p>
       </div>
     </div>
   )

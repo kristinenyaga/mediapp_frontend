@@ -72,6 +72,7 @@ const Appointment = () => {
       setDiagnosis({ ...diagnosis, finalDiagnosis: doctorDiagnosis, isApproved: false });
 
       Notify.success("Diagnosis submitted successfully!");
+      setValue('')
     } catch (error) {
       Notify.failure(error.response.data);
     }
@@ -85,6 +86,7 @@ const Appointment = () => {
       setDiagnosis({ ...diagnosis, isApproved: true });
 
       Notify.success("Diagnosis approved successfully!");
+      setValue('')
     } catch (error) {
       Notify.failure(error.response?.data?.message || "Something went wrong!");
     }

@@ -2,7 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { FaHome, FaCalendarAlt, FaBell, FaUser, FaSignOutAlt, FaClipboardList } from 'react-icons/fa';
+import { FaHome, FaCalendarAlt, FaUser, FaSignOutAlt, FaClipboardList } from 'react-icons/fa';
 import Image from 'next/image';
 import { logo } from '@/public/constants/images';
 import { useAuth } from '@/app/context/authContext';
@@ -13,7 +13,7 @@ const menuItems = [
   { name: 'Doctors', path: '/patient/doctors', icon: <FaClipboardList size={18} /> },
   { name: 'Book Appointment', path: '/patient/book-appointment', icon: <FaClipboardList size={18} /> },
   { name: 'Appointments', path: '/patient/appointments', icon: <FaCalendarAlt size={18} /> },
-  { name: 'Notifications', path: '/patient/notifications', icon: <FaBell size={18} /> },
+  // { name: 'Notifications', path: '/patient/notifications', icon: <FaBell size={18} /> },
   { name: 'Profile', path: '/patient/profile', icon: <FaUser size={18} /> },
 ];
 

@@ -126,7 +126,7 @@ export const generatePatientReport = (patientDetails, symptomList) => {
       getSymptomNames(apt.patientSymptom?.symptoms),
       apt.diagnosis.predictedDiagnosis,
       apt.diagnosis.finalDiagnosis || "Not yet confirmed",
-      apt.diagnosis.isApproved ? "Approved" : "Pending",
+      apt.diagnosis.isApproved ? "Yes" : "No",
     ]);
 
     doc.autoTable({
@@ -138,7 +138,8 @@ export const generatePatientReport = (patientDetails, symptomList) => {
           "Symptoms",
           "Predicted Diagnosis",
           "Final Diagnosis",
-          "Approval",
+          "Confidence",
+          "Doctor's Approval",
         ],
       ],
       body: diagnosisRows,

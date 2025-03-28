@@ -78,7 +78,7 @@ const FeedbackModal = ({ open, handleClose, lastAppointment }) => {
         <Typography id="modal-title" variant="h6" fontWeight="bold" textAlign="center" mb={1}>
           How was your last appointment?
         </Typography>
-        <Typography id="modal-title" variant="h3" fontWeight="normal" textAlign="center" mb={2}>
+        <Typography id="modal-title" variant="h6" fontWeight="normal" textAlign="center" mb={2}>
           Feedback is anonymous
         </Typography>
         {/* Star Rating */}

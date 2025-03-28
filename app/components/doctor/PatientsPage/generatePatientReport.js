@@ -104,7 +104,7 @@ export const generatePatientReport = (patientDetails, symptomList) => {
   );
   if (diagnosedAppointments.length > 0) {
     doc.setFontSize(14);
-    doc.text("Diagnoses", 15, doc.autoTable.previous.finalY + 10);
+    doc.text("Diagnoses", 15, doc.autoTable.previous.finalY + 30);
 
     const getSymptomNames = (symptomIds) => {
       if (!symptomList.length || !symptomIds) return "Unknown";
@@ -126,11 +126,11 @@ export const generatePatientReport = (patientDetails, symptomList) => {
       getSymptomNames(apt.patientSymptom?.symptoms),
       apt.diagnosis.predictedDiagnosis,
       apt.diagnosis.finalDiagnosis || "Not yet confirmed",
-      apt.diagnosis.isApproved ? "Approved" : "Pending",
+      apt.diagnosis.isApproved ? "Yes" : "No",
     ]);
 
     doc.autoTable({
-      startY: doc.autoTable.previous.finalY + 55,
+      startY: doc.autoTable.previous.finalY + 35,
       head: [
         [
           "#",
@@ -138,7 +138,7 @@ export const generatePatientReport = (patientDetails, symptomList) => {
           "Symptoms",
           "Predicted Diagnosis",
           "Final Diagnosis",
-          "Approval",
+          "Doctor's Approval",
         ],
       ],
       body: diagnosisRows,

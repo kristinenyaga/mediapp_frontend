@@ -92,9 +92,6 @@ const calculateAge = (dobString) => {
               <p className="text-gray-700"><strong>Phone:</strong> {patientDetails.phone}</p>
             </div>
 
-            <div className="flex items-center gap-3 rounded-md">
-              <p className="text-gray-700"><strong>Medical Info:</strong> {patientDetails.medicalinformation || "None provided"}</p>
-            </div>
           </div>
         </div>
 
@@ -163,7 +160,7 @@ const calculateAge = (dobString) => {
                     <TableCell><strong>Symptoms</strong></TableCell>
                     <TableCell><strong>Predicted Diagnosis</strong></TableCell>
                     <TableCell><strong>Final Diagnosis</strong></TableCell>
-                    <TableCell><strong>Approval Status</strong></TableCell>
+                    <TableCell><strong>Doctor&apos;s Approval</strong></TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -180,7 +177,7 @@ const calculateAge = (dobString) => {
                         <TableCell>{appointment.diagnosis.predictedDiagnosis}</TableCell>
                         <TableCell>{appointment.diagnosis.finalDiagnosis || "Not yet confirmed"}</TableCell>
                         <TableCell className={appointment.diagnosis.isApproved ? "text-green-600" : "text-red-600"}>
-                          {appointment.diagnosis.isApproved ? "Approved" : "Pending"}
+                          {appointment.diagnosis.isApproved ? "Yes" : "No"}
                         </TableCell>
                       </TableRow>
                     ))}

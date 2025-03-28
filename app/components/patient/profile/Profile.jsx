@@ -32,6 +32,7 @@ const Profile = () => {
             username: updatedValues?.fullName || profileDetails?.username,
             email: updatedValues?.email || profileDetails?.email,
             phone: updatedValues?.phone || profileDetails?.phone,
+            dob:updatedValues?.dob || profileDetails?.dob
           },
         };
         break
@@ -98,11 +99,14 @@ const Profile = () => {
                     { name: "fullName", label: "Full Name", required: true },
                     { name: "email", label: "Email", type: "email", required: true },
                     { name: "phone", label: "Phone", required: true },
+                    { name: "dob", label: "Date of Birth", type: "date", required: true },
                   ],
                   {
                     fullName: profileDetails?.username || "",
                     email: profileDetails?.email || "",
                     phone: profileDetails?.phone || "",
+                    dob: profileDetails?.dob || "",
+
                   }
                 )
               }

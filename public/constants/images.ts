@@ -20,6 +20,7 @@ import heartBeat from '../images/heartBeat.png'
 import hospital from '../images/hospital.png'
 import doctorImage from '../images/doctorImage.png'
 import doctorDp from '../images/doctorDP.png'
+import defaultImage from '../images/default-image.png'
 export {
   patient,
   doctor,
@@ -42,5 +43,6 @@ export {
   heartBeat,
   hospital,
   doctorImage,
-  doctorDp
+  doctorDp,
+  defaultImage
 }

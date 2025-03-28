@@ -2,7 +2,7 @@ import Image from "next/image";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import LoadingScreen from "../../loader/Loader";
-import { doctorDp } from "@/public/constants/images";
+import { defaultImage } from "@/public/constants/images";
 import { FaArrowRight, FaInfoCircle } from "react-icons/fa";
 import { useDoctor } from "@/app/context/doctorContext";
 
@@ -24,7 +24,7 @@ const DoctorCard = ({ doctor, onSelect }) => {
     <div className="border border-gray-200 rounded-lg flex flex-col p-5 shadow transition-all duration-300">
       {/* Doctor Image */}
       <div className="flex justify-center">
-        <Image src={doctorDp} className="w-20 h-20 rounded-full object-cover" alt="Doctor Profile" />
+        <Image src={defaultImage} className="w-20 h-20 rounded-full object-cover" alt="Doctor Profile" />
       </div>
 
       {/* Doctor Info */}
